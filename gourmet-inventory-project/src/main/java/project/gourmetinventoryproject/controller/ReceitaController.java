@@ -19,7 +19,7 @@ public class ReceitaController {
     @GetMapping
     public ResponseEntity<List<Receita>> getAllReceitas() {
         List<Receita> receitas = receitaService.getAllReceitas();
-        return new ResponseEntity<>(receitas, HttpStatus.OK);
+        return receitas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(receitas, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

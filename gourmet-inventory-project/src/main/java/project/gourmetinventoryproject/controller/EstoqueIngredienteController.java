@@ -20,7 +20,7 @@ public class EstoqueIngredienteController {
     @GetMapping
     public ResponseEntity<List<EstoqueIngrediente>> getAllEstoqueIngredientes() {
         List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
-        return new ResponseEntity<>(estoqueIngredientes, HttpStatus.OK);
+        return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(estoqueIngredientes, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

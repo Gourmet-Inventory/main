@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.Exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 
@@ -19,7 +20,10 @@ public class EstoqueIngredienteService {
     }
 
     public EstoqueIngrediente getEstoqueIngredienteById(Long id) {
-        return estoqueIngredienteRepository.findById(id).orElse(null);
+        if (estoqueIngredienteRepository.existsById(id)){
+            return estoqueIngredienteRepository.findById(id).orElse(null);
+        }
+        throw new IdNotFoundException();
     }
 
     public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente) {
@@ -27,11 +31,17 @@ public class EstoqueIngredienteService {
     }
 
     public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente) {
-        estoqueIngrediente.setIdItem(id);
-        return estoqueIngredienteRepository.save(estoqueIngrediente);
+        if (estoqueIngredienteRepository.existsById(id)){
+            estoqueIngrediente.setIdItem(id);
+            return estoqueIngredienteRepository.save(estoqueIngrediente);
+        }
+        throw new IdNotFoundException();
     }
 
     public void deleteEstoqueIngrediente(Long id) {
+        if (estoqueIngredienteRepository.findById(id).orElse(null) == null){
+            throw new IdNotFoundException();
+        }
         estoqueIngredienteRepository.deleteById(id);
     }
 }

@@ -19,7 +19,7 @@ public class PratoController {
     @GetMapping
     public ResponseEntity<List<Prato>> getAllPratos() {
         List<Prato> pratos = pratoService.getAllPratos();
-        return new ResponseEntity<>(pratos, HttpStatus.OK);
+        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")

@@ -1,5 +1,6 @@
 package project.gourmetinventoryproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,11 @@ public class IngredienteController {
     @Autowired
     private IngredienteService ingredienteService;
 
+    @Operation(description = "Obter lista de ingredientes")
     @GetMapping
     public ResponseEntity<List<Ingrediente>> getAllIngredientes() {
         List<Ingrediente> ingredientes = ingredienteService.getAllIngredientes();
-        return new ResponseEntity<>(ingredientes, HttpStatus.OK);
+        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(ingredientes, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -32,6 +34,7 @@ public class IngredienteController {
     public ResponseEntity<Ingrediente> createIngrediente(@RequestBody Ingrediente ingrediente) {
         Ingrediente newIngrediente = ingredienteService.createIngrediente(ingrediente);
         return new ResponseEntity<>(newIngrediente, HttpStatus.CREATED);
+
     }
 
     @PutMapping("/{id}")
