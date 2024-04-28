@@ -2,7 +2,7 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.gourmetinventoryproject.Exception.IdNotFoundException;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 

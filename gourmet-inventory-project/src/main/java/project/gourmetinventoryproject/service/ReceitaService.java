@@ -2,8 +2,8 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.gourmetinventoryproject.Exception.ElementAlreadyExistException;
-import project.gourmetinventoryproject.Exception.IdNotFoundException;
+import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Receita;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 
