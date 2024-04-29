@@ -26,6 +26,7 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há estoque de ingredientes disponíveis"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
@@ -40,6 +41,7 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="404", description = "ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
@@ -54,6 +56,7 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="409", description = "Estoque de ingredientes já existe"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
@@ -68,6 +71,7 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="404", description = "ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
@@ -82,6 +86,7 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="404", description = "ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @DeleteMapping("/{id}")
