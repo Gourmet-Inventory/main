@@ -2,10 +2,12 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.repository.IngredienteRepository;
 
 import java.util.List;
+
 import java.util.Optional;
 
 @Service
@@ -19,8 +21,11 @@ public class IngredienteService {
     }
 
     public Ingrediente getIngredienteById(Long id) {
-        Optional<Ingrediente> ingredienteOptional = ingredienteRepository.findById(id);
-        return ingredienteOptional.orElse(null);
+       if (ingredienteRepository.existsById(id)){
+           Optional<Ingrediente> ingredienteOptional = ingredienteRepository.findById(id);
+           return ingredienteOptional.orElse(null);
+       }
+       throw new IdNotFoundException();
     }
 
     public Ingrediente createIngrediente(Ingrediente ingrediente) {
@@ -28,11 +33,17 @@ public class IngredienteService {
     }
 
     public Ingrediente updateIngrediente(Long id, Ingrediente ingrediente) {
-        ingrediente.setIdIngrediente(id);
-        return ingredienteRepository.save(ingrediente);
+        if (ingredienteRepository.existsById(id)){
+            ingrediente.setIdIngrediente(id);
+            return ingredienteRepository.save(ingrediente);
+        }
+        throw new IdNotFoundException();
     }
 
     public void deleteIngrediente(Long id) {
+        if (ingredienteRepository.findById(id).orElse(null) == null){
+            throw new IdNotFoundException();
+        }
         ingredienteRepository.deleteById(id);
     }
 }
