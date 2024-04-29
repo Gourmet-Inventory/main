@@ -23,7 +23,10 @@ public class ReceitaController {
     @Operation(summary = "Obter lista de receitas", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de receitas encontrada"),
-            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há receitas disponíveis")
+            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há receitas disponíveis"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
     public ResponseEntity<List<Receita>> getAllReceitas() {
@@ -34,7 +37,10 @@ public class ReceitaController {
     @Operation(summary = "Buscar receita por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de receitas encontrada"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
     public ResponseEntity<Receita> getReceitaById(@PathVariable Long id) {
@@ -46,6 +52,9 @@ public class ReceitaController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Receita criada com sucesso"),
             @ApiResponse(responseCode ="409", description = "Receita já existe"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
     public ResponseEntity<Receita> createReceita(@RequestBody Receita receita) {
@@ -57,7 +66,10 @@ public class ReceitaController {
     @Operation(summary = "Atualizar receita por ID", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Receita atualizada com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
     public ResponseEntity<Receita> updateReceita(@PathVariable Long id, @RequestBody Receita receita) {
@@ -68,7 +80,10 @@ public class ReceitaController {
     @Operation(summary = "Deletar receita por id", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Receita deletada com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteReceita(@PathVariable Long id) {

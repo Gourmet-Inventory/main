@@ -22,7 +22,10 @@ public class PratoController {
     @Operation(summary = "Obter lista com todos pratos", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de pratos encontrada"),
-            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há pratos disponíveis")
+            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há pratos disponíveis"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
     public ResponseEntity<List<Prato>> getAllPratos() {
@@ -32,7 +35,10 @@ public class PratoController {
     @Operation(summary = "Buscar prato por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Prato encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
     public ResponseEntity<Prato> getPratoById(@PathVariable Long id) {
@@ -43,6 +49,9 @@ public class PratoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Prato criado com sucesso"),
             @ApiResponse(responseCode ="409", description = "Prato já existe"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
     public ResponseEntity<Prato> createPrato(@RequestBody Prato prato) {
@@ -52,7 +61,10 @@ public class PratoController {
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Prato atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
     public ResponseEntity<Prato> updatePrato(@PathVariable Long id, @RequestBody Prato prato) {
@@ -66,7 +78,10 @@ public class PratoController {
     @Operation(summary = "Deletar prato por ID", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Prato deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePrato(@PathVariable Long id) {

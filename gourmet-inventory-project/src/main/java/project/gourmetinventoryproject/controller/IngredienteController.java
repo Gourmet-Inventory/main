@@ -23,7 +23,10 @@ public class IngredienteController {
     @Operation(description = "Obter lista de ingredientes",method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de ingredientres encontrada"),
-            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há ingredientes disponíveis")
+            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há ingredientes disponíveis"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
     public ResponseEntity<List<Ingrediente>> getAllIngredientes() {
@@ -34,7 +37,10 @@ public class IngredienteController {
     @Operation(summary = "Buscar ingredientes por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Ingrediente encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
     public ResponseEntity<Ingrediente> getIngredienteById(@PathVariable Long id) {
@@ -46,6 +52,9 @@ public class IngredienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Ingrediente criado com sucesso"),
             @ApiResponse(responseCode ="409", description = "Ingrediente já existe"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
     public ResponseEntity<Ingrediente> createIngrediente(@RequestBody Ingrediente ingrediente) {
@@ -57,7 +66,10 @@ public class IngredienteController {
     @Operation(summary = "Atualizar ingrediente", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Ingrediente atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
     public ResponseEntity<Ingrediente> updateIngrediente(@PathVariable Long id, @RequestBody Ingrediente ingrediente) {
@@ -68,7 +80,10 @@ public class IngredienteController {
     @Operation(summary = "Deletar ingrediente", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Ingrediente deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteIngrediente(@PathVariable Long id) {

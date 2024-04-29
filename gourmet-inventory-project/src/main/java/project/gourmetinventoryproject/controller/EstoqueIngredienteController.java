@@ -23,7 +23,10 @@ public class EstoqueIngredienteController {
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de estoque de ingredientres encontrada"),
-            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há estoque de ingredientes disponíveis")
+            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há estoque de ingredientes disponíveis"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
     public ResponseEntity<List<EstoqueIngrediente>> getAllEstoqueIngredientes() {
@@ -34,7 +37,10 @@ public class EstoqueIngredienteController {
     @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Estoque de ingredientes encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
     public ResponseEntity<EstoqueIngrediente> getEstoqueIngredienteById(@PathVariable Long id) {
@@ -46,6 +52,9 @@ public class EstoqueIngredienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Estoque de ingredientes criado com sucesso"),
             @ApiResponse(responseCode ="409", description = "Estoque de ingredientes já existe"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
     public ResponseEntity<EstoqueIngrediente> createEstoqueIngrediente(@RequestBody EstoqueIngrediente estoqueIngrediente) {
@@ -56,7 +65,10 @@ public class EstoqueIngredienteController {
     @Operation(summary = "Atualizar estoque de ingredientes", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Estoque de ingredientes atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
     public ResponseEntity<EstoqueIngrediente> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngrediente estoqueIngrediente) {
@@ -67,7 +79,10 @@ public class EstoqueIngredienteController {
     @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Estoque de ingredientes deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado")
+            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEstoqueIngrediente(@PathVariable Long id) {
