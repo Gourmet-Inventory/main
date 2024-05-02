@@ -10,7 +10,6 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 public class EstoqueIngredienteCriacaoDto {
-    private Long idItem;
     private String lote;
     private String nome;
     private String categoria;

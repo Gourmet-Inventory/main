@@ -1,28 +1,23 @@
 package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
-import project.gourmetinventoryproject.domain.Medidas;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class EstoqueIngredienteMapper {
 
 
-    public static EstoqueIngrediente toEntity(EstoqueIngredienteCriacaoDto estoqueIngredienteCriacaoDto){
+    public static EstoqueIngrediente toEntity(EstoqueIngredienteCriacaoDto dto){
         EstoqueIngrediente estoqueIngrediente = new EstoqueIngrediente();
-        estoqueIngrediente.setLote(estoqueIngredienteCriacaoDto.getLote());
-        estoqueIngrediente.setNome(estoqueIngredienteCriacaoDto.getNome());
-        estoqueIngrediente.setCategoria(estoqueIngredienteCriacaoDto.getCategoria());
-        estoqueIngrediente.setTipoMedida(estoqueIngredienteCriacaoDto.getTipoMedida());
-        estoqueIngrediente.setValorMedida(estoqueIngredienteCriacaoDto.getValorMedida());
-        estoqueIngrediente.setLocalArmazenamento(estoqueIngredienteCriacaoDto.getLocalArmazenamento());
-        estoqueIngrediente.setDtaCadastro(estoqueIngredienteCriacaoDto.getDtaCadastro());
-        estoqueIngrediente.setDtaAviso(estoqueIngredienteCriacaoDto.getDtaAviso());
+        estoqueIngrediente.setLote(dto.getLote());
+        estoqueIngrediente.setNome(dto.getNome());
+        estoqueIngrediente.setCategoria(dto.getCategoria());
+        estoqueIngrediente.setTipoMedida(dto.getTipoMedida());
+        estoqueIngrediente.setValorMedida(dto.getValorMedida());
+        estoqueIngrediente.setLocalArmazenamento(dto.getLocalArmazenamento());
+        estoqueIngrediente.setDtaCadastro(dto.getDtaCadastro());
+        estoqueIngrediente.setDtaAviso(dto.getDtaAviso());
 
         return estoqueIngrediente;
     }
