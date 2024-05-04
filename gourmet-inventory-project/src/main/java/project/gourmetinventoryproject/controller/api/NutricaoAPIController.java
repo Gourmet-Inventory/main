@@ -18,8 +18,8 @@ import java.util.List;
 public class NutricaoAPIController {
 
     @GetMapping("/consulta-nutricao")
-    public List<EstoqueIngrediente> fetchNutritionData(@RequestParam String nomeComida, @RequestParam String quantidadeGramas) throws IOException {
-        String query = nomeComida.replace(" ", "%20") + " " + quantidadeGramas;
+    public List<EstoqueIngrediente> fetchNutritionData(@RequestParam String nomeIngrediente, @RequestParam String quantidadeGrama) throws IOException {
+        String query = quantidadeGrama + "g%20" + nomeIngrediente.replace(" ", "%20");
         URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("accept", "application/json");
