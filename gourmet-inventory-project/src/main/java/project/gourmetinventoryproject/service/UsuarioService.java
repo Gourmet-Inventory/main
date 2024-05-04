@@ -2,10 +2,19 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
 import java.util.ArrayList;
@@ -18,6 +27,12 @@ public class UsuarioService {
 
     @Autowired
     public UsuarioRepository usuarioRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private GerenciadorTokenJwt gerenciadorTokenJwt;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -25,6 +40,10 @@ public class UsuarioService {
 
     public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto, String cargo){//???
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
+
+        String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
+        novoUsuario.setSenha(senhaCriptografada);
+
         usuarioRepository.save(novoUsuario);
     }
 
@@ -49,6 +68,19 @@ public class UsuarioService {
             return status(200).build();
         }
         return status(204).build();
+    }
+
+    public UsuarioTokenDto authenticate(UsuarioLoginDto usuarioTokenDto){
+        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                usuarioTokenDto.getEmail(), usuarioTokenDto.getSenha());
+        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+        Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuarioTokenDto.getEmail())
+                .orElseThrow(
+                        () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
+                );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        final String token = gerenciadorTokenJwt.generateToken(authentication);
+        return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
     public ResponseEntity<Object> getEmpresasUsuario(){
