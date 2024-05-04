@@ -16,5 +16,6 @@ public class SpringDocConfig {
                        .contact(new io.swagger.v3.oas.models.info.Contact()
                                .email("gourmet_inventory@outlook.com")
                                .name("Equipe de Desenvolvimento")));
+
     }
 }

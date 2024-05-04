@@ -1,25 +1,21 @@
-package project.gourmetinventoryproject.domain;
+package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
-import jakarta.persistence.*;
-import lombok.Data;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import project.gourmetinventoryproject.domain.Medidas;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-@Entity
-@Data
 @Getter
 @Setter
-public class EstoqueIngrediente {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idItem;
+@NoArgsConstructor
+public class EstoqueIngredienteCriacaoDto {
     private String lote;
     private String nome;
     private String categoria;
-    @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Double valorMedida;
     private Double valorTotal;
@@ -27,4 +23,3 @@ public class EstoqueIngrediente {
     private LocalDate dtaCadastro;
     private Date dtaAviso;
 }
-

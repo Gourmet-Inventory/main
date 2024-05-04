@@ -3,14 +3,20 @@ package project.gourmetinventoryproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Ingrediente;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.service.IngredienteService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ingredientes")
@@ -19,10 +25,12 @@ public class IngredienteController {
     @Autowired
     private IngredienteService ingredienteService;
 
+    @Autowired
+    private ModelMapper mapper;
 
     @Operation(description = "Obter lista de ingredientes",method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Lista de ingredientres encontrada"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de ingredientres encontrada"),
             @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há ingredientes disponíveis"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
@@ -30,61 +38,64 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
-    public ResponseEntity<List<Ingrediente>> getAllIngredientes() {
+    public ResponseEntity<List<IngredienteConsultaDto>> getAllIngredientes() {
         List<Ingrediente> ingredientes = ingredienteService.getAllIngredientes();
-        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(ingredientes, HttpStatus.OK);
+        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(ingredientes.stream()
+                .map(ingrediente-> mapper.map(ingrediente, IngredienteConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar ingredientes por ID", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Ingrediente encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente encontrado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Ingrediente> getIngredienteById(@PathVariable Long id) {
+    public ResponseEntity<IngredienteConsultaDto> getIngredienteById(@PathVariable Long id) {
         Ingrediente ingrediente = ingredienteService.getIngredienteById(id);
-        return new ResponseEntity<>(ingrediente, HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(ingrediente,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Criar novo ingrediente", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Ingrediente criado com sucesso"),
-            @ApiResponse(responseCode ="409", description = "Ingrediente já existe"),
+            @ApiResponse(responseCode ="201", description = "Criado - Ingrediente criado com sucesso"),
+            @ApiResponse(responseCode ="409", description = "Conflito - Ingrediente já existe"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<Ingrediente> createIngrediente(@RequestBody Ingrediente ingrediente) {
-        Ingrediente newIngrediente = ingredienteService.createIngrediente(ingrediente);
-        return new ResponseEntity<>(newIngrediente, HttpStatus.CREATED);
-
+    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
+        var entidade = mapper.map(ingredienteDto, Ingrediente.class);
+        ingredienteService.createIngrediente(entidade);
+        return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
     }
 
     @Operation(summary = "Atualizar ingrediente", method = "PUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Ingrediente atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente atualizado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Ingrediente> updateIngrediente(@PathVariable Long id, @RequestBody Ingrediente ingrediente) {
-        Ingrediente updatedIngrediente = ingredienteService.updateIngrediente(id, ingrediente);
-        return new ResponseEntity<>(updatedIngrediente, HttpStatus.OK);
+    public ResponseEntity<IngredienteConsultaDto> updateIngrediente(@PathVariable Long id, @RequestBody IngredienteCriacaoDto ingredienteDto) {
+        var entidade = mapper.map(ingredienteDto, Ingrediente.class);
+        ingredienteService.updateIngrediente(id, entidade);
+        return new ResponseEntity<>(mapper.map(entidade,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Deletar ingrediente", method = "DELETE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Ingrediente deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente deletado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
