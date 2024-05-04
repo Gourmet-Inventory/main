@@ -4,14 +4,13 @@ package project.gourmetinventoryproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Receita;
-import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 import project.gourmetinventoryproject.service.ReceitaService;
@@ -31,7 +30,7 @@ public class ReceitaController {
 
     @Operation(summary = "Obter lista de receitas", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Lista de receitas encontrada"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de receitas encontrada"),
             @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há receitas disponíveis"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
@@ -48,8 +47,8 @@ public class ReceitaController {
 
     @Operation(summary = "Buscar receita por ID", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Lista de receitas encontrada"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de receitas encontrada"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -63,25 +62,27 @@ public class ReceitaController {
 
     @Operation(summary = "Criar nova receita", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Receita criada com sucesso"),
-            @ApiResponse(responseCode ="409", description = "Receita já existe"),
+            @ApiResponse(responseCode ="201", description = "Criado - Receita criada com sucesso"),
+            @ApiResponse(responseCode ="409", description = "Conflito - Receita já existe"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<ReceitaConsultaDto> createReceita(@RequestBody ReceitaCriacaoDto receitaDto) {
+    public ResponseEntity<ReceitaConsultaDto> createReceita(@RequestBody @Valid ReceitaCriacaoDto receitaDto) {
+//        var entidade = receitaMapper.toEntity(receitaDto);
+//        receitaService.createReceita(entidade);
+//        return new ResponseEntity<>(receitaMapper.toDto(entidade), HttpStatus.CREATED);
+
         var entidade = mapper.map(receitaDto, Receita.class);
         receitaService.createReceita(entidade);
         return new ResponseEntity<>(mapper.map(entidade, ReceitaConsultaDto.class), HttpStatus.CREATED);
     }
-
-
     @Operation(summary = "Atualizar receita por ID", method = "PUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Receita atualizada com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Receita atualizada com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -95,8 +96,8 @@ public class ReceitaController {
     }
     @Operation(summary = "Deletar receita por id", method = "DELETE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Receita deletada com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Receita deletada com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),

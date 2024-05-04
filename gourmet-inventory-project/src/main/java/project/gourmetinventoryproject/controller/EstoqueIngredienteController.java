@@ -31,7 +31,7 @@ public class EstoqueIngredienteController {
 
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Lista de estoque de ingredientres encontrada"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de estoque de ingredientres encontrada"),
             @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há estoque de ingredientes disponíveis"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
@@ -47,8 +47,8 @@ public class EstoqueIngredienteController {
     }
     @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Estoque de ingredientes encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes encontrado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -61,8 +61,8 @@ public class EstoqueIngredienteController {
     }
     @Operation(summary = "Criar novo estoque de ingredientes", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Estoque de ingredientes criado com sucesso"),
-            @ApiResponse(responseCode ="409", description = "Estoque de ingredientes já existe"),
+            @ApiResponse(responseCode ="201", description = "Criado - Estoque de ingredientes criado com sucesso"),
+            @ApiResponse(responseCode ="409", description = "Conflito - Estoque de ingredientes já existe"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -78,8 +78,8 @@ public class EstoqueIngredienteController {
 
     @Operation(summary = "Atualizar estoque de ingredientes", method = "PUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Estoque de ingredientes atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes atualizado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -94,8 +94,8 @@ public class EstoqueIngredienteController {
 
     @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Estoque de ingredientes deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes deletado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),

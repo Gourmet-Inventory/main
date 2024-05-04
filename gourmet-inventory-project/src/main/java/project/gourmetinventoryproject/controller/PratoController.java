@@ -30,7 +30,7 @@ public class PratoController {
 
     @Operation(summary = "Obter lista com todos pratos", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Lista de pratos encontrada"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de pratos encontrada"),
             @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há pratos disponíveis"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
@@ -46,8 +46,8 @@ public class PratoController {
     }
     @Operation(summary = "Buscar prato por ID", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Prato encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - encontrado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -60,8 +60,8 @@ public class PratoController {
     }
     @Operation(summary = "Criar novo prato", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Prato criado com sucesso"),
-            @ApiResponse(responseCode ="409", description = "Prato já existe"),
+            @ApiResponse(responseCode ="201", description = "Criado - Prato criado com sucesso"),
+            @ApiResponse(responseCode ="409", description = "Conflito - Prato já existe"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -75,8 +75,8 @@ public class PratoController {
     }
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Prato atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Prato atualizado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
@@ -90,8 +90,8 @@ public class PratoController {
     }
     @Operation(summary = "Deletar prato por ID", method = "DELETE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Prato deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "ID não encontrado"),
+            @ApiResponse(responseCode ="200", description = "Sucesso - Prato deletado com sucesso"),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
             @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),

@@ -2,10 +2,12 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.domain.Medidas;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.repository.IngredienteRepository;
 
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.Optional;
@@ -29,7 +31,14 @@ public class IngredienteService {
     }
 
     public Ingrediente createIngrediente(Ingrediente ingrediente) {
-        return ingredienteRepository.save(ingrediente);
+        List<Medidas> medidas = Arrays.asList(Medidas.values());
+        for (int i = 0; i < medidas.size(); i++) {
+            if (ingrediente.getTipoMedida() == medidas.get(i)){
+                return ingredienteRepository.save(ingrediente);
+            }
+        }
+        throw new IllegalArgumentException("Tipo de medida inválido: " + ingrediente.getTipoMedida());
+
     }
 
     public Ingrediente updateIngrediente(Long id, Ingrediente ingrediente) {

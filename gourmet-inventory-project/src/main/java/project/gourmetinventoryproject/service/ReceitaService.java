@@ -7,6 +7,7 @@ import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Receita;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,9 +29,9 @@ public class ReceitaService {
         throw new IdNotFoundException();
 
     }
-
     public Receita createReceita(Receita receita) {
-        if (receitaRepository.findByIdIngredienteAndIdPrato(receita.getIdIngrediente(),receita.getIdPrato()).isEmpty()){
+        List<Receita> receitas = receitaRepository.findByIdIngredienteAndIdPrato(receita.getIdIngrediente(),receita.getIdPrato());
+        if (receitas.isEmpty()){
             return receitaRepository.save(receita);
         }
         throw new ElementAlreadyExistException();
