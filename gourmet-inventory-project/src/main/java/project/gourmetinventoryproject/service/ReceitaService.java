@@ -34,9 +34,7 @@ public class ReceitaService {
             return receitaRepository.save(receita);
         }
         throw new ElementAlreadyExistException();
-
     }
-
     public Receita updateReceita(Long id, Receita receita) {
         if (receitaRepository.existsById(id)){
             receita.setId(id);

@@ -1,14 +1,17 @@
 package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import project.gourmetinventoryproject.domain.Medidas;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class EstoqueIngredienteCriacaoDto {
     private String lote;
     private String nome;

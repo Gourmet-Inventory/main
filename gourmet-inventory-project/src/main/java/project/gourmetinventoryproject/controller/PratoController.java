@@ -10,11 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.PratoService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/pratos")
@@ -38,7 +40,9 @@ public class PratoController {
     @GetMapping
     public ResponseEntity<List<PratoConsultaDto>> getAllPratos() {
         List<Prato> pratos = pratoService.getAllPratos();
-        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(pratos,new TypeToken<List<PratoConsultaDto>>(){}.getType()), HttpStatus.OK);
+        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
+                .map(prato-> mapper.map(prato, PratoConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
     }
     @Operation(summary = "Buscar prato por ID", method = "GET")
     @ApiResponses(value = {

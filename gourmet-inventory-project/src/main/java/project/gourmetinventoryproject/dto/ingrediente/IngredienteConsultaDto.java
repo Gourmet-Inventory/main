@@ -1,13 +1,16 @@
 package project.gourmetinventoryproject.dto.ingrediente;
 
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.domain.Medidas;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class IngredienteConsultaDto {
     private Long idIngrediente;
     private EstoqueIngrediente estoqueIngrediente;

@@ -10,11 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Ingrediente;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.service.IngredienteService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ingredientes")
@@ -38,7 +40,9 @@ public class IngredienteController {
     @GetMapping
     public ResponseEntity<List<IngredienteConsultaDto>> getAllIngredientes() {
         List<Ingrediente> ingredientes = ingredienteService.getAllIngredientes();
-        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(ingredientes,new TypeToken<List<IngredienteConsultaDto>>(){}.getType()), HttpStatus.OK);
+        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(ingredientes.stream()
+                .map(ingrediente-> mapper.map(ingrediente, IngredienteConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar ingredientes por ID", method = "GET")
@@ -66,11 +70,10 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingrediente) {
-        var entidade = mapper.map(ingrediente, Ingrediente.class);
+    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
+        var entidade = mapper.map(ingredienteDto, Ingrediente.class);
         ingredienteService.createIngrediente(entidade);
         return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
-
     }
 
     @Operation(summary = "Atualizar ingrediente", method = "PUT")

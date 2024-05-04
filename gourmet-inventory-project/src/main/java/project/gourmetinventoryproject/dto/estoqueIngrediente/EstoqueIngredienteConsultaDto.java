@@ -2,15 +2,18 @@ package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import project.gourmetinventoryproject.domain.Medidas;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class EstoqueIngredienteConsultaDto {
     private Long idItem;
     private String lote;

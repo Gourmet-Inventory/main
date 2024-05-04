@@ -11,11 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Receita;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 import project.gourmetinventoryproject.service.ReceitaService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/receitas")
@@ -39,7 +41,9 @@ public class ReceitaController {
     @GetMapping
     public ResponseEntity<List<ReceitaConsultaDto>> getAllReceitas() {
         List<Receita> receitas = receitaService.getAllReceitas();
-        return receitas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(receitas,new TypeToken<List<ReceitaConsultaDto>>(){}.getType()), HttpStatus.OK);
+        return receitas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(receitas.stream()
+                .map(receita-> mapper.map(receita, ReceitaConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar receita por ID", method = "GET")

@@ -1,10 +1,13 @@
 package project.gourmetinventoryproject.dto.prato;
 
-import lombok.AllArgsConstructor;
+
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
+@Setter
+@NoArgsConstructor
 public class PratoCriacaoDto {
     private String nome;
     private String descricao;
