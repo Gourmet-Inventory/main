@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface EstoqueIngredienteRepository extends JpaRepository<EstoqueIngrediente, Long> {
-    List<EstoqueIngrediente> findByCategoria(String categoria);
+    List<EstoqueIngrediente> findByNomeAndValorMedida(String nomeIngrediente, double quantidadeIngrediente);
 }
 

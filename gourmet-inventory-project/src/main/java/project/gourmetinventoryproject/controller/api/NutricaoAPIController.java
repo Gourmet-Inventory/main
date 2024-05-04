@@ -2,11 +2,16 @@ package project.gourmetinventoryproject.controller.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
+import project.gourmetinventoryproject.domain.NutritionData;
+import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -17,49 +22,98 @@ import java.util.List;
 @RestController
 public class NutricaoAPIController {
 
-    @GetMapping("/consulta-nutricao")
-    public List<EstoqueIngrediente> fetchNutritionData(@RequestParam String nomeIngrediente, @RequestParam String quantidadeGrama) throws IOException {
-        String query = quantidadeGrama + "g%20" + nomeIngrediente.replace(" ", "%20");
-        URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("accept", "application/json");
-        connection.setRequestProperty("X-Api-Key", "HVxQ77fkJrXL5oz4yfNsPw==153XAxgTjQ7zcIyc");
+    @Autowired
+    private EstoqueIngredienteRepository estoqueIngredienteRepository;
 
-        InputStream responseStream = connection.getInputStream();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(responseStream);
+    @GetMapping("/consulta-nutricao-api")
+    public List<NutritionData> fetchNutritionDataFromAPI(@RequestParam String nomeIngrediente, @RequestParam String quantidadeGrama) throws IOException {
+        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteRepository.findByNomeAndValorMedida(nomeIngrediente, Double.parseDouble(quantidadeGrama));
+        List<NutritionData> nutritionDataList = new ArrayList<>();
 
-        List<EstoqueIngrediente> estoqueIngredientes = new ArrayList<>();
+        for (EstoqueIngrediente estoqueIngrediente : estoqueIngredientes) {
+            String query = quantidadeGrama + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
+            URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("accept", "application/json");
+            connection.setRequestProperty("X-Api-Key", "HVxQ77fkJrXL5oz4yfNsPw==153XAxgTjQ7zcIyc");
 
-        mergeSort(estoqueIngredientes);
+            try (InputStream responseStream = connection.getInputStream()) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(responseStream);
 
-        return estoqueIngredientes;
+                for (JsonNode node : root) {
+                    String name = node.path("name").asText();
+                    double calories = node.path("calories").asDouble();
+                    double servingSize = node.path("serving_size_g").asDouble();
+                    double totalFat = node.path("fat_total_g").asDouble();
+                    double saturatedFat = node.path("fat_saturated_g").asDouble();
+                    double protein = node.path("protein_g").asDouble();
+                    int sodium = node.path("sodium_mg").asInt();
+                    int potassium = node.path("potassium_mg").asInt();
+                    int cholesterol = node.path("cholesterol_mg").asInt();
+                    double totalCarbohydrates = node.path("carbohydrates_total_g").asDouble();
+                    double fiber = node.path("fiber_g").asDouble();
+                    double sugar = node.path("sugar_g").asDouble();
+
+                    NutritionData nutritionData = new NutritionData(name, calories, servingSize, totalFat, saturatedFat, protein, sodium, potassium, cholesterol, totalCarbohydrates, fiber, sugar);
+                    nutritionDataList.add(nutritionData);
+                }
+            }
+        }
+
+        mergeSort(nutritionDataList);
+
+        // Salvar a lista ordenada em um arquivo CSV
+        String[] header = {"Name", "Calories", "Serving Size", "Total Fat", "Saturated Fat", "Protein", "Sodium", "Potassium", "Cholesterol", "Total Carbohydrates", "Fiber", "Sugar"};
+        try (CSVWriter writer = new CSVWriter(new FileWriter("nutrition_data.csv"))) {
+            writer.writeNext(header);
+
+            for (NutritionData nutritionData : nutritionDataList) {
+                String[] line = {
+                        nutritionData.getName(),
+                        String.valueOf(nutritionData.getCalories()),
+                        String.valueOf(nutritionData.getServingSize()),
+                        String.valueOf(nutritionData.getTotalFat()),
+                        String.valueOf(nutritionData.getSaturatedFat()),
+                        String.valueOf(nutritionData.getProtein()),
+                        String.valueOf(nutritionData.getSodium()),
+                        String.valueOf(nutritionData.getPotassium()),
+                        String.valueOf(nutritionData.getCholesterol()),
+                        String.valueOf(nutritionData.getTotalCarbohydrates()),
+                        String.valueOf(nutritionData.getFiber()),
+                        String.valueOf(nutritionData.getSugar())
+                };
+                writer.writeNext(line);
+            }
+        }
+
+        return nutritionDataList;
     }
 
-    private void mergeSort(List<EstoqueIngrediente> estoqueIngredientes) {
-        if (estoqueIngredientes.size() > 1) {
-            int meio = estoqueIngredientes.size() / 2;
-            List<EstoqueIngrediente> esquerda = new ArrayList<>(estoqueIngredientes.subList(0, meio));
-            List<EstoqueIngrediente> direita = new ArrayList<>(estoqueIngredientes.subList(meio, estoqueIngredientes.size()));
+    private void mergeSort(List<NutritionData> list) {
+        if (list.size() > 1) {
+            int meio = list.size() / 2;
+            List<NutritionData> esquerda = new ArrayList<>(list.subList(0, meio));
+            List<NutritionData> direita = new ArrayList<>(list.subList(meio, list.size()));
 
             mergeSort(esquerda);
             mergeSort(direita);
 
             int i = 0, j = 0, k = 0;
             while (i < esquerda.size() && j < direita.size()) {
-                if (esquerda.get(i).getNome().compareToIgnoreCase(direita.get(j).getNome()) < 0) {
-                    estoqueIngredientes.set(k++, esquerda.get(i++));
+                if (esquerda.get(i).getName().compareToIgnoreCase(direita.get(j).getName()) < 0) {
+                    list.set(k++, esquerda.get(i++));
                 } else {
-                    estoqueIngredientes.set(k++, direita.get(j++));
+                    list.set(k++, direita.get(j++));
                 }
             }
 
             while (i < esquerda.size()) {
-                estoqueIngredientes.set(k++, esquerda.get(i++));
+                list.set(k++, esquerda.get(i++));
             }
 
             while (j < direita.size()) {
-                estoqueIngredientes.set(k++, direita.get(j++));
+                list.set(k++, direita.get(j++));
             }
         }
     }
