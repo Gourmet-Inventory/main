@@ -3,11 +3,15 @@ package project.gourmetinventoryproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Ingrediente;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.service.IngredienteService;
 
 import java.util.List;
@@ -19,6 +23,8 @@ public class IngredienteController {
     @Autowired
     private IngredienteService ingredienteService;
 
+    @Autowired
+    private ModelMapper mapper;
 
     @Operation(description = "Obter lista de ingredientes",method = "GET")
     @ApiResponses(value = {
@@ -30,9 +36,9 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
-    public ResponseEntity<List<Ingrediente>> getAllIngredientes() {
+    public ResponseEntity<List<IngredienteConsultaDto>> getAllIngredientes() {
         List<Ingrediente> ingredientes = ingredienteService.getAllIngredientes();
-        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(ingredientes, HttpStatus.OK);
+        return ingredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(ingredientes,new TypeToken<List<IngredienteConsultaDto>>(){}.getType()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar ingredientes por ID", method = "GET")
@@ -45,9 +51,9 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Ingrediente> getIngredienteById(@PathVariable Long id) {
+    public ResponseEntity<IngredienteConsultaDto> getIngredienteById(@PathVariable Long id) {
         Ingrediente ingrediente = ingredienteService.getIngredienteById(id);
-        return new ResponseEntity<>(ingrediente, HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(ingrediente,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Criar novo ingrediente", method = "POST")
@@ -60,9 +66,10 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<Ingrediente> createIngrediente(@RequestBody Ingrediente ingrediente) {
-        Ingrediente newIngrediente = ingredienteService.createIngrediente(ingrediente);
-        return new ResponseEntity<>(newIngrediente, HttpStatus.CREATED);
+    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingrediente) {
+        var entidade = mapper.map(ingrediente, Ingrediente.class);
+        ingredienteService.createIngrediente(entidade);
+        return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
 
     }
 
@@ -76,9 +83,10 @@ public class IngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Ingrediente> updateIngrediente(@PathVariable Long id, @RequestBody Ingrediente ingrediente) {
-        Ingrediente updatedIngrediente = ingredienteService.updateIngrediente(id, ingrediente);
-        return new ResponseEntity<>(updatedIngrediente, HttpStatus.OK);
+    public ResponseEntity<IngredienteConsultaDto> updateIngrediente(@PathVariable Long id, @RequestBody IngredienteCriacaoDto ingredienteDto) {
+        var entidade = mapper.map(ingredienteDto, Ingrediente.class);
+        ingredienteService.updateIngrediente(id, entidade);
+        return new ResponseEntity<>(mapper.map(entidade,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Deletar ingrediente", method = "DELETE")

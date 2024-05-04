@@ -3,6 +3,10 @@ package project.gourmetinventoryproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteCriacaoDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +24,9 @@ public class EstoqueIngredienteController {
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
+    @Autowired
+    private ModelMapper mapper;
+
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de estoque de ingredientres encontrada"),
@@ -30,9 +37,9 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
-    public ResponseEntity<List<EstoqueIngrediente>> getAllEstoqueIngredientes() {
+    public ResponseEntity<List<EstoqueIngredienteConsultaDto>> getAllEstoqueIngredientes() {
         List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
-        return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(estoqueIngredientes, HttpStatus.OK);
+        return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(estoqueIngredientes,new TypeToken<List<EstoqueIngredienteConsultaDto>>(){}.getType()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
@@ -45,11 +52,10 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<EstoqueIngrediente> getEstoqueIngredienteById(@PathVariable Long id) {
+    public ResponseEntity<EstoqueIngredienteConsultaDto> getEstoqueIngredienteById(@PathVariable Long id) {
         EstoqueIngrediente estoqueIngrediente = estoqueIngredienteService.getEstoqueIngredienteById(id);
-        return new ResponseEntity<>(estoqueIngrediente, HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
     }
-
     @Operation(summary = "Criar novo estoque de ingredientes", method = "POST")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Estoque de ingredientes criado com sucesso"),
@@ -60,9 +66,11 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<EstoqueIngrediente> createEstoqueIngrediente(@RequestBody EstoqueIngrediente estoqueIngrediente) {
-        EstoqueIngrediente newEstoqueIngrediente = estoqueIngredienteService.createEstoqueIngrediente(estoqueIngrediente);
-        return new ResponseEntity<>(newEstoqueIngrediente, HttpStatus.CREATED);
+    public ResponseEntity<EstoqueIngredienteConsultaDto> createEstoqueIngrediente(@RequestBody EstoqueIngredienteCriacaoDto estoqueIngrediente) {
+        var entidade = mapper.map(estoqueIngrediente, EstoqueIngrediente.class);
+        estoqueIngredienteService.createEstoqueIngrediente(entidade);
+        var dtoResposta = mapper.map(entidade, EstoqueIngredienteConsultaDto.class);
+        return new ResponseEntity<>(dtoResposta, HttpStatus.CREATED);
     }
 
     @Operation(summary = "Atualizar estoque de ingredientes", method = "PUT")
@@ -75,9 +83,10 @@ public class EstoqueIngredienteController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EstoqueIngrediente> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngrediente estoqueIngrediente) {
-        EstoqueIngrediente updatedEstoqueIngrediente = estoqueIngredienteService.updateEstoqueIngrediente(id, estoqueIngrediente);
-        return new ResponseEntity<>(updatedEstoqueIngrediente, HttpStatus.OK);
+    public ResponseEntity<EstoqueIngredienteConsultaDto> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngredienteCriacaoDto estoqueIngredienteDto) {
+        var entidade = mapper.map(estoqueIngredienteDto, EstoqueIngrediente.class);
+        estoqueIngredienteService.updateEstoqueIngrediente(id, entidade );
+        return new ResponseEntity<>(mapper.map(entidade, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")

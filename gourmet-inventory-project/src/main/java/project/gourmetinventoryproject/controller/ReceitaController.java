@@ -4,11 +4,15 @@ package project.gourmetinventoryproject.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Receita;
+import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
+import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 import project.gourmetinventoryproject.service.ReceitaService;
 
 import java.util.List;
@@ -20,6 +24,9 @@ public class ReceitaController {
     @Autowired
     private ReceitaService receitaService;
 
+    @Autowired
+    private ModelMapper mapper;
+
     @Operation(summary = "Obter lista de receitas", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Lista de receitas encontrada"),
@@ -30,9 +37,9 @@ public class ReceitaController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping
-    public ResponseEntity<List<Receita>> getAllReceitas() {
+    public ResponseEntity<List<ReceitaConsultaDto>> getAllReceitas() {
         List<Receita> receitas = receitaService.getAllReceitas();
-        return receitas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(receitas, HttpStatus.OK);
+        return receitas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(mapper.map(receitas,new TypeToken<List<ReceitaConsultaDto>>(){}.getType()), HttpStatus.OK);
     }
 
     @Operation(summary = "Buscar receita por ID", method = "GET")
@@ -45,9 +52,9 @@ public class ReceitaController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Receita> getReceitaById(@PathVariable Long id) {
+    public ResponseEntity<ReceitaConsultaDto> getReceitaById(@PathVariable Long id) {
         Receita receita = receitaService.getReceitaById(id);
-        return new ResponseEntity<>(receita, HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(receita,ReceitaConsultaDto.class), HttpStatus.OK);
     }
 
     @Operation(summary = "Criar nova receita", method = "POST")
@@ -60,9 +67,10 @@ public class ReceitaController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PostMapping
-    public ResponseEntity<Receita> createReceita(@RequestBody Receita receita) {
-        Receita newReceita = receitaService.createReceita(receita);
-        return new ResponseEntity<>(newReceita, HttpStatus.CREATED);
+    public ResponseEntity<ReceitaConsultaDto> createReceita(@RequestBody ReceitaCriacaoDto receitaDto) {
+        var entidade = mapper.map(receitaDto, Receita.class);
+        receitaService.createReceita(entidade);
+        return new ResponseEntity<>(mapper.map(entidade, ReceitaConsultaDto.class), HttpStatus.CREATED);
     }
 
 
@@ -76,11 +84,11 @@ public class ReceitaController {
             @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Receita> updateReceita(@PathVariable Long id, @RequestBody Receita receita) {
-        Receita updatedReceita = receitaService.updateReceita(id, receita);
-        return new ResponseEntity<>(updatedReceita, HttpStatus.OK);
+    public ResponseEntity<ReceitaConsultaDto> updateReceita(@PathVariable Long id, @RequestBody ReceitaCriacaoDto receitaDto) {
+        var entidade = mapper.map(receitaDto, Receita.class);
+        receitaService.updateReceita(id, entidade);
+        return new ResponseEntity<>(mapper.map(entidade, ReceitaConsultaDto.class), HttpStatus.OK);
     }
-
     @Operation(summary = "Deletar receita por id", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Receita deletada com sucesso"),

@@ -18,6 +18,7 @@ public class EstoqueIngredienteConsultaDto {
     private String categoria;
     private Medidas tipoMedida;
     private Double valorMedida;
+    private Double valorTotal;
     private String localArmazenamento;
     private LocalDate dtaCadastro;
     private Date dtaAviso;
