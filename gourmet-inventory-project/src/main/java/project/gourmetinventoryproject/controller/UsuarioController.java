@@ -1,17 +1,23 @@
 package project.gourmetinventoryproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import project.gourmetinventoryproject.api.configuration.security.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
+import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
+import project.gourmetinventoryproject.repository.UsuarioRepository;
 import project.gourmetinventoryproject.service.UsuarioService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -21,6 +27,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @GetMapping("/{cargo}")
     public ResponseEntity<List<Usuario>> getUsuarios(@PathVariable String cargo) {
@@ -68,5 +76,15 @@ public class UsuarioController {
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
         UsuarioTokenDto usuarioToken = this.usuarioService.authenticate(usuarioLoginDto);
         return status(200).body(usuarioToken);
+    }
+
+    @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
+    @GetMapping("/csv")
+    public ResponseEntity<String> downloadCsvUsuariosAdm(@RequestParam (value = "Nome do Arquivo") String nomeArquivo) {
+        List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
+        //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
+        GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
+
+        return usuarioService.downloadFile(nomeArquivo).equals("Download concluído com sucesso!") ? status(200).build() : status(404).build();
     }
 }

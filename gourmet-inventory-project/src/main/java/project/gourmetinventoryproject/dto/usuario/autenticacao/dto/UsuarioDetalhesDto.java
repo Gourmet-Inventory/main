@@ -8,8 +8,8 @@ import project.gourmetinventoryproject.domain.Usuario;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 public class UsuarioDetalhesDto implements UserDetails {
-    @Getter
     private final String nome;
     private final String email;
     private final String senha;

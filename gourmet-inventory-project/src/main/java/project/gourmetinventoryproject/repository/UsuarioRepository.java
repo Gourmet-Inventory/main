@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import project.gourmetinventoryproject.domain.Usuario;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,4 +21,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Transactional
     @Modifying
     Void deleteById(long id);
+
+    List<Usuario> findByCargoEqualsIgnoreCase(String cargo);
 }
