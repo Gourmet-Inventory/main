@@ -1,6 +1,5 @@
 package project.gourmetinventoryproject.service;
 
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import project.gourmetinventoryproject.api.configuration.security.GerenciadorArquivoCSV;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
@@ -19,10 +18,6 @@ import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLogin
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,11 +71,13 @@ public class UsuarioService {
         return status(204).build();
     }
 
-    public UsuarioTokenDto authenticate(UsuarioLoginDto usuarioTokenDto){
+    public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto){
+
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
-                usuarioTokenDto.getEmail(), usuarioTokenDto.getSenha());
+                usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+
         final Authentication authentication = this.authenticationManager.authenticate(credentials);
-        Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuarioTokenDto.getEmail())
+        Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuarioLoginDto.getEmail())
                 .orElseThrow(
                         () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
                 );

@@ -1,6 +1,5 @@
-package project.gourmetinventoryproject.api.configuration.security;
+package project.gourmetinventoryproject;
 
-import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
 
 import java.io.*;

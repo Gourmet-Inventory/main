@@ -6,18 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import project.gourmetinventoryproject.api.configuration.security.GerenciadorArquivoCSV;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
-import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 import project.gourmetinventoryproject.service.UsuarioService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -74,7 +72,7 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
-        UsuarioTokenDto usuarioToken = this.usuarioService.authenticate(usuarioLoginDto);
+        UsuarioTokenDto usuarioToken = this.usuarioService.autenticar(usuarioLoginDto);
         return status(200).body(usuarioToken);
     }
 
