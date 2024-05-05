@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.domain.NutritionData;
-import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
+import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -23,15 +23,17 @@ import java.util.List;
 public class NutricaoAPIController {
 
     @Autowired
-    private EstoqueIngredienteRepository estoqueIngredienteRepository;
+    private EstoqueIngredienteController estoqueIngredienteController;
 
     @GetMapping("/consulta-nutricao-api")
-    public List<NutritionData> fetchNutritionDataFromAPI(@RequestParam String nomeIngrediente, @RequestParam String quantidadeGrama) throws IOException {
-        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteRepository.findByNomeAndValorMedida(nomeIngrediente, Double.parseDouble(quantidadeGrama));
+    public List<NutritionData> fetchNutritionDataFromAPI() throws IOException {
+        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes();
+        List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
+
         List<NutritionData> nutritionDataList = new ArrayList<>();
 
-        for (EstoqueIngrediente estoqueIngrediente : estoqueIngredientes) {
-            String query = quantidadeGrama + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
+        for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
+            String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
             URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("accept", "application/json");
@@ -61,6 +63,7 @@ public class NutricaoAPIController {
             }
         }
 
+        // Ordenar a lista de dados de nutrição
         mergeSort(nutritionDataList);
 
         // Salvar a lista ordenada em um arquivo CSV
