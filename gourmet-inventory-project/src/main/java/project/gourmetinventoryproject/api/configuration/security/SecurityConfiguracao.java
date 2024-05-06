@@ -61,8 +61,9 @@ public class SecurityConfiguracao {
         new AntPathRequestMatcher("/webjars/**"),
         new AntPathRequestMatcher("/v3/api-docs/**"),
         new AntPathRequestMatcher("/actuator/*"),
-        new AntPathRequestMatcher("/usuarios/login/**"),
         //new AntPathRequestMatcher("/usuarios/**"),
+        new AntPathRequestMatcher("/usuarios/login/**"),
+        new AntPathRequestMatcher("/usuarios/logout/**"),
         new AntPathRequestMatcher("/h2-console/**"),
         //new AntPathRequestMatcher("http://localhost:3306/workbench/**"), // Adicione a URL do MySQL Workbench
         //new AntPathRequestMatcher("jdbc:mysql://localhost:3306/**"), //??
@@ -96,7 +97,7 @@ public class SecurityConfiguracao {
     }
 
     @Bean
-    public AutenticacaoEntryPoint jwtAuthenticationEntryPotntBean( ) {
+    public AutenticacaoEntryPoint jwtAuthenticationEntryPointBean() {
         return new AutenticacaoEntryPoint();
     }
 

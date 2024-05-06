@@ -71,6 +71,10 @@ public class UsuarioService {
         return status(204).build();
     }
 
+    public ResponseEntity<Object> getEmpresasUsuario(){
+        return null;
+    }
+
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto){
 
         final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
@@ -86,9 +90,7 @@ public class UsuarioService {
         return UsuarioMapper.of(usuarioAutenticado, token);
     }
 
-    public ResponseEntity<Object> getEmpresasUsuario(){
-        return null;
-    }
+
 
     public static String downloadFile(String fileName /* ,HttpServletResponse response*/) {
         try {

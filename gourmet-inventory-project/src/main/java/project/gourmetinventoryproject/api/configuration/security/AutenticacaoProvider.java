@@ -15,20 +15,20 @@ import project.gourmetinventoryproject.dto.usuario.autenticacao.AutenticacaoServ
 
 public class AutenticacaoProvider implements AuthenticationProvider {
 
-    private AutenticacaoService usuarioAutenticacaoService;
-    private PasswordEncoder passwordEncoder;
+    private final AutenticacaoService usuarioAutoriazacaoService;
+    private final PasswordEncoder passwordEncoder;
 
-    public AutenticacaoProvider(AutenticacaoService usuarioAutenticacaoService, PasswordEncoder passwordEncoder) {
-        this.usuarioAutenticacaoService = usuarioAutenticacaoService;
+    public AutenticacaoProvider(AutenticacaoService usuarioAutorizacaoService, PasswordEncoder passwordEncoder) {
+        this.usuarioAutoriazacaoService = usuarioAutorizacaoService;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         final String username = authentication.getName();
         final String password = authentication.getCredentials().toString();
 
-        UserDetails userDetails = this.usuarioAutenticacaoService.loadUserByUsername(username);
+        UserDetails userDetails = this.usuarioAutoriazacaoService.loadUserByUsername(username);
 
         if (this.passwordEncoder.matches(password, userDetails.getPassword())){
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
