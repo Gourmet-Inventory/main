@@ -1,4 +1,4 @@
-package inventory_gourmet.api.domain;
+package project.gourmetinventoryproject.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

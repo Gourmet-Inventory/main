@@ -1,6 +1,6 @@
 package project.gourmetinventoryproject.dto.empresa;
 
-import inventory_gourmet.api.domain.Empresa;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
 
 public class EmpresaMapper {

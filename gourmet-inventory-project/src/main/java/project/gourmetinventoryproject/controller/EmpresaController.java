@@ -1,6 +1,6 @@
 package project.gourmetinventoryproject.controller;
 
-import inventory_gourmet.api.domain.Empresa;
+import project.gourmetinventoryproject.domain.Empresa;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

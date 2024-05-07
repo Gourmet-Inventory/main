@@ -1,6 +1,6 @@
 package project.gourmetinventoryproject.repository;
 
-import inventory_gourmet.api.domain.Empresa;
+import project.gourmetinventoryproject.domain.Empresa;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

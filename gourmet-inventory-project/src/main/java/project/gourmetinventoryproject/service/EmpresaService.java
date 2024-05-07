@@ -1,6 +1,6 @@
 package project.gourmetinventoryproject.service;
 
-import inventory_gourmet.api.domain.Empresa;
+import project.gourmetinventoryproject.domain.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
