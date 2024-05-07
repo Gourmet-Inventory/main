@@ -68,6 +68,7 @@ public class SecurityConfiguracao {
         //new AntPathRequestMatcher("http://localhost:3306/workbench/**"), // Adicione a URL do MySQL Workbench
         //new AntPathRequestMatcher("jdbc:mysql://localhost:3306/**"), //??
         new AntPathRequestMatcher("/error/**"),
+        //new AntPathRequestMatcher("http://localhost:8080/**"),
     };
 
     @Bean
