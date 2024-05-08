@@ -1,6 +1,10 @@
 package project.gourmetinventoryproject.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -70,11 +74,19 @@ public class UsuarioController {
         return null;
     }
 
+    @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode ="200", description = "Logado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"email\": \"peterson@example.com\",\"senha\": \"123456\"}")})}),
+            @ApiResponse(responseCode ="404", description = "Usuario não encontrado")
+    })
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
         UsuarioTokenDto usuarioToken = this.usuarioService.autenticar(usuarioLoginDto);
         return status(200).body(usuarioToken);
     }
+
 
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
     @GetMapping("/csv")
