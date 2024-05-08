@@ -18,6 +18,7 @@ import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLogin
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 import project.gourmetinventoryproject.service.UsuarioService;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class UsuarioController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Operation(summary = "Obter Lista de usuarios", method = "GET")
     @GetMapping("/{cargo}")
     public ResponseEntity<List<Usuario>> getUsuarios(@PathVariable String cargo) {
         if (cargo.equalsIgnoreCase("administrador")){
@@ -41,6 +43,7 @@ public class UsuarioController {
         throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
 
+    @Operation(summary = "Criar novo usuario", method = "POST")
     @PostMapping("/{cargo}")
     public ResponseEntity<Void> postUsuario(@RequestBody @Valid UsuarioCriacaoDto novoUsuario, String cargo) {
         if (cargo.equalsIgnoreCase("administrador")){
@@ -50,6 +53,7 @@ public class UsuarioController {
         throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
 
+    @Operation(summary = "Deletar usuario por id", method = "DELETE")
     @DeleteMapping("/{id}/{cargo}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id, @PathVariable String cargo){
         if (cargo.equalsIgnoreCase("administrador")){
@@ -58,6 +62,7 @@ public class UsuarioController {
         throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
 
+    @Operation(summary = "Atualizar usuario por id", method = "PATCH")
     @PatchMapping("/{cargo}")
     public ResponseEntity<Void> patchUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioCriacaoDto novoUsuario, String cargo) {
         if (cargo.equalsIgnoreCase("administrador")){
@@ -68,13 +73,13 @@ public class UsuarioController {
         }
         throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
-
+    @ApiIgnore
     @GetMapping("/empresas")
     public ResponseEntity<Object> getAllEmpresas() {
         return null;
     }
 
-    @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
+    @Operation(summary = "Logar para receber o token", method = "POST")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Logado com sucesso",
                     content = {@Content(mediaType = "application/json",
