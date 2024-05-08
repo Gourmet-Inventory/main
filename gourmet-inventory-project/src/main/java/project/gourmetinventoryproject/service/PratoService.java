@@ -51,7 +51,7 @@ public class PratoService {
                 existingPrato.setCategoria(prato.getCategoria());
                 return pratoRepository.save(existingPrato);
             } else {
-                return null;
+                throw new IdNotFoundException();
             }
         }
         throw new IdNotFoundException();

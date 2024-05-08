@@ -22,6 +22,7 @@ public class EstoqueIngrediente {
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Double valorMedida;
+    private Double valorTotal;
     private String localArmazenamento;
     private LocalDate dtaCadastro;
     private Date dtaAviso;
