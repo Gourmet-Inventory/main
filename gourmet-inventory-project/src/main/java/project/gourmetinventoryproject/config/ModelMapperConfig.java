@@ -6,8 +6,6 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-import project.gourmetinventoryproject.domain.Receita;
-import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 
 @Configuration
 @Component
