@@ -21,7 +21,6 @@ public class Empresa {
     private String nomeFantasia;
     private String cnpj;
     private String telefone;
-
     @OneToOne
     @JoinColumn(name = "responsavel_id")
     private Usuario responsavel;

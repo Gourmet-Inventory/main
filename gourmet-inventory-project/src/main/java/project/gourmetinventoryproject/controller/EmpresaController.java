@@ -21,7 +21,7 @@ public class EmpresaController {
     private EmpresaService empresaService;
 
     @PostMapping
-    public ResponseEntity<Void> postEmpresa(@RequestBody @Valid EmpresaCriacaoDto novaEmpresa) {
+    public ResponseEntity<Void> postEmpresa(@RequestBody EmpresaCriacaoDto novaEmpresa) {
         empresaService.postEmpresa(novaEmpresa);
         return status(201).build();
     }
@@ -43,7 +43,11 @@ public class EmpresaController {
         empresaService.patchEmpresa(id, empresaAtualizada);
         return status(200).build();
     }
-
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> putEmpresa(@PathVariable Long id, @RequestBody EmpresaCriacaoDto empresaAtualizada) {
+        empresaService.putEmpresa(id, empresaAtualizada);
+        return status(200).build();
+    }
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Empresa>> getEmpresasById(@PathVariable Long id) {
         Optional<Empresa> empresas = empresaService.getEmpresasById(id);
