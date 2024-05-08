@@ -1,6 +1,8 @@
 package project.gourmetinventoryproject.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.modelmapper.ModelMapper;
@@ -28,14 +30,23 @@ public class IngredienteController {
     @Autowired
     private ModelMapper mapper;
 
-    @Operation(description = "Obter lista de ingredientes",method = "GET")
+    @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de ingredientres encontrada"),
-            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há ingredientes disponíveis"),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
+            @ApiResponse(responseCode ="200", description = "Sucesso - Lista de ingredientes encontrada",
+                content = {@Content(mediaType = "application/json",
+                        examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="204", description = "Sem conteúdo - Não há ingredientes disponíveis",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
     })
     @GetMapping
     public ResponseEntity<List<IngredienteConsultaDto>> getAllIngredientes() {
@@ -47,12 +58,21 @@ public class IngredienteController {
 
     @Operation(summary = "Buscar ingredientes por ID", method = "GET")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente encontrado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente encontrado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
     })
     @GetMapping("/{id}")
     public ResponseEntity<IngredienteConsultaDto> getIngredienteById(@PathVariable Long id) {
@@ -62,12 +82,24 @@ public class IngredienteController {
 
     @Operation(summary = "Criar novo ingrediente", method = "POST")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Criado - Ingrediente criado com sucesso"),
-            @ApiResponse(responseCode ="409", description = "Conflito - Ingrediente já existe"),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
+            @ApiResponse(responseCode ="201", description = "Criado - Ingrediente criado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+            @ApiResponse(responseCode ="409", description = "Conflito - Ingrediente já existe",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":String,\"unidade\":String,\"valorTotal\":String,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+                    content = {@Content(mediaType = "text/plain",
+                        examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+                    content = {@Content(mediaType = "text/plain",
+                        examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+                    content = {@Content(mediaType = "text/plain",
+                        examples = {@ExampleObject(value = "")})}),
     })
     @PostMapping
     public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
@@ -78,12 +110,24 @@ public class IngredienteController {
 
     @Operation(summary = "Atualizar ingrediente", method = "PUT")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente atualizado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente atualizado com sucesso",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5B\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":3,\"valorTotal\":600,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
+                    content = {@Content(mediaType = "application/json",
+                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5B\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":String,\"unidade\":String,\"valorTotal\":String,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
     })
     @PutMapping("/{id}")
     public ResponseEntity<IngredienteConsultaDto> updateIngrediente(@PathVariable Long id, @RequestBody IngredienteCriacaoDto ingredienteDto) {
@@ -94,12 +138,21 @@ public class IngredienteController {
 
     @Operation(summary = "Deletar ingrediente", method = "DELETE")
     @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente deletado com sucesso"),
-            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado"),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos"),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida"),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la"),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição")
+            @ApiResponse(responseCode ="200", description = "Sucesso - Ingrediente deletado com sucesso",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
+            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+                    content = {@Content(mediaType = "text/plain",
+                            examples = {@ExampleObject(value = "")})}),
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteIngrediente(@PathVariable Long id) {
