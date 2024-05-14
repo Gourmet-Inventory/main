@@ -89,12 +89,17 @@ public class UsuarioController {
 
 
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
-    @GetMapping("/csv")
-    public ResponseEntity<String> downloadCsvUsuariosAdm(@RequestParam (value = "Nome do Arquivo") String nomeArquivo) {
-        List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
-        //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
-        GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
-
-        return usuarioService.downloadFile(nomeArquivo).equals("Download concluído com sucesso!") ? status(200).build() : status(404).build();
+    @GetMapping("/csv/{nomeArquivo}")
+    public ResponseEntity<String> downloadCsvUsuariosAdm(@PathVariable String nomeArquivo) {
+//        if (nomeArquivo.isBlank()){
+//            throw new ResponseStatusException(411, "Preencha um nome para gerar o arquivo", null);
+//        }else {
+            List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
+            //List<Usuario> usuarioList = usuarioRepository.findAll();
+            //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
+            GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
+       //}
+        String arquivo = usuarioService.downloadFile(nomeArquivo);
+        return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();
     }
 }
