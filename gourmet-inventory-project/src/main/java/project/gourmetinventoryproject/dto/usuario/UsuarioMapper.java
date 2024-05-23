@@ -22,11 +22,10 @@ public class UsuarioMapper {
     }
 
     public static List<UsuarioDetalhesDto> toDto(List<Usuario> usuarioList) {
-        List<UsuarioDetalhesDto> usuarioDetalhesDtoList = usuarioList
+        return usuarioList
                 .stream()
-                .map(usuario -> new UsuarioDetalhesDto(usuario))
+                .map(UsuarioDetalhesDto::new)
                 .collect(Collectors.toList());
-        return usuarioDetalhesDtoList;
     }
 
     public static UsuarioTokenDto of(Usuario usuario, String token) {
@@ -36,6 +35,8 @@ public class UsuarioMapper {
         usuarioTokenDto.setEmail(usuario.getEmail());
         usuarioTokenDto.setNome(usuario.getNome()); 
         usuarioTokenDto. setToken(token);
+        usuarioTokenDto.setCargo(usuario.getCargo());
+
         return usuarioTokenDto;
     }
 }

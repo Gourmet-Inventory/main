@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
@@ -34,45 +33,34 @@ public class UsuarioController {
     private UsuarioRepository usuarioRepository;
 
     @Operation(summary = "Obter Lista de usuarios", method = "GET")
-    @GetMapping("/{cargo}")
-    public ResponseEntity<List<Usuario>> getUsuarios(@PathVariable String cargo) {
-        if (cargo.equalsIgnoreCase("administrador")){
-            List<Usuario> lista = usuarioService.getUsuarios(cargo);
+    @GetMapping()
+    public ResponseEntity<List<Usuario>> getUsuarios() {
+            List<Usuario> lista = usuarioService.getUsuarios();
             return lista.isEmpty() ? status(204).build() : status(200).body(lista);
-        }
-        throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
 
     @Operation(summary = "Criar novo usuario", method = "POST")
-    @PostMapping("/{cargo}")
-    public ResponseEntity<Void> postUsuario(@RequestBody @Valid UsuarioCriacaoDto novoUsuario, String cargo) {
-        if (cargo.equalsIgnoreCase("administrador")){
-            usuarioService.postUsuario(novoUsuario, cargo);
+    @PostMapping()
+    public ResponseEntity<Void> postUsuario(@RequestBody @Valid UsuarioCriacaoDto novoUsuario) {
+            usuarioService.postUsuario(novoUsuario);
             return status(201).build();
-        }
-        throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
 
     @Operation(summary = "Deletar usuario por id", method = "DELETE")
-    @DeleteMapping("/{id}/{cargo}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id, @PathVariable String cargo){
-        if (cargo.equalsIgnoreCase("administrador")){
-            return usuarioService.deleteUsuario(cargo, id);
-        }
-        throw new ResponseStatusException(403, "Cargo insuficiente", null);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id){
+            return usuarioService.deleteUsuario(id);
     }
 
     @Operation(summary = "Atualizar usuario por id", method = "PATCH")
-    @PatchMapping("/{cargo}")
-    public ResponseEntity<Void> patchUsuario(@PathVariable Long id, @RequestBody @Valid UsuarioCriacaoDto novoUsuario, String cargo) {
-        if (cargo.equalsIgnoreCase("administrador")){
-            if (usuarioService.usuarioRepository.existsById(id)) {
-                return usuarioService.patchUsuario(id, novoUsuario, cargo);
+    @PatchMapping("/{userId}")
+    public ResponseEntity<Void> patchUsuario(@PathVariable Long userId, @RequestBody @Valid UsuarioCriacaoDto novoUsuario) {
+            if (usuarioService.usuarioRepository.existsById(userId)) {
+                return usuarioService.patchUsuario(userId, novoUsuario);
             }
             return status(204).build();
-        }
-        throw new ResponseStatusException(403, "Cargo insuficiente", null);
     }
+
     @ApiIgnore
     @GetMapping("/empresas")
     public ResponseEntity<Object> getAllEmpresas() {
@@ -89,9 +77,13 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
         UsuarioTokenDto usuarioToken = this.usuarioService.autenticar(usuarioLoginDto);
+
+//        UsuarioService.LoginUserResponse response = new UsuarioService.LoginUserResponse();
+//        response.setToken(usuarioToken.getToken());
+//        response.setEmail(usuarioToken.getEmail());
+//        response.setIdUsuario(usuarioToken.getUserId());
         return status(200).body(usuarioToken);
     }
-
 
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
     @GetMapping("/csv/{nomeArquivo}")
@@ -104,7 +96,7 @@ public class UsuarioController {
             //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
             GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
        //}
-        String arquivo = usuarioService.downloadFile(nomeArquivo);
+        String arquivo = UsuarioService.downloadFile(nomeArquivo);
         return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();
     }
 }
