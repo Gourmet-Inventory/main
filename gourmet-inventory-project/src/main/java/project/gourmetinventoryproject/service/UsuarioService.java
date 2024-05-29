@@ -39,7 +39,7 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto, String cargo){//???
+    public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto){//???
         final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
 
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
@@ -48,13 +48,13 @@ public class UsuarioService {
         usuarioRepository.save(novoUsuario);
     }
 
-    public List<Usuario> getUsuarios(String cargo){ //???
+    public List<Usuario> getUsuarios(){ //???
         List<Usuario> usuarios = new ArrayList<>();
         usuarios = usuarioRepository.findAll();
         return usuarios;
     }
 
-    public ResponseEntity<Void> deleteUsuario(String cargo, Long id){ //???
+    public ResponseEntity<Void> deleteUsuario(Long id){ //???
         if (usuarioRepository.existsById(id)) {
             usuarioRepository.deleteById(id);
             return status(200).build();
@@ -62,7 +62,7 @@ public class UsuarioService {
         return status(404).build();
     }
 
-    public ResponseEntity<Void> patchUsuario(Long id, UsuarioCriacaoDto usuarioCriacaoDto, String cargo){
+    public ResponseEntity<Void> patchUsuario(Long id, UsuarioCriacaoDto usuarioCriacaoDto){
         if (usuarioRepository.existsById(id)) {
             Usuario newUsuario = UsuarioMapper.of(usuarioCriacaoDto);
             usuarioRepository.save(newUsuario);
