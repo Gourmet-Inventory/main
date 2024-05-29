@@ -1,6 +1,11 @@
 package project.gourmetinventoryproject.dto.usuario;
 
 import project.gourmetinventoryproject.domain.Usuario;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UsuarioMapper {
 
@@ -14,5 +19,24 @@ public class UsuarioMapper {
         usuario.setCelular(usuarioCriacaoDto.getCelular());
         usuario.setSenha(usuarioCriacaoDto.getSenha());
         return usuario;
+    }
+
+    public static List<UsuarioDetalhesDto> toDto(List<Usuario> usuarioList) {
+        return usuarioList
+                .stream()
+                .map(UsuarioDetalhesDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public static UsuarioTokenDto of(Usuario usuario, String token) {
+        UsuarioTokenDto usuarioTokenDto = new UsuarioTokenDto() ;
+
+        usuarioTokenDto.setUserId( usuario.getIdUsuario());
+        usuarioTokenDto.setEmail(usuario.getEmail());
+        usuarioTokenDto.setNome(usuario.getNome()); 
+        usuarioTokenDto. setToken(token);
+        usuarioTokenDto.setCargo(usuario.getCargo());
+
+        return usuarioTokenDto;
     }
 }
