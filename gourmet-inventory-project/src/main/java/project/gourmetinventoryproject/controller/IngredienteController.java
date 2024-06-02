@@ -76,7 +76,8 @@ public class IngredienteController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<IngredienteConsultaDto> getIngredienteById(@PathVariable Long id) {
-        Ingrediente ingrediente = ingredienteService.getIngredienteById(id);
+        IngredienteConsultaDto ingrediente = ingredienteService.getIngredienteById(id);
+
         return new ResponseEntity<>(mapper.map(ingrediente,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
@@ -103,7 +104,8 @@ public class IngredienteController {
     })
     @PostMapping
     public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
-        var entidade = mapper.map(ingredienteDto, Ingrediente.class);
+        Ingrediente entidade = mapper.map(ingredienteDto, Ingrediente.class);
+
         ingredienteService.createIngrediente(entidade);
         return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
     }
