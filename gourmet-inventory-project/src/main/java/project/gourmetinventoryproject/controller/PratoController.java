@@ -18,6 +18,7 @@ import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.PratoService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -154,5 +155,9 @@ public class PratoController {
     public ResponseEntity<?> deletePrato(@PathVariable Long id) {
         pratoService.deletePrato(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    @PostMapping("/calculate-ingredient-usage")
+    public Map<Long, Integer> calculateIngredientUsage(@RequestBody List<Long> servedDishesIds) {
+        return pratoService.calculateIngredientUsage(servedDishesIds);
     }
 }
