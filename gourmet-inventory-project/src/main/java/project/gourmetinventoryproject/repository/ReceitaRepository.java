@@ -11,6 +11,5 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
 
     List<Receita> findByIdIngredienteAndIdPrato(Long idIngrediente, Long idPrato);
 
-
+    List<Receita> findByIdPrato(Long idPrato);
 }
-

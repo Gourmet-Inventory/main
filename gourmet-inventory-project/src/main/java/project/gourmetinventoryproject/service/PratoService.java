@@ -2,11 +2,17 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
-import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.domain.Receita;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
+import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +22,7 @@ public class PratoService {
 
     @Autowired
     private PratoRepository pratoRepository;
+    @Autowired
     private ReceitaRepository receitaRepository;
 
     public List<Prato> getAllPratos() {
@@ -63,6 +70,18 @@ public class PratoService {
             throw new IdNotFoundException();
         }
         pratoRepository.deleteById(id);
+    }
 
+    public Map<Long, Integer> calculateIngredientUsage(List<Long> servedDishesIds) {
+        Map<Long, Integer> ingredientUsage = new HashMap<>();
+
+        for (Long dishId : servedDishesIds) {
+            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
+            for (Receita recipe : recipes) {
+                ingredientUsage.put(recipe.getIdIngrediente(), ingredientUsage.getOrDefault(recipe.getIdIngrediente(), 0) + recipe.getQuantidade());
+            }
+        }
+
+        return ingredientUsage;
     }
 }
