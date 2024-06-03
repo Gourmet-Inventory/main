@@ -11,9 +11,5 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
 
     List<Receita> findByIdIngredienteAndIdPrato(Long idIngrediente, Long idPrato);
     Long findIngredienteIdByTipoMedidaValorMedida(Long estoqueIngrediente, String tipoMedida, String valorMedida);
+    List<Receita> findByIdPrato(Long idPrato);
 }
-
-List<Receita> findByIdPrato(Long idPrato);
-
-}
-
