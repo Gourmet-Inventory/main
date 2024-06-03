@@ -10,18 +10,24 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -42,6 +48,9 @@ class UsuarioServiceTest {
 
     @InjectMocks
     private UsuarioService usuarioService;
+
+    @Mock
+    private GerenciadorArquivoCSV GerenciadorArquivoCSV;
 
     @BeforeEach
     void setUp() {
@@ -128,4 +137,60 @@ class UsuarioServiceTest {
         ResponseEntity<Void> response = usuarioService.patchUsuario(1L, usuarioCriacaoDto);
         assertEquals(204, response.getStatusCodeValue());
     }
+
+    @DisplayName("Deve autenticar um usuário válido")
+    @Test
+    void authenticateValidUser() {
+        UsuarioLoginDto usuarioLoginDto = new UsuarioLoginDto();
+        usuarioLoginDto.setEmail("jane.doe@example.org");
+        usuarioLoginDto.setSenha("password");
+
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.of(new Usuario()));
+        when(authenticationManager.authenticate(any())).thenReturn(new TestingAuthenticationToken("user", "password"));
+
+        UsuarioTokenDto result = usuarioService.autenticar(usuarioLoginDto);
+
+        assertNotNull(result);
+        verify(authenticationManager).authenticate(any());
+        verify(usuarioRepository).findByEmail(anyString());
+    }
+
+    @DisplayName("Deve falhar na autenticação de um usuário inexistente")
+    @Test
+    void authenticateNonExistentUser() {
+        UsuarioLoginDto usuarioLoginDto = new UsuarioLoginDto();
+        usuarioLoginDto.setEmail("non.existent@example.org");
+        usuarioLoginDto.setSenha("password");
+
+        when(usuarioRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(ResponseStatusException.class, () -> usuarioService.autenticar(usuarioLoginDto));
+        verify(authenticationManager, never()).authenticate(any());
+    }
+
+//    @DisplayName("Deve realizar o download com sucesso")
+//    @Test
+//    void downloadFileSuccess() {
+//        String fileName = "test";
+//        String fileContent = "File content";
+//
+//        when(GerenciadorArquivoCSV.downloadArquivoCsv(anyString())).thenReturn(fileContent);
+//
+//        String result = UsuarioService.downloadFile(fileName);
+//
+//        assertEquals(fileContent, result);
+//        verify(GerenciadorArquivoCSV).downloadArquivoCsv(fileName);
+//    }
+//
+//    @DisplayName("Deve gerar uma exeption ao tentar realizar o download")
+//    @Test
+//    void downloadFileFailure() {
+//        String fileName = "test.csv";
+//        when(GerenciadorArquivoCSV.downloadArquivoCsv(anyString())).thenThrow(new RuntimeException("File not found"));
+//
+//        String result = UsuarioService.downloadFile(fileName);
+//
+//        assertEquals("File not found", result);
+//        verify(GerenciadorArquivoCSV).downloadArquivoCsv(fileName);
+//        }
 }
