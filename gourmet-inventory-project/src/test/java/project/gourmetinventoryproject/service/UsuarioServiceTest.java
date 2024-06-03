@@ -109,7 +109,7 @@ class UsuarioServiceTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-    @DisplayName("Deve atualizar um uzuario se existir")
+    @DisplayName("Deve atualizar um usuário se existir")
     @Test
     void patchUsuario() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
@@ -119,7 +119,7 @@ class UsuarioServiceTest {
         assertEquals(200, response.getStatusCodeValue());
     }
 
-    @DisplayName("Não deve atualizar um usuario se não existir")
+    @DisplayName("Não deve atualizar um usuário se não existir")
     @Test
     void patchUsuarioNotFound() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
