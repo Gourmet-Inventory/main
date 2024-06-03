@@ -5,7 +5,8 @@ INSERT INTO usuarios (nome, cargo, cpf, email, celular, senha)VALUES ('luan', 'a
 INSERT INTO usuarios (nome, cargo, cpf, email, celular, senha)VALUES ('mirella', 'administrador', '789.123.456-78', 'mirella@example.com', '11998765432', '$2a$10$0/TKTGxdREbWaWjWYhwf6e9P1fPOAMMNqEnZgOG95jnSkHSfkkIrC');
 INSERT INTO usuarios (nome, cargo, cpf, email, celular, senha)VALUES ('kevin', 'administrador', '321.654.987-01', 'kevin@example.com', '11945678901', '$2a$10$0/TKTGxdREbWaWjWYhwf6e9P1fPOAMMNqEnZgOG95jnSkHSfkkIrC');
 
-INSERT INTO empresas VALUES (1,'Empresa A', '12345678000101', '1122334455', 1);
-INSERT INTO empresas VALUES (2,'Empresa B', '23456789000121', '9988776655', 2);
-INSERT INTO empresas VALUES (3,'Empresa C', '34567890000132', '5544332211', 3);
-INSERT INTO empresas VALUES (4,'Empresa D', '45678901200143', '6677889900', 4);
+
+INSERT INTO empresas (nome_fantasia,cnpj, responsavel_id, telefone) VALUES ('Empresa A','12345678000106', 1, '1122334456');
+INSERT INTO empresas (nome_fantasia,cnpj, responsavel_id, telefone) VALUES ('Empresa B','12345678000103', 1, '1122334454');
+INSERT INTO empresas (nome_fantasia,cnpj, responsavel_id, telefone) VALUES ('Empresa C','12345678000105', 2, '1122334455');
+INSERT INTO empresas (nome_fantasia,cnpj, responsavel_id, telefone) VALUES ('Empresa D','12345678000104', 3, '1122334451');
