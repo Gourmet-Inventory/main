@@ -14,7 +14,6 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
-import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
@@ -48,9 +47,6 @@ class UsuarioServiceTest {
 
     @InjectMocks
     private UsuarioService usuarioService;
-
-    @Mock
-    private GerenciadorArquivoCSV GerenciadorArquivoCSV;
 
     @BeforeEach
     void setUp() {
@@ -118,7 +114,7 @@ class UsuarioServiceTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-    @DisplayName("Deve atualizar um uzuario se existir")
+    @DisplayName("Deve atualizar um usuário se existir")
     @Test
     void patchUsuario() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
@@ -128,7 +124,7 @@ class UsuarioServiceTest {
         assertEquals(200, response.getStatusCodeValue());
     }
 
-    @DisplayName("Não deve atualizar um usuario se não existir")
+    @DisplayName("Não deve atualizar um usuário se não existir")
     @Test
     void patchUsuarioNotFound() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
