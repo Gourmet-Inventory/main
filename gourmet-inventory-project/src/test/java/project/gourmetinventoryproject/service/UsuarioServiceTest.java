@@ -49,7 +49,7 @@ class UsuarioServiceTest {
         when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
     }
 
-    @DisplayName("Should create a new user")
+    @DisplayName("Deve criar um novo usuário")
     @Test
     void postUsuario() {
         // Arrange
@@ -81,7 +81,7 @@ class UsuarioServiceTest {
         verify(passwordEncoder).encode(isA(CharSequence.class));
     }
 
-    @DisplayName("Should return all users")
+    @DisplayName("Deve retornar todos os usuários")
     @Test
     void getUsuarios() {
         Usuario user1 = new Usuario();
@@ -93,7 +93,7 @@ class UsuarioServiceTest {
         assertEquals(2, usuarios.size());
     }
 
-    @DisplayName("Should delete a user if exists")
+    @DisplayName("Deve deletar um usuário caso exista")
     @Test
     void deleteUsuario() {
         when(usuarioRepository.existsById(anyLong())).thenReturn(true);
@@ -101,7 +101,7 @@ class UsuarioServiceTest {
         assertEquals(200, response.getStatusCodeValue());
     }
 
-    @DisplayName("Should not delete a user if not exists")
+    @DisplayName("Não deve deletar um usuário caso não exista")
     @Test
     void deleteUsuarioNotFound() {
         when(usuarioRepository.existsById(anyLong())).thenReturn(false);
@@ -109,7 +109,7 @@ class UsuarioServiceTest {
         assertEquals(404, response.getStatusCodeValue());
     }
 
-    @DisplayName("Should update a user if exists")
+    @DisplayName("Deve atualizar um uzuario se existir")
     @Test
     void patchUsuario() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
@@ -119,7 +119,7 @@ class UsuarioServiceTest {
         assertEquals(200, response.getStatusCodeValue());
     }
 
-    @DisplayName("Should not update a user if not exists")
+    @DisplayName("Não deve atualizar um usuario se não existir")
     @Test
     void patchUsuarioNotFound() {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
