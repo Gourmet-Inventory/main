@@ -51,5 +51,9 @@ public class ReceitaService {
         }
         receitaRepository.deleteById(id);
     }
+
+    public Long getIngredienteIdByTipoMedidaValorMedida(Long estoqueIngrediente, String tipoMedida, String valorMedida){
+        return receitaRepository.findIngredienteIdByTipoMedidaValorMedida(estoqueIngrediente, tipoMedida, valorMedida);
+    }
 }
 

@@ -13,5 +13,6 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
 
     Long findIngredienteIdByTipoMedidaValorMedida(Long estoqueIngrediente, String tipoMedida, String valorMedida);
 
+
 }
 
