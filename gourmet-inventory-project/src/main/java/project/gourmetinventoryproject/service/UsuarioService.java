@@ -1,6 +1,7 @@
 package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import project.gourmetinventoryproject.repository.UsuarioRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -71,26 +73,30 @@ public class UsuarioService {
         return status(204).build();
     }
 
-    public ResponseEntity<Object> getEmpresasUsuario(){
-        return null;
-    }
+//    public ResponseEntity<Object> getEmpresasUsuario(){
+//        return null;
+//    }
 
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto){
 
-        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
-                usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+        Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(usuarioLoginDto.getEmail());
 
-        final Authentication authentication = this.authenticationManager.authenticate(credentials);
-        Usuario usuarioAutenticado = usuarioRepository.findByEmail(usuarioLoginDto.getEmail())
-                .orElseThrow(
-                        () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
-                );
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
-        return UsuarioMapper.of(usuarioAutenticado, token);
+        if (usuarioOptional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não cadastrado", null);
+        }else {
+            final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                    usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
+
+            final Authentication authentication = this.authenticationManager.authenticate(credentials);
+            usuarioOptional
+                    .orElseThrow(
+                            () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
+                    );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            final String token = gerenciadorTokenJwt.generateToken(authentication);
+            return UsuarioMapper.of(usuarioOptional.orElse(null), token);
+        }
     }
-
-
 
     public static String downloadFile(String fileName /* ,HttpServletResponse response*/) {
         try {
