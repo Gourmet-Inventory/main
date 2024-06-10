@@ -1,5 +1,6 @@
 package project.gourmetinventoryproject.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.domain.Empresa;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
-import project.gourmetinventoryproject.dto.empresa.EmpresaMapper;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
@@ -28,8 +28,10 @@ public class EmpresaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    ModelMapper mapper = new ModelMapper();
+
     public void postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
-        Empresa novaEmpresa = EmpresaMapper.of(empresaCriacaoDto);
+        Empresa novaEmpresa = mapper.map(empresaCriacaoDto, Empresa.class);
         empresaRepository.save(novaEmpresa);
     }
 
@@ -49,14 +51,14 @@ public class EmpresaService {
 
     public void patchEmpresa(Long id, EmpresaCriacaoDto empresaAtualizada) {
         if (empresaRepository.existsById(id)) {
-            Empresa empresa = EmpresaMapper.of(empresaAtualizada);
+            Empresa empresa = mapper.map(empresaAtualizada, Empresa.class);
             empresa.setIdEmpresa(id);
             empresaRepository.save(empresa);
         }
     }
     public Empresa putEmpresa(Long id, EmpresaCriacaoDto empresaAtualizada){
         if (empresaRepository.existsById(id)){
-            var empresa = EmpresaMapper.of(empresaAtualizada);
+            var empresa = mapper.map(empresaAtualizada, Empresa.class);
             empresa.setIdEmpresa(id);
             return empresaRepository.save(empresa);
         }

@@ -16,6 +16,6 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long> {
     @Query("SELECT r.id FROM Receita r JOIN Ingrediente i WHERE r.idIngrediente = :idIngrediente AND i.tipoMedida = :tipoMedida AND i.valorMedida = :valorMedida")
     Long findIngredienteIdByTipoMedidaValorMedida(@Param("idIngrediente") Long idIngrediente, @Param("tipoMedida") String tipoMedida, @Param("valorMedida") String valorMedida);
 
-
+    List<Receita> findByIdPrato(Long idPrato);
 }
 
