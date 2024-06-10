@@ -73,17 +73,30 @@ public class PratoService {
     }
 
     public Map<Long, Integer> calculateIngredientUsage(List<Long> servedDishesIds) {
+        // Cria um mapa para armazenar o uso de ingredientes.
+        // Chave: ID do ingrediente (Long)
+        // Valor: Quantidade do ingrediente usado (Integer)
         Map<Long, Integer> ingredientUsage = new HashMap<>();
 
+        // Itera sobre todos os IDs de pratos servidos fornecidos como entrada para o método.
         for (Long dishId : servedDishesIds) {
+            // Obtém a lista de receitas associadas ao prato atual usando o ID do prato.
+            // Supõe-se que receitaRepository.findByIdPrato(dishId) retorne uma lista de objetos do tipo Receita.
             List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
+
+            // Itera sobre todas as receitas associadas ao prato atual.
             for (Receita recipe : recipes) {
+                // Atualiza o mapa ingredientUsage:
+                // Se o ingrediente já estiver presente no mapa, o valor existente é substituído pela soma do valor existente e da quantidade do ingrediente na receita atual.
+                // Se o ingrediente não estiver presente, ele é adicionado ao mapa com a quantidade da receita atual.
                 ingredientUsage.merge(recipe.getIdIngrediente(), recipe.getQuantidade(), Integer::sum);
             }
         }
 
+        // Retorna ingredientUsage, que contém o uso de ingredientes calculado para todos os pratos servidos.
         return ingredientUsage;
     }
+
 
     public int[][] generateIngredientUsageReport(List<Long> servedDishesIds, int numberOfIngredients) {
         int[][] ingredientUsageReport = new int[servedDishesIds.size()][numberOfIngredients];
