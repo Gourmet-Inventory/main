@@ -1,5 +1,6 @@
 package project.gourmetinventoryproject.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,15 +13,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Usuario;
+import project.gourmetinventoryproject.dto.usuario.UsuarioConsultaDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
+import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.status;
@@ -36,24 +42,27 @@ public class UsuarioService {
     private GerenciadorTokenJwt gerenciadorTokenJwt;
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private ModelMapper modelMapper;
+    @Autowired
+    private EmpresaRepository empresaRepository;
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
-    }
 
-    public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto){//???
-        final Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
-
+    public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto){
+        Empresa empresa = empresaRepository.findById(usuarioCriacaoDto.getIdEmpresa()).orElseThrow(()-> new IdNotFoundException());
+        Usuario novoUsuario = modelMapper.map(usuarioCriacaoDto, Usuario.class);
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
-
+        novoUsuario.setEmpresa(empresa);
         usuarioRepository.save(novoUsuario);
     }
 
-    public List<Usuario> getUsuarios(){ //???
-        List<Usuario> usuarios = new ArrayList<>();
-        usuarios = usuarioRepository.findAll();
-        return usuarios;
+    public List<UsuarioConsultaDto> getUsuarios(){ //???
+        List<Usuario> usuarios = usuarioRepository.findAll();
+
+        return usuarios.stream()
+                .map(usuario -> modelMapper.map(usuario, UsuarioConsultaDto.class))
+                .collect(Collectors.toList());
     }
 
     public ResponseEntity<Void> deleteUsuario(Long id){ //???
@@ -66,16 +75,16 @@ public class UsuarioService {
 
     public ResponseEntity<Void> patchUsuario(Long id, UsuarioCriacaoDto usuarioCriacaoDto){
         if (usuarioRepository.existsById(id)) {
-            Usuario newUsuario = UsuarioMapper.of(usuarioCriacaoDto);
+            Usuario newUsuario = modelMapper.map(usuarioCriacaoDto, Usuario.class);
             usuarioRepository.save(newUsuario);
             return status(200).build();
         }
         return status(204).build();
     }
 
-//    public ResponseEntity<Object> getEmpresasUsuario(){
-//        return null;
-//    }
+    public ResponseEntity<Object> getEmpresasUsuario(){
+        return null;
+    }
 
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto){
 
@@ -97,6 +106,8 @@ public class UsuarioService {
             return UsuarioMapper.of(usuarioOptional.orElse(null), token);
         }
     }
+
+
 
     public static String downloadFile(String fileName /* ,HttpServletResponse response*/) {
         try {

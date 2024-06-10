@@ -17,7 +17,7 @@ public class UsuarioCriacaoDto {
 
     @Size(min = 1)
     private String nome;
-    private String cargo; //Enum
+    private String cargo;
     @CPF
     private String cpf;
     @Email
@@ -27,4 +27,5 @@ public class UsuarioCriacaoDto {
     //@Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+=-])")//senha forte | Pelo menos uma letra minúscula | Pelo menos uma letra maiúscula | Pelo menos um número | Pelo menos um caractere especial
     @NotBlank
     private String senha;
+    private Long idEmpresa;
 }

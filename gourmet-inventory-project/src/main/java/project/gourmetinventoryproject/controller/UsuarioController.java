@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Usuario;
+import project.gourmetinventoryproject.dto.usuario.UsuarioConsultaDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
@@ -34,8 +35,8 @@ public class UsuarioController {
 
     @Operation(summary = "Obter Lista de usuarios", method = "GET")
     @GetMapping()
-    public ResponseEntity<List<Usuario>> getUsuarios() {
-            List<Usuario> lista = usuarioService.getUsuarios();
+    public ResponseEntity<List<UsuarioConsultaDto>> getUsuarios() {
+            List<UsuarioConsultaDto> lista = usuarioService.getUsuarios();
             return lista.isEmpty() ? status(204).build() : status(200).body(lista);
     }
 
