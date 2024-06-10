@@ -1,7 +1,8 @@
 package project.gourmetinventoryproject.service;
 
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.domain.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,18 +28,19 @@ public class EmpresaService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    ModelMapper mapper = new ModelMapper();
 
-    @Transactional
     public void postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
-
-        Usuario responsavel = usuarioRepository.findById(empresaCriacaoDto.getResponsavelId()).orElseThrow(()-> new IdNotFoundException());
-
-        Empresa novaEmpresa = modelMapper.map(empresaCriacaoDto,Empresa.class);
-        novaEmpresa.setResponsavel(responsavel);
+        Empresa novaEmpresa = mapper.map(empresaCriacaoDto, Empresa.class);
         empresaRepository.save(novaEmpresa);
     }
+
+//    public void save(Empresa empresa, Integer idUsuario) {
+//        Optional<Usuario> usuario = usuarioRepository.findById(Long.valueOf(idUsuario));
+//        empresa.setResponsavel(usuario.get());
+//        empresaRepository.save(empresa);
+//    }
+
     public List<Empresa> getEmpresas() {
         return empresaRepository.findAll();
     }
@@ -47,21 +51,15 @@ public class EmpresaService {
 
     public void patchEmpresa(Long id, EmpresaCriacaoDto empresaAtualizada) {
         if (empresaRepository.existsById(id)) {
-            Empresa empresa = modelMapper.map(empresaAtualizada, Empresa.class);
+            Empresa empresa = mapper.map(empresaAtualizada, Empresa.class);
             empresa.setIdEmpresa(id);
             empresaRepository.save(empresa);
         }
     }
     public Empresa putEmpresa(Long id, EmpresaCriacaoDto empresaAtualizada){
-
         if (empresaRepository.existsById(id)){
-            Empresa empresa = modelMapper.map(empresaAtualizada,Empresa.class);
-
-            if (empresaAtualizada.getResponsavelId() != null) {
-                Usuario responsavel = usuarioRepository.findById(empresaAtualizada.getResponsavelId())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid responsavelId"));
-                empresa.setResponsavel(responsavel);
-            }
+            var empresa = mapper.map(empresaAtualizada, Empresa.class);
+            empresa.setIdEmpresa(id);
             return empresaRepository.save(empresa);
         }
         throw new IdNotFoundException();

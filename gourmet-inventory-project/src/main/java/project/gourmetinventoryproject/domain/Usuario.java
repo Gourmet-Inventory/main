@@ -28,4 +28,6 @@ public class Usuario {
     private String email;
     private String celular;
     private String senha;
+    @ManyToOne
+    private Empresa empresa;
 }
