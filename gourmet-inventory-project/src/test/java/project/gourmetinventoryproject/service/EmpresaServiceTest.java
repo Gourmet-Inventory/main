@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import project.gourmetinventoryproject.domain.Empresa;
-import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
 
 import java.util.Arrays;

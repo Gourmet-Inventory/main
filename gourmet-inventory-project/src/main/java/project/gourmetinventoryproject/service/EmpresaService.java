@@ -1,13 +1,19 @@
 package project.gourmetinventoryproject.service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.domain.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
 import project.gourmetinventoryproject.dto.empresa.EmpresaMapper;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
+import project.gourmetinventoryproject.repository.UsuarioRepository;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,10 +25,20 @@ public class EmpresaService {
     @Autowired
     private EmpresaRepository empresaRepository;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public void postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
         Empresa novaEmpresa = EmpresaMapper.of(empresaCriacaoDto);
         empresaRepository.save(novaEmpresa);
     }
+
+//    public void save(Empresa empresa, Integer idUsuario) {
+//        Optional<Usuario> usuario = usuarioRepository.findById(Long.valueOf(idUsuario));
+//        empresa.setResponsavel(usuario.get());
+//        empresaRepository.save(empresa);
+//    }
+
     public List<Empresa> getEmpresas() {
         return empresaRepository.findAll();
     }

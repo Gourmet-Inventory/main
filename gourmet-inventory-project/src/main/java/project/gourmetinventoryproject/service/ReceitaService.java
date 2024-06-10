@@ -7,7 +7,6 @@ import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Receita;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,7 +51,7 @@ public class ReceitaService {
         receitaRepository.deleteById(id);
     }
 
-    public Long getIngredienteIdByTipoMedidaValorMedida(Long estoqueIngrediente, String tipoMedida, String valorMedida){
+    public Long findIngredienteIdByTipoMedidaValorMedida(Long estoqueIngrediente, String tipoMedida, String valorMedida){
         return receitaRepository.findIngredienteIdByTipoMedidaValorMedida(estoqueIngrediente, tipoMedida, valorMedida);
     }
 }
