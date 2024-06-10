@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.api.configuration.security.jwt.GerenciadorTokenJwt;
 import project.gourmetinventoryproject.domain.Usuario;
+import project.gourmetinventoryproject.dto.usuario.UsuarioConsultaDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
@@ -94,7 +95,7 @@ class UsuarioServiceTest {
         Usuario user2 = new Usuario();
         user2.setNome("User 2");
         when(usuarioRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
-        List<Usuario> usuarios = usuarioService.getUsuarios();
+        List<UsuarioConsultaDto> usuarios = usuarioService.getUsuarios();
         assertEquals(2, usuarios.size());
     }
 
