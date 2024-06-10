@@ -78,10 +78,27 @@ public class PratoService {
         for (Long dishId : servedDishesIds) {
             List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
             for (Receita recipe : recipes) {
-                ingredientUsage.put(recipe.getIdIngrediente(), ingredientUsage.getOrDefault(recipe.getIdIngrediente(), 0) + recipe.getQuantidade());
+                ingredientUsage.merge(recipe.getIdIngrediente(), recipe.getQuantidade(), Integer::sum);
             }
         }
 
         return ingredientUsage;
+    }
+
+    public int[][] generateIngredientUsageReport(List<Long> servedDishesIds, int numberOfIngredients) {
+        int[][] ingredientUsageReport = new int[servedDishesIds.size()][numberOfIngredients];
+
+        for (int i = 0; i < servedDishesIds.size(); i++) {
+            Long dishId = servedDishesIds.get(i);
+            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
+
+            for (Receita recipe : recipes) {
+                int ingredientIndex = recipe.getIdIngrediente().intValue() - 1;
+                int quantity = recipe.getQuantidade();
+                ingredientUsageReport[i][ingredientIndex] += quantity;
+            }
+        }
+
+        return ingredientUsageReport;
     }
 }
