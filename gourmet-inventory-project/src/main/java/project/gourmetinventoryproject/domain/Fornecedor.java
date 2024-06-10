@@ -12,13 +12,16 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class Receita {
+public class Fornecedor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private Long idIngrediente;
-    private Long idPrato;
-    private Boolean manipulavel;
-    private Integer quantidade;
-}
+    private Long idFornecedor;
+    private String nomeFornecedor;
+    private String cnpj;
+    private String logradouro;
+    private String numeracaoLogradouro;
+    private String telefone;
+    private String categoria;
 
+}
