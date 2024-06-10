@@ -113,5 +113,13 @@ public class PratoService {
         }
 
         return ingredientUsageReport;
+
+        /*Resultado esperado
+                    | Ingrediente 1 | Ingrediente 2 | Ingrediente 3 | Ingrediente 4 |
+            ----------------------------------------------------------------------
+            Prato 1 |       1       |       3       |       0       |       1       |
+            Prato 2 |       0       |       4       |       2       |       0       |
+            Prato 3 |       3       |       0       |       8       |       7       |
+        */
     }
 }
