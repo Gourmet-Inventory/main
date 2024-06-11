@@ -2,8 +2,10 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
+import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 
 
@@ -15,8 +17,13 @@ public class EstoqueIngredienteService {
     @Autowired
     private EstoqueIngredienteRepository estoqueIngredienteRepository;
 
-    public List<EstoqueIngrediente> getAllEstoqueIngredientes() {
-        return estoqueIngredienteRepository.findAll();
+    @Autowired
+    private EmpresaService empresaService;
+
+
+    public List<EstoqueIngrediente> getAllEstoqueIngredientes(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        return estoqueIngredienteRepository.findAllByEmpresa(empresa);
     }
 
     public EstoqueIngrediente getEstoqueIngredienteById(Long id) {
@@ -26,7 +33,8 @@ public class EstoqueIngredienteService {
         throw new IdNotFoundException();
     }
 
-    public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente) {
+    public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente, Long idEmpresa) {
+        estoqueIngrediente.setEmpresa(empresaService.getEmpresasById(idEmpresa));
         return estoqueIngredienteRepository.save(estoqueIngrediente);
     }
 

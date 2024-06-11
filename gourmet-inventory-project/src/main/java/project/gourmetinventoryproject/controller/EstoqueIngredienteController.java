@@ -49,13 +49,13 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})})
     })
-        @GetMapping()
-        public ResponseEntity<List<EstoqueIngredienteConsultaDto>> getAllEstoqueIngredientes() {
-            List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
-            return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(estoqueIngredientes.stream()
-                    .map(estoqueIngrediente -> mapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class))
-                    .collect(Collectors.toList()), HttpStatus.OK);
-        }
+    @GetMapping("/{idEmpresa}")
+    public ResponseEntity<List<EstoqueIngredienteConsultaDto>> getAllEstoqueIngredientes(@PathVariable Long idEmpresa) {
+        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
+        return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(estoqueIngredientes.stream()
+                .map(estoqueIngrediente -> mapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
+    }
     @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes encontrado com sucesso",
@@ -74,7 +74,7 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<EstoqueIngredienteConsultaDto> getEstoqueIngredienteById(@PathVariable Long id) {
         EstoqueIngrediente estoqueIngrediente = estoqueIngredienteService.getEstoqueIngredienteById(id);
         return new ResponseEntity<>(mapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
@@ -100,10 +100,10 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PostMapping
-    public ResponseEntity<EstoqueIngredienteConsultaDto> createEstoqueIngrediente(@RequestBody EstoqueIngredienteCriacaoDto estoqueIngrediente) {
+    @PostMapping("/{idEmpresa}")
+    public ResponseEntity<EstoqueIngredienteConsultaDto> createEstoqueIngrediente(@PathVariable Long idEmpresa,@RequestBody EstoqueIngredienteCriacaoDto estoqueIngrediente) {
         var entidade = mapper.map(estoqueIngrediente, EstoqueIngrediente.class);
-        estoqueIngredienteService.createEstoqueIngrediente(entidade);
+        estoqueIngredienteService.createEstoqueIngrediente(entidade,idEmpresa);
         var dtoResposta = mapper.map(entidade, EstoqueIngredienteConsultaDto.class);
         return new ResponseEntity<>(dtoResposta, HttpStatus.CREATED);
     }

@@ -1,9 +1,6 @@
 package project.gourmetinventoryproject.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +13,9 @@ public class Prato {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPrato;
+    @OneToOne(cascade = CascadeType.DETACH)
+    @JoinColumn(name = "id_empresa")
+    private Empresa empresa;
     private String nome;
     private String descricao;
     private Double preco;
