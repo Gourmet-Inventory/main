@@ -5,14 +5,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.PratoService;
@@ -20,6 +19,8 @@ import project.gourmetinventoryproject.service.PratoService;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/pratos")
@@ -159,5 +160,16 @@ public class PratoController {
     @PostMapping("/calculate-ingredient-usage")
     public Map<Long, Integer> calculateIngredientUsage(@RequestBody List<Long> servedDishesIds) {
         return pratoService.calculateIngredientUsage(servedDishesIds);
+    }
+
+    @PatchMapping(value = "/foto/{codigo}",
+            consumes = {"image/jpeg", "image/png", "image/webp", "image/gif"})
+    public ResponseEntity<Void> updatePratoFoto(@PathVariable Long id, @RequestBody byte[] novaFoto) {
+        Prato prato = pratoService.updatePratoFoto(id, novaFoto);
+
+        if ( prato != null){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

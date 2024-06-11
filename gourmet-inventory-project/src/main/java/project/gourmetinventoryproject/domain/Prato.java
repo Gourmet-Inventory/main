@@ -20,4 +20,5 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
+    private byte[] foto;
 }
