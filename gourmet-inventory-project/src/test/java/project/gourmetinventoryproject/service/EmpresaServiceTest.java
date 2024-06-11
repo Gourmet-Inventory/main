@@ -10,9 +10,11 @@ import project.gourmetinventoryproject.repository.EmpresaRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+
 
 class EmpresaServiceTest {
 
@@ -26,7 +28,7 @@ class EmpresaServiceTest {
 
     @BeforeEach
     void setUp() {
-//        MockitoAnnotations.openMocks(this);
+        MockitoAnnotations.openMocks(this);
 
         Empresa empresa1 = new Empresa();
         empresa1.setIdEmpresa(1L);
@@ -34,18 +36,30 @@ class EmpresaServiceTest {
         Empresa empresa2 = new Empresa();
         empresa2.setIdEmpresa(2L);
 
-        //empresas = Arrays.asList(empresa1, empresa2);
-        empresas.add(empresa1);
-        empresas.add(empresa2);
+        empresas = Arrays.asList(empresa1, empresa2);
 
         when(empresaRepository.findAll()).thenReturn(empresas);
-        when(empresaRepository.findById(1L)).thenReturn(java.util.Optional.of(empresa1));
-        when(empresaRepository.findById(2L)).thenReturn(java.util.Optional.of(empresa2));
+        when(empresaRepository.findById(1L)).thenReturn(Optional.of(empresa1));
+        when(empresaRepository.findById(2L)).thenReturn(Optional.of(empresa2));
     }
 
     @Test
-    void getEmpresasValido() {
+    void getEmpresasReturnsCorrectSize() {
         List<Empresa> empresas = empresaService.getEmpresas();
         assertEquals(2, empresas.size());
     }
+
+    @Test
+    void getEmpresaByIdReturnsCorrectEmpresa() {
+        Empresa empresa = empresaService.getEmpresasById(1L);
+        assertNotNull(empresa);
+        assertEquals(1L, empresa.getIdEmpresa());
+    }
+
+
+    @Test
+    void getEmpresaByIdReturnsEmptyForNonExistentId() {
+        assertNull(empresaService.getEmpresasById(3L));
+    }
+
 }

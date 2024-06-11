@@ -19,5 +19,6 @@ public class Receita {
     private Long idIngrediente;
     private Long idPrato;
     private Boolean manipulavel;
+    private Integer quantidade;
 }
 

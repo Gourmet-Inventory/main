@@ -23,7 +23,7 @@ public class EmpresaController {
 
     @Operation(summary = "Criar nova empresa", method = "POST")
     @PostMapping
-    public ResponseEntity<Void> postEmpresa(@RequestBody EmpresaCriacaoDto novaEmpresa) {
+    public ResponseEntity<Void> postEmpresa(@RequestBody @Valid EmpresaCriacaoDto novaEmpresa) {
         empresaService.postEmpresa(novaEmpresa);
         return status(201).build();
     }
@@ -50,7 +50,7 @@ public class EmpresaController {
     }
     @Operation(summary = "Atualizar empresa por id", method = "Patch")
     @PutMapping("/{id}")
-    public ResponseEntity<Void> putEmpresa(@PathVariable Long id, @RequestBody EmpresaCriacaoDto empresaAtualizada) {
+    public ResponseEntity<Void> putEmpresa(@PathVariable Long id, @RequestBody @Valid EmpresaCriacaoDto empresaAtualizada) {
         empresaService.putEmpresa(id, empresaAtualizada);
         return status(200).build();
     }
