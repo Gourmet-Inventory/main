@@ -20,7 +20,4 @@ public class Empresa {
 
     private String telefone;
 
-    @ManyToOne
-    @JoinColumn(name = "responsavel_id")
-    private Usuario responsavel;
 }

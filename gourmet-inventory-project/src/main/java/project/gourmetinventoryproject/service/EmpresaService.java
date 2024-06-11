@@ -1,21 +1,15 @@
 package project.gourmetinventoryproject.service;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.domain.Empresa;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.empresa.EmpresaCriacaoDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -29,6 +23,7 @@ public class EmpresaService {
     private UsuarioRepository usuarioRepository;
 
     ModelMapper mapper = new ModelMapper();
+
 
     public void postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
         Empresa novaEmpresa = mapper.map(empresaCriacaoDto, Empresa.class);
@@ -65,7 +60,11 @@ public class EmpresaService {
         throw new IdNotFoundException();
     }
 
-    public Optional<Empresa> getEmpresasById(Long id) {
-        return empresaRepository.findById(id);
+    public Empresa getEmpresasById(Long idEmpresa) {
+        Empresa empresa = empresaRepository.findById(idEmpresa).orElse(null);
+        if (empresa == null) {
+            throw new IdNotFoundException();
+        }
+        return empresa;
     }
 }
