@@ -23,4 +23,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Void deleteById(long id);
 
     List<Usuario> findByCargoEqualsIgnoreCase(String cargo);
+
+
+    @Query("select u from Usuario u where u.empresa.idEmpresa = ?1")
+    List<Usuario> findAllByidEmpresa(Long id);
 }

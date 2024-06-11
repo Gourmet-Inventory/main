@@ -51,13 +51,15 @@ class EmpresaServiceTest {
 
     @Test
     void getEmpresaByIdReturnsCorrectEmpresa() {
-        Empresa empresa = empresaService.getEmpresasById(1L).orElse(null);
+        Empresa empresa = empresaService.getEmpresasById(1L);
         assertNotNull(empresa);
         assertEquals(1L, empresa.getIdEmpresa());
     }
 
+
     @Test
     void getEmpresaByIdReturnsEmptyForNonExistentId() {
-        assertFalse(empresaService.getEmpresasById(3L).isPresent());
+        assertNull(empresaService.getEmpresasById(3L));
     }
+
 }

@@ -30,15 +30,10 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     @Operation(summary = "Obter Lista de usuarios", method = "GET")
-    @GetMapping()
-    public ResponseEntity<List<UsuarioConsultaDto>> getUsuarios() {
-            List<UsuarioConsultaDto> lista = usuarioService.getUsuarios();
-            return lista.isEmpty() ? status(204).build() : status(200).body(lista);
-    }
+    @GetMapping("/{idEmpresa}")
+    public ResponseEntity<List<UsuarioConsultaDto>> getUsuarios(@PathVariable Long idEmpresa) {return status(200).body(usuarioService.getUsuarios(idEmpresa));};
 
     @Operation(summary = "Criar novo usuario", method = "POST")
     @PostMapping()
@@ -55,11 +50,11 @@ public class UsuarioController {
 
     @Operation(summary = "Atualizar usuario por id", method = "PATCH")
     @PatchMapping("/{userId}")
-    public ResponseEntity<Void> patchUsuario(@PathVariable Long userId, @RequestBody @Valid UsuarioCriacaoDto novoUsuario) {
+    public ResponseEntity<Void> patchUsuario(@PathVariable Long userId, @RequestBody UsuarioCriacaoDto novoUsuario) {
             if (usuarioService.usuarioRepository.existsById(userId)) {
                 return usuarioService.patchUsuario(userId, novoUsuario);
             }
-            return status(204).build();
+            return status(404).build();
     }
 
     @ApiIgnore
@@ -92,10 +87,10 @@ public class UsuarioController {
 //        if (nomeArquivo.isBlank()){
 //            throw new ResponseStatusException(411, "Preencha um nome para gerar o arquivo", null);
 //        }else {
-            List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
+            //List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
             //List<Usuario> usuarioList = usuarioRepository.findAll();
             //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
-            GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
+            //GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
        //}
         String arquivo = UsuarioService.downloadFile(nomeArquivo);
         return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();

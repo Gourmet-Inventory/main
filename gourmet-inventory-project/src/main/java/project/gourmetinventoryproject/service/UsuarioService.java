@@ -1,8 +1,10 @@
 package project.gourmetinventoryproject.service;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,12 +59,13 @@ public class UsuarioService {
         usuarioRepository.save(novoUsuario);
     }
 
-    public List<UsuarioConsultaDto> getUsuarios(){ //???
-        List<Usuario> usuarios = usuarioRepository.findAll();
-
-        return usuarios.stream()
-                .map(usuario -> modelMapper.map(usuario, UsuarioConsultaDto.class))
-                .collect(Collectors.toList());
+    public List<UsuarioConsultaDto> getUsuarios(Long idEmpresa){
+        List<Usuario> lista = usuarioRepository.findAllByidEmpresa(idEmpresa);
+            if (lista.isEmpty()){
+                throw new ResponseStatusException(HttpStatusCode.valueOf(204));
+            }
+            List<UsuarioConsultaDto> listaDto = modelMapper.map(lista,new TypeToken<List<UsuarioConsultaDto>>(){}.getType());
+        return listaDto;
     }
 
     public ResponseEntity<Void> deleteUsuario(Long id){ //???
@@ -73,39 +76,71 @@ public class UsuarioService {
         return status(404).build();
     }
 
-    public ResponseEntity<Void> patchUsuario(Long id, UsuarioCriacaoDto usuarioCriacaoDto){
-        if (usuarioRepository.existsById(id)) {
-            Usuario newUsuario = modelMapper.map(usuarioCriacaoDto, Usuario.class);
-            usuarioRepository.save(newUsuario);
-            return status(200).build();
+    public ResponseEntity<Void> patchUsuario(Long id, UsuarioCriacaoDto usuarioCriacaoDto) {
+            Optional<Usuario> usuarioOptional = usuarioRepository.findById(id);
+            if (usuarioOptional.isPresent()) {
+                Usuario usuarioExistente = usuarioOptional.get();
+
+                if (usuarioCriacaoDto.getNome() != null) {
+                    usuarioExistente.setNome(usuarioCriacaoDto.getNome());
+                }
+                if (usuarioCriacaoDto.getCargo() != null) {
+                    usuarioExistente.setCargo(usuarioCriacaoDto.getCargo());
+                }
+                if (usuarioCriacaoDto.getCpf() != null) {
+                    usuarioExistente.setCpf(usuarioCriacaoDto.getCpf());
+                }
+                if (usuarioCriacaoDto.getEmail() != null) {
+                    usuarioExistente.setEmail(usuarioCriacaoDto.getEmail());
+                }
+                if (usuarioCriacaoDto.getSenha() != null) {
+                    usuarioExistente.setSenha(usuarioCriacaoDto.getSenha());
+                }
+                if (usuarioCriacaoDto.getIdEmpresa() != null) {
+                    Empresa empresa = empresaRepository.findById(usuarioCriacaoDto.getIdEmpresa()).orElseThrow(()-> new IdNotFoundException());
+                    usuarioExistente.setEmpresa(empresa);
+                }
+
+
+                usuarioRepository.save(usuarioExistente);
+
+                return ResponseEntity.status(200).build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
-        return status(204).build();
-    }
+
+
 
     public ResponseEntity<Object> getEmpresasUsuario(){
         return null;
     }
 
-    public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto){
+    public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(usuarioLoginDto.getEmail());
 
         if (usuarioOptional.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não cadastrado", null);
-        }else {
+        } else {
             final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                     usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());
 
             final Authentication authentication = this.authenticationManager.authenticate(credentials);
-            usuarioOptional
-                    .orElseThrow(
-                            () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
-                    );
+
+            usuarioOptional.orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email do usuário não cadastrado", null)
+            );
+
             SecurityContextHolder.getContext().setAuthentication(authentication);
             final String token = gerenciadorTokenJwt.generateToken(authentication);
-            return UsuarioMapper.of(usuarioOptional.orElse(null), token);
+
+            UsuarioTokenDto usuarioTokenDto = modelMapper.map(usuarioOptional.get(), UsuarioTokenDto.class);
+            usuarioTokenDto.setToken(token);
+
+            return usuarioTokenDto;
         }
-    }
+}
 
 
 
