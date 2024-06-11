@@ -12,8 +12,4 @@ import java.util.Optional;
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 
-//    Optional<Empresa> findById(Long id);
-
-//    @Query("SELECT e FROM Empresa e WHERE e.responsavel = ?1")
-//    List<Empresa> findByResponsavel(Usuario responsavel);
 }

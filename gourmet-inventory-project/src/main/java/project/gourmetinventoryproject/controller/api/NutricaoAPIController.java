@@ -6,6 +6,7 @@ import com.opencsv.CSVWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import project.gourmetinventoryproject.domain.NutritionData;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
@@ -25,9 +26,9 @@ public class NutricaoAPIController {
     @Autowired
     private EstoqueIngredienteController estoqueIngredienteController;
 
-    @GetMapping("/consulta-nutricao-api")
-    public List<NutritionData> fetchNutritionDataFromAPI() throws IOException {
-        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes();
+    @GetMapping("/consulta-nutricao-api/{idEmpresa}")
+    public List<NutritionData> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
+        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
         List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
 
         List<NutritionData> nutritionDataList = new ArrayList<>();

@@ -57,8 +57,8 @@ public class EmpresaController {
 
     @Operation(summary = "Obter empresa por id", method = "GET")
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Empresa>> getEmpresasById(@PathVariable Long id) {
-        Optional<Empresa> empresas = empresaService.getEmpresasById(id);
-        return empresas.isEmpty() ? status(204).build() : status(200).body(empresas);
+    public ResponseEntity<Empresa> getEmpresasById(@PathVariable Long id) {
+        Empresa empresa = empresaService.getEmpresasById(id);
+        return ResponseEntity.status(200).body(empresa);
     }
 }

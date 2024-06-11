@@ -17,14 +17,18 @@ public class EstoqueIngrediente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idItem;
     private String lote;
+    @ManyToOne
+    @JoinColumn(name = "id_empresa")
+    private Empresa empresa;
     private String nome;
     private String categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
+    private Integer unidades;
     private Double valorMedida;
     private Double valorTotal;
     private String localArmazenamento;
     private LocalDate dtaCadastro;
-    private Date dtaAviso;
+    private LocalDate dtaAviso;
 }
 

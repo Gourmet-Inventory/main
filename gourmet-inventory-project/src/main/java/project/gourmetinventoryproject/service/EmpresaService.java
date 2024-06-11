@@ -67,7 +67,11 @@ public class EmpresaService {
         throw new IdNotFoundException();
     }
 
-    public Optional<Empresa> getEmpresasById(Long id) {
-        return empresaRepository.findById(id);
+    public Empresa getEmpresasById(Long idEmpresa) {
+        Empresa empresa = empresaRepository.findById(idEmpresa).orElse(null);
+        if (empresa == null) {
+            throw new IdNotFoundException();
+        }
+        return empresa;
     }
 }
