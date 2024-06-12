@@ -1,9 +1,15 @@
 package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.domain.Receita;
+import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
@@ -17,16 +23,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.http.ResponseEntity.status;
+
 @Service
 public class PratoService {
 
     @Autowired
+
     private PratoRepository pratoRepository;
+
     @Autowired
     private ReceitaRepository receitaRepository;
 
-    public List<Prato> getAllPratos() {
-        return pratoRepository.findAll();
+    @Autowired
+    private EmpresaService empresaService;
+
+    public List<Prato> getAllPratos(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        return pratoRepository.findAllByEmpresa(empresa);
     }
 
     public Prato getPratoById(Long id) {
@@ -38,7 +52,8 @@ public class PratoService {
 
     }
 
-    public Prato createPrato(Prato prato) {
+    public Prato createPrato(Prato prato, Long idEmpresa) {
+        prato.setEmpresa(empresaService.getEmpresasById(idEmpresa));
         if (pratoRepository.findByNomeIgnoreCase(prato.getNome()).isEmpty()){
             return pratoRepository.save(prato);
         }
@@ -121,5 +136,17 @@ public class PratoService {
             Prato 2 |       0       |       4       |       2       |       0       |
             Prato 3 |       3       |       0       |       8       |       7       |
         */
+    }
+
+    public Prato updatePratoFoto(@PathVariable Long codigo, @RequestBody byte[] novaFoto) {
+        Prato prato;
+        if (pratoRepository.existsById(codigo) == false){
+            throw new IdNotFoundException();
+        } else {
+            prato = pratoRepository.findById(codigo).get();
+            prato.setFoto(novaFoto);
+            pratoRepository.save(prato);
+        }
+        return prato;
     }
 }

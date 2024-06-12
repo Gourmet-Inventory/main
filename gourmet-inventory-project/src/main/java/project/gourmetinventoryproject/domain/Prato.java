@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Data
 @Getter
@@ -20,4 +22,7 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
+    @Enumerated(EnumType.STRING)
+    private List<AlergicosRestricoes> alergicosRestricoes;
+    private byte[] foto;
 }

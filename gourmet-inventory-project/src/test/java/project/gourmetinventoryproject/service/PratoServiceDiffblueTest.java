@@ -53,9 +53,9 @@ class PratoServiceDiffblueTest {
         // Arrange
         ArrayList<Prato> pratoList = new ArrayList<>();
         when(pratoRepository.findAll()).thenReturn(pratoList);
-
+        Long idEmpresa = 1L;
         // Act
-        List<Prato> actualAllPratos = pratoService.getAllPratos();
+        List<Prato> actualAllPratos = pratoService.getAllPratos(idEmpresa);
 
         // Assert
         verify(pratoRepository).findAll();
@@ -70,9 +70,9 @@ class PratoServiceDiffblueTest {
     void testGetAllPratos2() {
         // Arrange
         when(pratoRepository.findAll()).thenThrow(new IdNotFoundException());
-
+        Long idEmpresa = 1L;
         // Act and Assert
-        assertThrows(IdNotFoundException.class, () -> pratoService.getAllPratos());
+        assertThrows(IdNotFoundException.class, () -> pratoService.getAllPratos(idEmpresa));
         verify(pratoRepository).findAll();
     }
 
