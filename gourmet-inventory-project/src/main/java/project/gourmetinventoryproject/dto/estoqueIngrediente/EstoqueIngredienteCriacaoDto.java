@@ -23,5 +23,5 @@ public class EstoqueIngredienteCriacaoDto {
     private Double valorTotal;
     private String localArmazenamento;
     private LocalDate dtaCadastro;
-    private Date dtaAviso;
+    private LocalDate dtaAviso;
 }
