@@ -1,5 +1,10 @@
 package project.gourmetinventoryproject.service;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,6 +18,8 @@ import project.gourmetinventoryproject.repository.ReceitaRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -127,6 +134,39 @@ public class PratoService {
             Prato 2 |       0       |       4       |       2       |       0       |
             Prato 3 |       3       |       0       |       8       |       7       |
         */
+    }
+
+    public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
+        // Criar um novo workbook do Excel
+        Workbook workbook = new XSSFWorkbook();
+
+        // Criar uma nova planilha
+        Sheet sheet = workbook.createSheet("Relatório de Uso de Ingredientes");
+
+        // Cabeçalho
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < numberOfIngredients; i++) {
+            Cell cell = headerRow.createCell(i + 1);
+            cell.setCellValue("Ingrediente " + (i + 1));
+        }
+
+        // Preencher os dados do relatório
+        int[][] ingredientUsageReport = generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
+        for (int i = 0; i < servedDishesIds.size(); i++) {
+            Row row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue("Prato " + (i + 1));
+            for (int j = 0; j < numberOfIngredients; j++) {
+                row.createCell(j + 1).setCellValue(ingredientUsageReport[i][j]);
+            }
+        }
+
+        // Escrever os dados no arquivo
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        }
+
+        // Fechar o workbook
+        workbook.close();
     }
 
     public Prato updatePratoFoto(@PathVariable Long codigo, @RequestBody byte[] novaFoto) {
