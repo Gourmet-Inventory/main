@@ -11,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.PratoService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -162,7 +164,7 @@ public class PratoController {
         return pratoService.calculateIngredientUsage(servedDishesIds);
     }
 
-    @PatchMapping(value = "/foto/{codigo}",
+    @PatchMapping(value = "/foto/{id}",
             consumes = {"image/jpeg", "image/png", "image/webp", "image/gif"})
     public ResponseEntity<Void> updatePratoFoto(@PathVariable Long id, @RequestBody byte[] novaFoto) {
         Prato prato = pratoService.updatePratoFoto(id, novaFoto);
@@ -171,5 +173,10 @@ public class PratoController {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/alergicos")
+    public List<AlergicosRestricoes> getAlergicos() {
+        return Arrays.asList(AlergicosRestricoes.values());
     }
 }
