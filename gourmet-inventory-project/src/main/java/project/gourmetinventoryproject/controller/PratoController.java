@@ -163,6 +163,12 @@ public class PratoController {
     public Map<Long, Integer> calculateIngredientUsage(@RequestBody List<Long> servedDishesIds) {
         return pratoService.calculateIngredientUsage(servedDishesIds);
     }
+    
+    @PostMapping("/generate-ingredient-usage-report")
+    public ResponseEntity<int[][]> generateIngredientUsageReport(@RequestBody List<Long> servedDishesIds, @RequestParam int numberOfIngredients) {
+        int[][] report = pratoService.generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
+        return new ResponseEntity<>(report, HttpStatus.OK);
+    }
 
     @PatchMapping(value = "/foto/{id}",
             consumes = {"image/jpeg", "image/png", "image/webp", "image/gif"})
