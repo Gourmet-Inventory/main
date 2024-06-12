@@ -29,28 +29,35 @@ public class AlertaController {
     @Autowired
     private ModelMapper mapper;
 
-    @GetMapping()
-    public ResponseEntity<List<AlertaConsultaDto>> getAllAlertas() {
-        List<Alerta> alertas = alertaService.getAllAlerta();
+    @GetMapping("/{idEmpresa}")
+    public ResponseEntity<List<AlertaConsultaDto>> getAllAlertas(@PathVariable Long idEmpresa) {
+        List<Alerta> alertas = alertaService.getAllAlerta(idEmpresa);
         return alertas.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(alertas.stream()
                 .map(alerta -> mapper.map(alerta, AlertaConsultaDto.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @PostMapping("/{idEmpresa}")
-    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(Long idEmpresa){
+    //Arrumar alertas duplicados
+    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(@PathVariable Long idEmpresa){
         List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
         List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
+        if (estoqueIngredientes.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         for (int i = 0; i < estoqueIngredientes.size(); i++) {
             if (tipoAlerta(estoqueIngredientes.get(i)) != null){
                 Alerta alerta = new Alerta();
                 alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
                 alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                alertaService.createAlerta(alerta);
-                alertaConsultaDtos.add(mapper.map(alerta, AlertaConsultaDto.class));
+                try {
+                    alertaConsultaDtos.add(mapper.map(alertaService.createAlerta(alerta), AlertaConsultaDto.class));
+                }catch (Exception e){
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
             }
         }
-        return new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
+        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAlerta(@PathVariable Long id) {

@@ -50,9 +50,9 @@ class EstoqueIngredienteServiceDiffblueTest {
         // Arrange
         ArrayList<EstoqueIngrediente> estoqueIngredienteList = new ArrayList<>();
         when(estoqueIngredienteRepository.findAll()).thenReturn(estoqueIngredienteList);
-
+        Long idEmpresa = 1L;
         // Act
-        List<EstoqueIngrediente> actualAllEstoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
+        List<EstoqueIngrediente> actualAllEstoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
 
         // Assert
         verify(estoqueIngredienteRepository).findAll();
@@ -70,7 +70,7 @@ class EstoqueIngredienteServiceDiffblueTest {
         when(estoqueIngredienteRepository.findAll()).thenThrow(new IdNotFoundException());
 
         // Act and Assert
-        assertThrows(IdNotFoundException.class, () -> estoqueIngredienteService.getAllEstoqueIngredientes());
+        assertThrows(IdNotFoundException.class, () -> estoqueIngredienteServiceo.getAllEstoqueIngredientes());
         verify(estoqueIngredienteRepository).findAll();
     }
 

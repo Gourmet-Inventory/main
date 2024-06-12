@@ -50,9 +50,9 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                         examples = {@ExampleObject(value = "")})}),
     })
-    @GetMapping
-    public ResponseEntity<List<PratoConsultaDto>> getAllPratos() {
-        List<Prato> pratos = pratoService.getAllPratos();
+    @GetMapping("/{idEmpresa}")
+    public ResponseEntity<List<PratoConsultaDto>> getAllPratos(@PathVariable Long idEmpresa) {
+        List<Prato> pratos = pratoService.getAllPratos(idEmpresa);
         return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
                 .map(prato-> mapper.map(prato, PratoConsultaDto.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
@@ -75,7 +75,7 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<PratoConsultaDto> getPratoById(@PathVariable Long id) {
         Prato prato = pratoService.getPratoById(id);
         return new ResponseEntity<>(mapper.map(prato,PratoConsultaDto.class), HttpStatus.OK);
@@ -101,10 +101,10 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PostMapping
-    public ResponseEntity<PratoConsultaDto> createPrato(@RequestBody PratoCriacaoDto pratoDto) {
+    @PostMapping("/{idEmpresa}")
+    public ResponseEntity<PratoConsultaDto> createPrato(@RequestBody PratoCriacaoDto pratoDto,@PathVariable Long idEmpresa) {
         var entidade = mapper.map(pratoDto, Prato.class);
-        pratoService.createPrato(entidade);
+        pratoService.createPrato(entidade,idEmpresa);
         return new ResponseEntity<>(mapper.map(entidade,PratoConsultaDto.class), HttpStatus.CREATED);
     }
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
