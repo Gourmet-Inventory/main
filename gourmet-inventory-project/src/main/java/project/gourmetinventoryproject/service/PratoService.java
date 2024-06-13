@@ -6,15 +6,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.domain.Receita;
-import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
@@ -27,10 +24,7 @@ import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 
-import java.util.List;
-import java.util.Optional;
 
-import static org.springframework.http.ResponseEntity.status;
 
 @Service
 public class PratoService {

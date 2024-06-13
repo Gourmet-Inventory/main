@@ -34,14 +34,16 @@ public class EstoqueIngredienteService {
     }
 
     public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente, Long idEmpresa) {
-        estoqueIngrediente.setEmpresa(empresaService.getEmpresasById(idEmpresa));
-        return estoqueIngredienteRepository.save(estoqueIngrediente);
+        EstoqueIngrediente estoqueIngrediente1 = verficarTipo(estoqueIngrediente);
+        estoqueIngrediente1.setEmpresa(empresaService.getEmpresasById(idEmpresa));
+        return estoqueIngredienteRepository.save(estoqueIngrediente1);
     }
 
     public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente) {
         if (estoqueIngredienteRepository.existsById(id)){
-            estoqueIngrediente.setIdItem(id);
-            return estoqueIngredienteRepository.save(estoqueIngrediente);
+            EstoqueIngrediente estoqueIngrediente1 = verficarTipo(estoqueIngrediente);
+            estoqueIngrediente1.setIdItem(id);
+            return estoqueIngredienteRepository.save(estoqueIngrediente1);
         }
         throw new IdNotFoundException();
     }
@@ -51,6 +53,17 @@ public class EstoqueIngredienteService {
             throw new IdNotFoundException();
         }
         estoqueIngredienteRepository.deleteById(id);
+    }
+
+    public EstoqueIngrediente verficarTipo(EstoqueIngrediente estoqueIngrediente){
+        if (estoqueIngrediente.getUnidades()== null){
+            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida());
+        } else if (estoqueIngrediente.getValorMedida() == null){
+            estoqueIngrediente.setValorTotal(Double.valueOf(estoqueIngrediente.getUnidades()));
+        }else{
+            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida() * estoqueIngrediente.getUnidades());
+        }
+        return estoqueIngrediente;
     }
 }
 
