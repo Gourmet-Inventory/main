@@ -22,6 +22,8 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
+    @OneToMany
+    private List<Ingrediente> receitaPrato;
     @Enumerated(EnumType.STRING)
     private List<AlergicosRestricoes> alergicosRestricoes;
     private byte[] foto;

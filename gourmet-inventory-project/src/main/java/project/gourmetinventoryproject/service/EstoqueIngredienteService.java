@@ -3,6 +3,7 @@ package project.gourmetinventoryproject.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Empresa;
+import project.gourmetinventoryproject.domain.Medidas;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
@@ -59,12 +60,10 @@ public class EstoqueIngredienteService {
     }
 
     public EstoqueIngrediente verficarTipo(EstoqueIngrediente estoqueIngrediente){
-        if (estoqueIngrediente.getUnidades()== null){
-            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida());
-        } else if (estoqueIngrediente.getValorMedida() == null){
-            estoqueIngrediente.setValorTotal(Double.valueOf(estoqueIngrediente.getUnidades()));
+        if(estoqueIngrediente.getUnitario() != null){
+            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida() * estoqueIngrediente.getUnitario());
         }else{
-            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida() * estoqueIngrediente.getUnidades());
+            estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida());
         }
         return estoqueIngrediente;
     }
