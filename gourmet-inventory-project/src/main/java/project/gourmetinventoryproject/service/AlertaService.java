@@ -20,26 +20,33 @@ public class AlertaService {
     private AlertaRepository alertaRepository;
 
     @Autowired
-    private EstoqueIngredienteRepository estoqueIngredienteRepository;
-    @Autowired
     private EmpresaService empresaService;
+
+    @Autowired
+    private EstoqueIngredienteService estoqueIngredienteService;
 
 
     public List<Alerta> getAllAlerta(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
-        List<EstoqueIngrediente> estoque = estoqueIngredienteRepository.findAllByEmpresa(empresa);
-        List<Alerta> alertas = new ArrayList<>();
-        for (int i = 0; i < estoque.size(); i++) {
-            Alerta alerta = alertaRepository.findByEstoqueIngrediente(estoque.get(i));
-            alertas.add(alerta);
+        List<Alerta> alertasAll = alertaRepository.findAll();
+//        List<EstoqueIngrediente> estoque = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
+        List<Alerta> alertasEmpresa = new ArrayList<>();
+        for (int i = 0; i < alertasAll.size(); i++) {
+            Long alertaIdEmpresa = alertasAll.get(i).getEstoqueIngrediente().getEmpresa().getIdEmpresa();
+            if (alertaIdEmpresa.equals(idEmpresa)) {
+                alertasEmpresa.add(alertasAll.get(i));
+            }
         }
-        return alertas;
-
+        return alertasEmpresa;
     }
-    public Alerta createAlerta(Alerta alerta) {
+    public List<Alerta> getAllAlerta() {
+        return alertaRepository.findAll();
+    }
 
+    public Alerta createAlerta(Alerta alerta) {
         return alertaRepository.save(alerta);
     }
+
     public void deleteAlerta(Long id) {
         if (alertaRepository.findById(id).orElse(null) == null){
             throw new IdNotFoundException();

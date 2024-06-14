@@ -26,6 +26,9 @@ public class EstoqueIngredienteService {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         return estoqueIngredienteRepository.findAllByEmpresa(empresa);
     }
+    public List<EstoqueIngrediente> getAllEstoqueIngredientes() {
+        return estoqueIngredienteRepository.findAll();
+    }
 
     public EstoqueIngrediente getEstoqueIngredienteById(Long id) {
         if (estoqueIngredienteRepository.existsById(id)){
