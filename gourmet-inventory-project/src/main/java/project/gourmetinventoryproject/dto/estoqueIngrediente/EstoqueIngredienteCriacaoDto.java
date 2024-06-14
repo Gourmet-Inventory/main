@@ -15,6 +15,7 @@ import java.util.Date;
 public class EstoqueIngredienteCriacaoDto {
     private String lote;
     private Long idEmpresa;
+    private Boolean manipulado;
     private String nome;
     private String categoria;
     private Medidas tipoMedida;

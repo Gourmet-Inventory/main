@@ -51,16 +51,7 @@ public class UsuarioController {
     @Operation(summary = "Atualizar usuario por id", method = "PATCH")
     @PatchMapping("/{userId}")
     public ResponseEntity<Void> patchUsuario(@PathVariable Long userId, @RequestBody UsuarioCriacaoDto novoUsuario) {
-            if (usuarioService.usuarioRepository.existsById(userId)) {
-                return usuarioService.patchUsuario(userId, novoUsuario);
-            }
-            return status(404).build();
-    }
-
-    @ApiIgnore
-    @GetMapping("/empresas")
-    public ResponseEntity<Object> getAllEmpresas() {
-        return null;
+        return usuarioService.patchUsuario(userId, novoUsuario);
     }
 
     @Operation(summary = "Logar para receber o token", method = "POST")
@@ -72,13 +63,8 @@ public class UsuarioController {
     })
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
-        UsuarioTokenDto usuarioToken = this.usuarioService.autenticar(usuarioLoginDto);
+        return ResponseEntity.status(200).body(usuarioService.autenticar(usuarioLoginDto));
 
-//        UsuarioService.LoginUserResponse response = new UsuarioService.LoginUserResponse();
-//        response.setToken(usuarioToken.getToken());
-//        response.setEmail(usuarioToken.getEmail());
-//        response.setIdUsuario(usuarioToken.getUserId());
-        return status(200).body(usuarioToken);
     }
 
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")

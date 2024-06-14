@@ -17,6 +17,7 @@ public class EstoqueIngrediente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idItem;
     private String lote;
+    private Boolean manipulado;
     @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;

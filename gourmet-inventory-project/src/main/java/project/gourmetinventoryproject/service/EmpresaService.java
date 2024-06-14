@@ -14,7 +14,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.status;
 
 @Service
-public class EmpresaService {
+public class    EmpresaService {
 
     @Autowired
     private EmpresaRepository empresaRepository;

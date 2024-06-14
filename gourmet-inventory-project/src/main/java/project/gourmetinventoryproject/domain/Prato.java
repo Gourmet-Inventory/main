@@ -15,7 +15,7 @@ public class Prato {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPrato;
-    @OneToOne(cascade = CascadeType.DETACH)
+    @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;
     private String nome;
