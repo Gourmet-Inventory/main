@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,18 +19,20 @@ public class EstoqueIngrediente {
     private Long idItem;
     private String lote;
     private Boolean manipulado;
+    private String nome;
     @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;
-    private String nome;
     private String categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
-    private Integer unidades;
+    private Integer unitario;
     private Double valorMedida;
     private Double valorTotal;
     private String localArmazenamento;
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
+    @OneToMany(mappedBy = "estoqueIngrediente")
+    private List<Ingrediente> receitaManipulado;
 }
 

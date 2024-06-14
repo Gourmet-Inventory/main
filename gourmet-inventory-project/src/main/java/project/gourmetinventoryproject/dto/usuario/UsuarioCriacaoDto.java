@@ -25,7 +25,7 @@ public class UsuarioCriacaoDto {
     @Pattern(regexp = "^\\(\\d{2}\\) (?:9\\d{4}|\\d{4})-\\d{4}$",message = "Telefone inválido")
     private String celular;
     @Size(min = 6)
-    @Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+=-])")
+    //@Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+=-])")
     @NotBlank
     private String senha;
     private Long idEmpresa;
