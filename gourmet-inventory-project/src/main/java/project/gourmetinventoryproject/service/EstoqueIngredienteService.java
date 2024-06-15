@@ -74,8 +74,11 @@ public class EstoqueIngredienteService {
             System.out.println(("Atualizando entidade: {}" + existingEstoqueIngrediente));
             return estoqueIngredienteRepository.save(existingEstoqueIngrediente);
         }).orElseThrow(() -> new IdNotFoundException());
+
+    }
+
     public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente,Long idEmpresa) {
-        if (estoqueIngredienteRepository.existsById(id)){
+        if (estoqueIngredienteRepository.existsById(id)) {
             EstoqueIngrediente estoqueIngrediente1 = verficarTipo(estoqueIngrediente);
             estoqueIngrediente1.setIdItem(id);
             estoqueIngrediente1.setEmpresa(empresaService.getEmpresasById(idEmpresa));
