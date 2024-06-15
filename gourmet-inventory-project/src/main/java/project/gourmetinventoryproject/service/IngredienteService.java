@@ -5,20 +5,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Medidas;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.repository.IngredienteRepository;
 
-import java.util.Arrays;
-import java.util.List;
-
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class IngredienteService {
 
     @Autowired
     private IngredienteRepository ingredienteRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private ModelMapper mapper = new ModelMapper();
 
@@ -35,15 +37,17 @@ public class IngredienteService {
        throw new IdNotFoundException();
     }
 
-    public Ingrediente createIngrediente(Ingrediente ingredienteDto) {
-        List<Medidas> medidas = Arrays.asList(Medidas.values());
-
-        for (int i = 0; i < medidas.size(); i++) {
-            if (ingredienteDto.getTipoMedida() == medidas.get(i)){
-                return ingredienteRepository.save(mapper.map(ingredienteDto, Ingrediente.class));
-            }
+    public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
+        if (ingredienteDto.isEmpty()){
+            throw new ElementAlreadyExistException();
         }
-        throw new IllegalArgumentException("Tipo de medida inválido: " + ingredienteDto.getTipoMedida());
+        List<Ingrediente> lista = new ArrayList<>();
+        for (IngredienteCriacaoDto ingrediente : ingredienteDto){
+            Ingrediente ingrediente1 =  modelMapper.map(ingrediente,Ingrediente.class);
+            ingredienteRepository.save(ingrediente1);
+            lista.add(ingrediente1);
+        }
+        return lista;
     }
 
     public Ingrediente updateIngrediente(Long id, Ingrediente ingrediente) {

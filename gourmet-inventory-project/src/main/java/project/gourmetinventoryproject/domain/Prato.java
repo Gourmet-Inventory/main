@@ -24,7 +24,9 @@ public class Prato {
     private String categoria;
     @OneToMany
     private List<Ingrediente> receitaPrato;
-    @Enumerated(EnumType.STRING)
-    private List<AlergicosRestricoes> alergicosRestricoes;
+    @ElementCollection
+    @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
+    @Column(name = "restricao")
+    private List<String> alergicosRestricoes;
     private byte[] foto;
 }

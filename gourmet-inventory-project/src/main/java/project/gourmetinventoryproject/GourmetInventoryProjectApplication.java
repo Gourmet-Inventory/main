@@ -13,15 +13,5 @@ public class GourmetInventoryProjectApplication {
 		SpringApplication.run(GourmetInventoryProjectApplication.class, args);
 	}
 
-	@Bean
-	public ModelMapper modelMapper() {
-		var modelMapper = new ModelMapper();
-
-		modelMapper.getConfiguration()
-				.setFieldMatchingEnabled(true)
-				.setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
-
-		return modelMapper;
-	}
 
 }

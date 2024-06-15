@@ -5,12 +5,17 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import project.gourmetinventoryproject.domain.Empresa;
+import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
@@ -34,6 +39,12 @@ public class PratoService {
     @Autowired
     private EmpresaService empresaService;
 
+    @Autowired
+    private IngredienteService ingredienteService;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
     public List<Prato> getAllPratos(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         return pratoRepository.findAllByEmpresa(empresa);
@@ -48,14 +59,16 @@ public class PratoService {
 
     }
 
-    public Prato createPrato(Prato prato, Long idEmpresa) {
-        prato.setEmpresa(empresaService.getEmpresasById(idEmpresa));
-        if (pratoRepository.findByNomeIgnoreCase(prato.getNome()).isEmpty()){
-            return pratoRepository.save(prato);
+    public void createPrato(PratoCriacaoDto prato, Long empresa) {
+        Empresa idEmpresa = empresaService.getEmpresasById(empresa);
+        if (idEmpresa.equals(null)){
+            throw new IdNotFoundException();
         }
-        throw new ElementAlreadyExistException();
-
-
+        List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
+        Prato pratoNovo = modelMapper.map(prato, Prato.class);
+        pratoNovo.setReceitaPrato(ingredientes);
+        pratoNovo.setEmpresa(idEmpresa);
+        pratoRepository.save(pratoNovo);
     }
 
     public Prato updatePrato(Long id, Prato prato) {
@@ -132,6 +145,39 @@ public class PratoService {
 //            Prato 2 |       0       |       4       |       2       |       0       |
 //            Prato 3 |       3       |       0       |       8       |       7       |
 //        */
+//    }
+
+//    public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
+//        // Criar um novo workbook do Excel
+//        Workbook workbook = new XSSFWorkbook();
+//
+//        // Criar uma nova planilha
+//        Sheet sheet = workbook.createSheet("Relatório de Uso de Ingredientes");
+//
+//        // Cabeçalho
+//        Row headerRow = sheet.createRow(0);
+//        for (int i = 0; i < numberOfIngredients; i++) {
+//            Cell cell = headerRow.createCell(i + 1);
+//            cell.setCellValue("Ingrediente " + (i + 1));
+//        }
+//
+////        // Preencher os dados do relatório
+////        int[][] ingredientUsageReport = generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
+////        for (int i = 0; i < servedDishesIds.size(); i++) {
+////            Row row = sheet.createRow(i + 1);
+////            row.createCell(0).setCellValue("Prato " + (i + 1));
+////            for (int j = 0; j < numberOfIngredients; j++) {
+////                row.createCell(j + 1).setCellValue(ingredientUsageReport[i][j]);
+////            }
+////        }
+//
+//        // Escrever os dados no arquivo
+//        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+//            workbook.write(fileOut);
+//        }
+//
+//        // Fechar o workbook
+//        workbook.close();
 //    }
 
     public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
