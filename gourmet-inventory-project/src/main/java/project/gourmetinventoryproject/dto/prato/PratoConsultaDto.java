@@ -19,5 +19,6 @@ public class PratoConsultaDto {
     private String descricao;
     private Double preco;
     private String categoria;
-    private List<AlergicosRestricoes> alergicosRestricoes;
+    private List<String> alergicosRestricoes;
+
 }

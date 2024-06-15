@@ -81,34 +81,34 @@ public class IngredienteController {
         return new ResponseEntity<>(mapper.map(ingrediente,IngredienteConsultaDto.class), HttpStatus.OK);
     }
 
-    @Operation(summary = "Criar novo ingrediente", method = "POST")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode ="201", description = "Criado - Ingrediente criado com sucesso",
-                    content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
-            @ApiResponse(responseCode ="409", description = "Conflito - Ingrediente já existe",
-                    content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":String,\"unidade\":String,\"valorTotal\":String,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
-                    content = {@Content(mediaType = "text/plain",
-                        examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
-                    content = {@Content(mediaType = "text/plain",
-                        examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
-                    content = {@Content(mediaType = "text/plain",
-                        examples = {@ExampleObject(value = "")})}),
-    })
-    @PostMapping
-    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
-        Ingrediente entidade = mapper.map(ingredienteDto, Ingrediente.class);
-
-        ingredienteService.createIngrediente(entidade);
-        return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
-    }
+//    @Operation(summary = "Criar novo ingrediente", method = "POST")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode ="201", description = "Criado - Ingrediente criado com sucesso",
+//                    content = {@Content(mediaType = "application/json",
+//                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+//            @ApiResponse(responseCode ="409", description = "Conflito - Ingrediente já existe",
+//                    content = {@Content(mediaType = "application/json",
+//                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+//            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
+//                    content = {@Content(mediaType = "text/plain",
+//                            examples = {@ExampleObject(value = "{\"estoqueIngrediente\": {\"idItem\":\"1\",\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":String,\"unidade\":String,\"valorTotal\":String,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"},\"tipoMedida\": \"GRAMAS\",\"valorMedida\": \"200\"}")})}),
+//            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+//                    content = {@Content(mediaType = "text/plain",
+//                        examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+//                    content = {@Content(mediaType = "text/plain",
+//                        examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+//                    content = {@Content(mediaType = "text/plain",
+//                        examples = {@ExampleObject(value = "")})}),
+//    })
+//    @PostMapping
+//    public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody IngredienteCriacaoDto ingredienteDto) {
+//        Ingrediente entidade = mapper.map(ingredienteDto, Ingrediente.class);
+//
+//        ingredienteService.createIngrediente(entidade);
+//        return new ResponseEntity<>(mapper.map(entidade, IngredienteConsultaDto.class), HttpStatus.CREATED);
+//    }
 
     @Operation(summary = "Atualizar ingrediente", method = "PUT")
     @ApiResponses(value = {

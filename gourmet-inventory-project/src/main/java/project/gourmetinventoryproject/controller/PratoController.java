@@ -109,10 +109,9 @@ public class PratoController {
                             examples = {@ExampleObject(value = "")})}),
     })
     @PostMapping("/{idEmpresa}")
-    public ResponseEntity<PratoConsultaDto> createPrato(@RequestBody PratoCriacaoDto pratoDto,@PathVariable Long idEmpresa) {
-        var entidade = mapper.map(pratoDto, Prato.class);
-        pratoService.createPrato(entidade,idEmpresa);
-        return new ResponseEntity<>(mapper.map(entidade,PratoConsultaDto.class), HttpStatus.CREATED);
+    public ResponseEntity<Void> createPrato(@RequestBody PratoCriacaoDto pratoDto,@PathVariable Long idEmpresa) {
+        pratoService.createPrato(pratoDto,idEmpresa);
+        return ResponseEntity.status(200).build();
     }
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
     @ApiResponses(value = {

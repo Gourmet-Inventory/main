@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Empresa;
+import project.gourmetinventoryproject.domain.Ingrediente;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 
 import java.util.List;
 
@@ -18,5 +21,6 @@ public class PratoCriacaoDto {
     private String descricao;
     private Double preco;
     private String categoria;
-    private List<AlergicosRestricoes> alergicosRestricoes;
+    private List<IngredienteCriacaoDto> receitaPrato;
+    private List<String> alergicosRestricoes;
 }

@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteCriacaoDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,11 @@ public class EstoqueIngredienteController {
     public ResponseEntity<?> deleteEstoqueIngrediente(@PathVariable Long id) {
         estoqueIngredienteService.deleteEstoqueIngrediente(id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/estoque-select/{id}")
+    public ResponseEntity<List<EstoqueIngredientePratosDto>> getEstoqueSelect(@PathVariable Long id){
+        return ResponseEntity.status(200).body(estoqueIngredienteService.getEIngredientesSelect(id));
     }
 }
 

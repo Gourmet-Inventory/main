@@ -1,9 +1,14 @@
 package project.gourmetinventoryproject.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Medidas;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.repository.EmpresaRepository;
@@ -11,6 +16,7 @@ import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EstoqueIngredienteService {
@@ -23,6 +29,8 @@ public class EstoqueIngredienteService {
 
     @Autowired
     private  AlertaService alertaService;
+    @Autowired
+    private ModelMapper modelMapper;
 
 
     public List<EstoqueIngrediente> getAllEstoqueIngredientes(Long idEmpresa) {
@@ -64,6 +72,14 @@ public class EstoqueIngredienteService {
         estoqueIngredienteRepository.deleteById(id);
     }
 
+    public List<EstoqueIngredientePratosDto> getEIngredientesSelect(Long idEmpresa){
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        if (empresa == null){
+            throw new IdNotFoundException();
+        }
+        List <EstoqueIngrediente> lista= estoqueIngredienteRepository.findAllByEmpresa(empresa);
+        return  lista.stream().map(estoqueIngrediente -> modelMapper.map(estoqueIngrediente, EstoqueIngredientePratosDto.class)).collect(Collectors.toList());
+    }
 
     public EstoqueIngrediente verficarTipo(EstoqueIngrediente estoqueIngrediente){
         if(estoqueIngrediente.getUnitario() != null){
