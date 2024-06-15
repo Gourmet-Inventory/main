@@ -28,5 +28,5 @@ public class UsuarioCriacaoDto {
     //@Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*()_+=-])")
     @NotBlank
     private String senha;
-    private Long idEmpresa;
+        private Long idEmpresa;
 }
