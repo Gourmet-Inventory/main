@@ -129,10 +129,10 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<EstoqueIngredienteConsultaDto> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngredienteCriacaoDto estoqueIngredienteDto) {
+    @PutMapping("/{id}/{idEmpresa}")
+    public ResponseEntity<EstoqueIngredienteConsultaDto> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngredienteCriacaoDto estoqueIngredienteDto, @PathVariable Long idEmpresa) {
         var entidade = mapper.map(estoqueIngredienteDto, EstoqueIngrediente.class);
-        estoqueIngredienteService.updateEstoqueIngrediente(id, entidade );
+        estoqueIngredienteService.updateEstoqueIngrediente(id, entidade, idEmpresa );
         return new ResponseEntity<>(mapper.map(entidade, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
     }
 

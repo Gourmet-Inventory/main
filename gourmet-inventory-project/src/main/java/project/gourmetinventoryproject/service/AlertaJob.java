@@ -49,7 +49,7 @@ public class AlertaJob implements Job{
                         Alerta alerta = new Alerta();
                         alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
                         alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        alertaService.createAlerta(alerta);
+                        alertaService.saveAlerta(alerta);
                     }
                 }
                 else {
@@ -57,7 +57,7 @@ public class AlertaJob implements Job{
                         Alerta alerta = new Alerta();
                         alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
                         alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        alertaService.createAlerta(alerta);
+                        alertaService.saveAlerta(alerta);
                     }
                 }
             }
@@ -73,12 +73,6 @@ public class AlertaJob implements Job{
         }
         if (estoqueIngrediente.getDtaAviso().isBefore(dataTresDiasDepois)){
             return "Data Proxima";
-        }
-        if (estoqueIngrediente.getValorTotal() <= 10){
-            return "Estoque vazio";
-        }
-        if (estoqueIngrediente.getValorTotal() <= 200){
-            return "Estoque acabando";
         }
         else {
             return null;

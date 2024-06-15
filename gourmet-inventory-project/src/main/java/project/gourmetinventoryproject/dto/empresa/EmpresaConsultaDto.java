@@ -9,5 +9,4 @@ public class EmpresaConsultaDto {
     private String nomeFantasia;
     private String cnpj;
     private String telefone;
-    private Long responsavelId;
 }

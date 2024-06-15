@@ -167,39 +167,6 @@ public class PratoService {
         workbook.close();
     }
 
-    public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
-        // Criar um novo workbook do Excel
-        Workbook workbook = new XSSFWorkbook();
-
-        // Criar uma nova planilha
-        Sheet sheet = workbook.createSheet("Relatório de Uso de Ingredientes");
-
-        // Cabeçalho
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < numberOfIngredients; i++) {
-            Cell cell = headerRow.createCell(i + 1);
-            cell.setCellValue("Ingrediente " + (i + 1));
-        }
-
-        // Preencher os dados do relatório
-        int[][] ingredientUsageReport = generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
-        for (int i = 0; i < servedDishesIds.size(); i++) {
-            Row row = sheet.createRow(i + 1);
-            row.createCell(0).setCellValue("Prato " + (i + 1));
-            for (int j = 0; j < numberOfIngredients; j++) {
-                row.createCell(j + 1).setCellValue(ingredientUsageReport[i][j]);
-            }
-        }
-
-        // Escrever os dados no arquivo
-        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-            workbook.write(fileOut);
-        }
-
-        // Fechar o workbook
-        workbook.close();
-    }
-
     public Prato updatePratoFoto(@PathVariable Long codigo, @RequestBody byte[] novaFoto) {
         Prato prato;
         if (pratoRepository.existsById(codigo) == false){

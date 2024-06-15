@@ -34,28 +34,17 @@ public class AlertaController {
                 .collect(Collectors.toList()), HttpStatus.OK);
     }
 
-//    @PostMapping()
-//    //Arrumar alertas duplicados
-//    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(){
-//        List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
-//        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
-//        if (estoqueIngredientes.isEmpty()) {
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        }
-//        for (int i = 0; i < estoqueIngredientes.size(); i++) {
-//            if (tipoAlerta(estoqueIngredientes.get(i)) != null){
-//                Alerta alerta = new Alerta();
-//                alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
-//                alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-//                try {
-//                    alertaConsultaDtos.add(mapper.map(alertaService.createAlerta(alerta), AlertaConsultaDto.class));
-//                }catch (Exception e){
-//                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-//                }
-//            }
-//        }
-//        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
-//    }
+    @PostMapping()
+    //Arrumar alertas duplicados
+    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(){
+        List<Alerta> alertas = alertaService.createAlerta();
+        List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
+        for (Alerta alerta : alertas) {
+            alertaConsultaDtos.add(mapper.map(alerta, AlertaConsultaDto.class));
+        }
+        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAlerta(@PathVariable Long id) {
         alertaService.deleteAlerta(id);

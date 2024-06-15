@@ -21,6 +21,9 @@ public class EstoqueIngredienteService {
     @Autowired
     private EmpresaService empresaService;
 
+    @Autowired
+    private  AlertaService alertaService;
+
 
     public List<EstoqueIngrediente> getAllEstoqueIngredientes(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -43,10 +46,12 @@ public class EstoqueIngredienteService {
         return estoqueIngredienteRepository.save(estoqueIngrediente1);
     }
 
-    public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente) {
+    public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente,Long idEmpresa) {
         if (estoqueIngredienteRepository.existsById(id)){
             EstoqueIngrediente estoqueIngrediente1 = verficarTipo(estoqueIngrediente);
             estoqueIngrediente1.setIdItem(id);
+            estoqueIngrediente1.setEmpresa(empresaService.getEmpresasById(idEmpresa));
+            alertaService.checarAlerta(estoqueIngrediente1);
             return estoqueIngredienteRepository.save(estoqueIngrediente1);
         }
         throw new IdNotFoundException();
@@ -58,6 +63,7 @@ public class EstoqueIngredienteService {
         }
         estoqueIngredienteRepository.deleteById(id);
     }
+
 
     public EstoqueIngrediente verficarTipo(EstoqueIngrediente estoqueIngrediente){
         if(estoqueIngrediente.getUnitario() != null){
