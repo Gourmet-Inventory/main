@@ -38,7 +38,8 @@ public class NutricaoAPIController {
             return ResponseEntity.badRequest().build();
         }
 
-        List<NutritionData> nutritionDataList = new ArrayList<>();
+        // Criar uma matriz de dados para o Excel
+        List<List<Object>> excelData = new ArrayList<>();
 
         for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
             String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
@@ -65,8 +66,22 @@ public class NutricaoAPIController {
                     double fiber = node.path("fiber_g").asDouble();
                     double sugar = node.path("sugar_g").asDouble();
 
-                    NutritionData nutritionData = new NutritionData(name, calories, servingSize, totalFat, saturatedFat, protein, sodium, potassium, cholesterol, totalCarbohydrates, fiber, sugar);
-                    nutritionDataList.add(nutritionData);
+                    // Adicionar os dados à matriz de dados do Excel
+                    List<Object> rowData = new ArrayList<>();
+                    rowData.add(name);
+                    rowData.add(calories);
+                    rowData.add(servingSize);
+                    rowData.add(totalFat);
+                    rowData.add(saturatedFat);
+                    rowData.add(protein);
+                    rowData.add(sodium);
+                    rowData.add(potassium);
+                    rowData.add(cholesterol);
+                    rowData.add(totalCarbohydrates);
+                    rowData.add(fiber);
+                    rowData.add(sugar);
+
+                    excelData.add(rowData);
                 }
             } catch (IOException e) {
                 // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
@@ -75,8 +90,8 @@ public class NutricaoAPIController {
             }
         }
 
-        // Ordenar a lista de dados de nutrição
-        nutritionDataList.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+        // Ordenar a matriz de dados usando Merge Sort
+        mergeSort(excelData, 0, excelData.size() - 1);
 
         // Criar um arquivo Excel
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -85,7 +100,7 @@ public class NutricaoAPIController {
 
             // Cabeçalho
             Row headerRow = sheet.createRow(0);
-            String[] header = {"Name", "Calories", "Serving Size", "Total Fat", "Saturated Fat", "Protein", "Sodium", "Potassium", "Cholesterol", "Total Carbohydrates", "Fiber", "Sugar"};
+            String[] header = {"Nome Ingrediente/Prato", "Calorias", "Tamanho da Porção", "Gordura Total", "Gordura Saturada", "Proteína", "Sódio", "Potássio", "Colesterol", "Carboidratos Totais", "Fibra", "Açúcar"};
             for (int i = 0; i < header.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(header[i]);
@@ -93,20 +108,20 @@ public class NutricaoAPIController {
 
             // Dados
             int rowNum = 1;
-            for (NutritionData nutritionData : nutritionDataList) {
+            for (List<Object> rowData : excelData) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(nutritionData.getName());
-                row.createCell(1).setCellValue(nutritionData.getCalories());
-                row.createCell(2).setCellValue(nutritionData.getServingSize());
-                row.createCell(3).setCellValue(nutritionData.getTotalFat());
-                row.createCell(4).setCellValue(nutritionData.getSaturatedFat());
-                row.createCell(5).setCellValue(nutritionData.getProtein());
-                row.createCell(6).setCellValue(nutritionData.getSodium());
-                row.createCell(7).setCellValue(nutritionData.getPotassium());
-                row.createCell(8).setCellValue(nutritionData.getCholesterol());
-                row.createCell(9).setCellValue(nutritionData.getTotalCarbohydrates());
-                row.createCell(10).setCellValue(nutritionData.getFiber());
-                row.createCell(11).setCellValue(nutritionData.getSugar());
+                int colNum = 0;
+                for (Object field : rowData) {
+                    Cell cell = row.createCell(colNum++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    } else if (field instanceof Double) {
+                        cell.setCellValue((Double) field);
+                    } else if (field instanceof Integer) {
+                        cell.setCellValue((Integer) field);
+                    }
+                    // Adicione mais verificações conforme necessário para outros tipos de dados
+                }
             }
 
             workbook.write(outputStream);
@@ -121,5 +136,68 @@ public class NutricaoAPIController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(bytes);
+    }
+
+    private void mergeSort(List<List<Object>> arr, int l, int r) {
+        if (l < r) {
+            // Encontrar o ponto médio
+            int m = l + (r - l) / 2;
+
+            // Ordenar a primeira e a segunda metade
+            mergeSort(arr, l, m);
+            mergeSort(arr, m + 1, r);
+
+            // Mesclar as partes ordenadas
+            merge(arr, l, m, r);
+        }
+    }
+
+    private void merge(List<List<Object>> arr, int l, int m, int r) {
+        // Tamanhos dos subarrays a serem mesclados
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        // Arrays temporários
+        List<List<Object>> L = new ArrayList<>(n1);
+        List<List<Object>> R = new ArrayList<>(n2);
+
+        // Copiar dados para arrays temporários L[] e R[]
+        for (int i = 0; i < n1; ++i) {
+            L.add(arr.get(l + i));
+        }
+        for (int j = 0; j < n2; ++j) {
+            R.add(arr.get(m + 1 + j));
+        }
+
+        // Índices iniciais dos subarrays L[] e R[]
+        int i = 0, j = 0;
+
+        // Índice inicial do subarray mesclado
+        int k = l;
+        while (i < n1 && j < n2) {
+            // Comparar os elementos L.get(i) e R.get(j) e colocar o menor em arr.get(k)
+            if (((String) L.get(i).get(0)).compareTo((String) R.get(j).get(0)) <= 0) {
+                arr.set(k, L.get(i));
+                i++;
+            } else {
+                arr.set(k, R.get(j));
+                j++;
+            }
+            k++;
+        }
+
+        // Copiar os elementos restantes de L[], se houver
+        while (i < n1) {
+            arr.set(k, L.get(i));
+            i++;
+            k++;
+        }
+
+        // Copiar os elementos restantes de R[], se houver
+        while (j < n2) {
+            arr.set(k, R.get(j));
+            j++;
+            k++;
+        }
     }
 }
