@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import project.gourmetinventoryproject.domain.NutritionData;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
 
@@ -19,9 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Base64;
+import java.util.*;
 
 @RestController
 public class NutricaoAPIController {
@@ -38,9 +35,13 @@ public class NutricaoAPIController {
             return ResponseEntity.badRequest().build();
         }
 
-        // Criar uma matriz de dados para o Excel
+        // Lista para armazenar os dados finais que serão usados para gerar o Excel
         List<List<Object>> excelData = new ArrayList<>();
 
+        // Fila para processar os dados antes de adicioná-los à lista excelData
+        Queue<List<Object>> dataQueue = new LinkedList<>();
+
+        // Processar os dados obtidos da API e adicioná-los à fila
         for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
             String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
             URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
@@ -66,7 +67,7 @@ public class NutricaoAPIController {
                     double fiber = node.path("fiber_g").asDouble();
                     double sugar = node.path("sugar_g").asDouble();
 
-                    // Adicionar os dados à matriz de dados do Excel
+                    // Adicionar os dados à fila para processamento posterior
                     List<Object> rowData = new ArrayList<>();
                     rowData.add(name);
                     rowData.add(calories);
@@ -81,7 +82,7 @@ public class NutricaoAPIController {
                     rowData.add(fiber);
                     rowData.add(sugar);
 
-                    excelData.add(rowData);
+                    dataQueue.offer(rowData);
                 }
             } catch (IOException e) {
                 // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
@@ -90,52 +91,26 @@ public class NutricaoAPIController {
             }
         }
 
-        // Ordenar a matriz de dados usando Merge Sort
+        // Processar os dados da fila e adicionar à lista excelData
+        while (!dataQueue.isEmpty()) {
+            excelData.add(dataQueue.poll());
+        }
+
+        // Ordenar os dados usando Merge Sort
         mergeSort(excelData, 0, excelData.size() - 1);
 
         // Criar um arquivo Excel
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("Nutrition Data");
+        byte[] excelBytes = createExcel(excelData);
 
-            // Cabeçalho
-            Row headerRow = sheet.createRow(0);
-            String[] header = {"Nome Ingrediente/Prato", "Calorias", "Tamanho da Porção", "Gordura Total", "Gordura Saturada", "Proteína", "Sódio", "Potássio", "Colesterol", "Carboidratos Totais", "Fibra", "Açúcar"};
-            for (int i = 0; i < header.length; i++) {
-                Cell cell = headerRow.createCell(i);
-                cell.setCellValue(header[i]);
-            }
-
-            // Dados
-            int rowNum = 1;
-            for (List<Object> rowData : excelData) {
-                Row row = sheet.createRow(rowNum++);
-                int colNum = 0;
-                for (Object field : rowData) {
-                    Cell cell = row.createCell(colNum++);
-                    if (field instanceof String) {
-                        cell.setCellValue((String) field);
-                    } else if (field instanceof Double) {
-                        cell.setCellValue((Double) field);
-                    } else if (field instanceof Integer) {
-                        cell.setCellValue((Integer) field);
-                    }
-                    // Adicione mais verificações conforme necessário para outros tipos de dados
-                }
-            }
-
-            workbook.write(outputStream);
-        }
-
-        // Retornar o arquivo diretamente na resposta
-        byte[] bytes = outputStream.toByteArray();
+        // Definir headers para a resposta HTTP
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=nutrition_data.xlsx");
         headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
+        // Retornar a resposta HTTP com o conteúdo do arquivo Excel
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(bytes);
+                .body(excelBytes);
     }
 
     private void mergeSort(List<List<Object>> arr, int l, int r) {
@@ -199,5 +174,42 @@ public class NutricaoAPIController {
             j++;
             k++;
         }
+    }
+
+    private byte[] createExcel(List<List<Object>> excelData) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nutrition Data");
+
+            // Cabeçalho
+            Row headerRow = sheet.createRow(0);
+            String[] header = {"Nome Ingrediente/Prato", "Calorias", "Tamanho da Porção", "Gordura Total", "Gordura Saturada", "Proteína", "Sódio", "Potássio", "Colesterol", "Carboidratos Totais", "Fibra", "Açúcar"};
+            for (int i = 0; i < header.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(header[i]);
+            }
+
+            // Dados
+            int rowNum = 1;
+            for (List<Object> rowData : excelData) {
+                Row row = sheet.createRow(rowNum++);
+                int colNum = 0;
+                for (Object field : rowData) {
+                    Cell cell = row.createCell(colNum++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    } else if (field instanceof Double) {
+                        cell.setCellValue((Double) field);
+                    } else if (field instanceof Integer) {
+                        cell.setCellValue((Integer) field);
+                    }
+                    // Adicione mais verificações conforme necessário para outros tipos de dados
+                }
+            }
+
+            workbook.write(outputStream);
+        }
+
+        return outputStream.toByteArray();
     }
 }
