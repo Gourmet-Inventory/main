@@ -3,6 +3,8 @@ package project.gourmetinventoryproject.controller.api;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +14,7 @@ import project.gourmetinventoryproject.domain.NutritionData;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
 
-import java.io.FileWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -27,7 +29,7 @@ public class NutricaoAPIController {
     private EstoqueIngredienteController estoqueIngredienteController;
 
     @GetMapping("/consulta-nutricao-api/{idEmpresa}")
-    public List<NutritionData> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
+    public ResponseEntity<String> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
         ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
         List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
 
@@ -67,31 +69,47 @@ public class NutricaoAPIController {
         // Ordenar a lista de dados de nutrição
         mergeSort(nutritionDataList);
 
-        // Salvar a lista ordenada em um arquivo CSV
-        String[] header = {"Name", "Calories", "Serving Size", "Total Fat", "Saturated Fat", "Protein", "Sodium", "Potassium", "Cholesterol", "Total Carbohydrates", "Fiber", "Sugar"};
-        try (CSVWriter writer = new CSVWriter(new FileWriter("nutrition_data.csv"))) {
-            writer.writeNext(header);
+        // Criar um arquivo Excel
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nutrition Data");
 
-            for (NutritionData nutritionData : nutritionDataList) {
-                String[] line = {
-                        nutritionData.getName(),
-                        String.valueOf(nutritionData.getCalories()),
-                        String.valueOf(nutritionData.getServingSize()),
-                        String.valueOf(nutritionData.getTotalFat()),
-                        String.valueOf(nutritionData.getSaturatedFat()),
-                        String.valueOf(nutritionData.getProtein()),
-                        String.valueOf(nutritionData.getSodium()),
-                        String.valueOf(nutritionData.getPotassium()),
-                        String.valueOf(nutritionData.getCholesterol()),
-                        String.valueOf(nutritionData.getTotalCarbohydrates()),
-                        String.valueOf(nutritionData.getFiber()),
-                        String.valueOf(nutritionData.getSugar())
-                };
-                writer.writeNext(line);
+            // Cabeçalho
+            Row headerRow = sheet.createRow(0);
+            String[] header = {"Name", "Calories", "Serving Size", "Total Fat", "Saturated Fat", "Protein", "Sodium", "Potassium", "Cholesterol", "Total Carbohydrates", "Fiber", "Sugar"};
+            for (int i = 0; i < header.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(header[i]);
             }
+
+            // Dados
+            int rowNum = 1;
+            for (NutritionData nutritionData : nutritionDataList) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(nutritionData.getName());
+                row.createCell(1).setCellValue(nutritionData.getCalories());
+                row.createCell(2).setCellValue(nutritionData.getServingSize());
+                row.createCell(3).setCellValue(nutritionData.getTotalFat());
+                row.createCell(4).setCellValue(nutritionData.getSaturatedFat());
+                row.createCell(5).setCellValue(nutritionData.getProtein());
+                row.createCell(6).setCellValue(nutritionData.getSodium());
+                row.createCell(7).setCellValue(nutritionData.getPotassium());
+                row.createCell(8).setCellValue(nutritionData.getCholesterol());
+                row.createCell(9).setCellValue(nutritionData.getTotalCarbohydrates());
+                row.createCell(10).setCellValue(nutritionData.getFiber());
+                row.createCell(11).setCellValue(nutritionData.getSugar());
+            }
+
+            workbook.write(outputStream);
         }
 
-        return nutritionDataList;
+        // Disponibilizar link para download
+        byte[] bytes = outputStream.toByteArray();
+        String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
+        String downloadLink = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + base64;
+
+        // Retornar o link de download
+        return ResponseEntity.ok(downloadLink);
     }
 
     private void mergeSort(List<NutritionData> list) {
