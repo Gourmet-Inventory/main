@@ -2,10 +2,10 @@ package project.gourmetinventoryproject.controller.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVWriter;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Base64;
 
 @RestController
 public class NutricaoAPIController {
@@ -29,9 +30,13 @@ public class NutricaoAPIController {
     private EstoqueIngredienteController estoqueIngredienteController;
 
     @GetMapping("/consulta-nutricao-api/{idEmpresa}")
-    public ResponseEntity<String> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
+    public ResponseEntity<byte[]> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
         ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
         List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
+
+        if (estoqueIngredientes == null || estoqueIngredientes.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
 
         List<NutritionData> nutritionDataList = new ArrayList<>();
 
@@ -63,11 +68,15 @@ public class NutricaoAPIController {
                     NutritionData nutritionData = new NutritionData(name, calories, servingSize, totalFat, saturatedFat, protein, sodium, potassium, cholesterol, totalCarbohydrates, fiber, sugar);
                     nutritionDataList.add(nutritionData);
                 }
+            } catch (IOException e) {
+                // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
+                e.printStackTrace();
+                continue;
             }
         }
 
         // Ordenar a lista de dados de nutrição
-        mergeSort(nutritionDataList);
+        nutritionDataList.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
         // Criar um arquivo Excel
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -103,40 +112,14 @@ public class NutricaoAPIController {
             workbook.write(outputStream);
         }
 
-        // Disponibilizar link para download
+        // Retornar o arquivo diretamente na resposta
         byte[] bytes = outputStream.toByteArray();
-        String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
-        String downloadLink = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64," + base64;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=nutrition_data.xlsx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
 
-        // Retornar o link de download
-        return ResponseEntity.ok(downloadLink);
-    }
-
-    private void mergeSort(List<NutritionData> list) {
-        if (list.size() > 1) {
-            int meio = list.size() / 2;
-            List<NutritionData> esquerda = new ArrayList<>(list.subList(0, meio));
-            List<NutritionData> direita = new ArrayList<>(list.subList(meio, list.size()));
-
-            mergeSort(esquerda);
-            mergeSort(direita);
-
-            int i = 0, j = 0, k = 0;
-            while (i < esquerda.size() && j < direita.size()) {
-                if (esquerda.get(i).getName().compareToIgnoreCase(direita.get(j).getName()) < 0) {
-                    list.set(k++, esquerda.get(i++));
-                } else {
-                    list.set(k++, direita.get(j++));
-                }
-            }
-
-            while (i < esquerda.size()) {
-                list.set(k++, esquerda.get(i++));
-            }
-
-            while (j < direita.size()) {
-                list.set(k++, direita.get(j++));
-            }
-        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(bytes);
     }
 }
