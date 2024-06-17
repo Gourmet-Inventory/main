@@ -17,9 +17,6 @@ import java.util.Stack;
 public class RelatorioService {
 
     @Autowired
-    private RelatorioService relatorioService;
-
-    @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
 
