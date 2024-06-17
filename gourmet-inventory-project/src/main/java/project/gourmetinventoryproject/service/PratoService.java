@@ -15,6 +15,7 @@ import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
@@ -59,19 +60,20 @@ public class PratoService {
 
     }
 
-    public void createPrato(PratoCriacaoDto prato, Long empresa) {
+    public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long empresa) {
         Empresa idEmpresa = empresaService.getEmpresasById(empresa);
         if (idEmpresa.equals(null)){
             throw new IdNotFoundException();
         }
+        System.out.println(prato);
         List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
         Prato pratoNovo = modelMapper.map(prato, Prato.class);
         pratoNovo.setReceitaPrato(ingredientes);
         pratoNovo.setEmpresa(idEmpresa);
-        pratoRepository.save(pratoNovo);
+        return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
     }
 
-    public Prato updatePrato(Long id, Prato prato) {
+    public Prato updatePrato(Long id, PratoCriacaoDto prato) {
         if (pratoRepository.existsById(id)){
             Optional<Prato> existingPratoOptional = pratoRepository.findById(id);
             if (existingPratoOptional.isPresent()) {
@@ -80,6 +82,8 @@ public class PratoService {
                 existingPrato.setDescricao(prato.getDescricao());
                 existingPrato.setPreco(prato.getPreco());
                 existingPrato.setCategoria(prato.getCategoria());
+                existingPrato.setAlergicosRestricoes(prato.getAlergicosRestricoes());
+                existingPrato.setReceitaPrato(ingredienteService.createIngrediente(prato.getReceitaPrato()));
                 return pratoRepository.save(existingPrato);
             } else {
                 throw new IdNotFoundException();

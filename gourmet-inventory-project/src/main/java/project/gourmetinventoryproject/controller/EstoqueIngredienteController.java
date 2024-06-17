@@ -5,12 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteCriacaoDto;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosDto;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,6 +49,8 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})})
     })
+
+
     @GetMapping("/{idEmpresa}")
     public ResponseEntity<List<EstoqueIngredienteConsultaDto>> getAllEstoqueIngredientes(@PathVariable Long idEmpresa) {
         List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
@@ -102,7 +103,7 @@ public class EstoqueIngredienteController {
                             examples = {@ExampleObject(value = "")})}),
     })
     @PostMapping("/{idEmpresa}")
-    public ResponseEntity<EstoqueIngredienteConsultaDto> createEstoqueIngrediente(@PathVariable Long idEmpresa,@RequestBody EstoqueIngredienteCriacaoDto estoqueIngrediente) {
+    public ResponseEntity<EstoqueIngredienteConsultaDto> createEstoqueIngrediente(@PathVariable Long idEmpresa,@RequestBody @Valid EstoqueIngredienteCriacaoDto estoqueIngrediente) {
         var entidade = mapper.map(estoqueIngrediente, EstoqueIngrediente.class);
         estoqueIngredienteService.createEstoqueIngrediente(entidade,idEmpresa);
         var dtoResposta = mapper.map(entidade, EstoqueIngredienteConsultaDto.class);
@@ -141,35 +142,8 @@ public class EstoqueIngredienteController {
 
             return new ResponseEntity<>(mapper.map(updatedEstoqueIngrediente, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
         }
-    @Operation(summary = "Atualizar estoque de ingredientes", method = "PUT")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes atualizado com sucesso",
-                    content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"}")})}),
-            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
-                    content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"}")})}),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-    })
-    @PutMapping("/{id}/{idEmpresa}")
-    public ResponseEntity<EstoqueIngredienteConsultaDto> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngredienteCriacaoDto estoqueIngredienteDto, @PathVariable Long idEmpresa) {
-        var entidade = mapper.map(estoqueIngredienteDto, EstoqueIngrediente.class);
-        estoqueIngredienteService.updateEstoqueIngrediente(id, entidade, idEmpresa );
-        return new ResponseEntity<>(mapper.map(entidade, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
-    }
 
-    @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
+   @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes deletado com sucesso",
                     content = {@Content(mediaType = "text/plain",
@@ -194,7 +168,7 @@ public class EstoqueIngredienteController {
     }
 
     @GetMapping("/estoque-select/{id}")
-    public ResponseEntity<List<EstoqueIngredientePratosDto>> getEstoqueSelect(@PathVariable Long id){
+    public ResponseEntity<List<EstoqueIngredientePratosSelectDto>> getEstoqueSelect(@PathVariable Long id){
         return ResponseEntity.status(200).body(estoqueIngredienteService.getEIngredientesSelect(id));
     }
 }

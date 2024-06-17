@@ -33,7 +33,7 @@ public class EstoqueIngredienteConsultaDto {
     private String localArmazenamento;
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
-    private List<Ingrediente> receitaManipulado;
+   // private List<Ingrediente> receitaManipulado;
     private List<Alerta> Alertas;
 
 }

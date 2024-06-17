@@ -3,10 +3,12 @@ package project.gourmetinventoryproject.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.domain.Medidas;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
+import project.gourmetinventoryproject.exception.EmptyListException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.repository.IngredienteRepository;
@@ -22,40 +24,41 @@ public class IngredienteService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private EstoqueIngredienteService estoqueIngredienteService;
+
     private ModelMapper mapper = new ModelMapper();
 
     public List<Ingrediente> getAllIngredientes() {
         return ingredienteRepository.findAll();
     }
 
-    public IngredienteConsultaDto getIngredienteById(Long id) {
+    public Ingrediente getIngredienteById(Long id) {
        if (ingredienteRepository.existsById(id)){
-           Optional<Ingrediente> ingredienteOptional = ingredienteRepository.findById(id);
-
-           return mapper.map(ingredienteOptional.orElse(null), IngredienteConsultaDto.class);
+           Ingrediente ingredienteOptional = ingredienteRepository.findById(id).orElse(null);
+           return ingredienteOptional;
        }
        throw new IdNotFoundException();
     }
 
     public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
-        if (ingredienteDto.isEmpty()){
-            throw new ElementAlreadyExistException();
+        if (ingredienteDto == null) {
+            throw new IllegalArgumentException("Lista de ingredientes não pode ser nula");
         }
+        if (ingredienteDto.isEmpty()) {
+            throw new EmptyListException("Lista de ingredientes vazia");
+        }
+
         List<Ingrediente> lista = new ArrayList<>();
-        for (IngredienteCriacaoDto ingrediente : ingredienteDto){
-            Ingrediente ingrediente1 =  modelMapper.map(ingrediente,Ingrediente.class);
-            ingredienteRepository.save(ingrediente1);
-            lista.add(ingrediente1);
+        for (IngredienteCriacaoDto ingrediente : ingredienteDto) {
+            EstoqueIngrediente newEstoqueIngrediente = estoqueIngredienteService.getEstoqueIngredienteById(ingrediente.getIdItem());
+            Ingrediente newIngrediente = modelMapper.map(ingrediente, Ingrediente.class);
+            newIngrediente.setEstoqueIngrediente(newEstoqueIngrediente);
+
+            ingredienteRepository.save(newIngrediente);
+            lista.add(newIngrediente);
         }
         return lista;
-    }
-
-    public Ingrediente updateIngrediente(Long id, Ingrediente ingrediente) {
-        if (ingredienteRepository.existsById(id)){
-            ingrediente.setIdIngrediente(id);
-            return ingredienteRepository.save(ingrediente);
-        }
-        throw new IdNotFoundException();
     }
 
     public void deleteIngrediente(Long id) {

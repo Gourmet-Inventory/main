@@ -51,7 +51,7 @@ public class RelatorioService {
             for (Ingrediente ingrediente : prato.getReceitaPrato()) {
                 EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
                 if (estoque != null) {
-                    Double quantidadeUsada = Double.parseDouble(ingrediente.getValorMedida());
+                    Double quantidadeUsada = ingrediente.getValorMedida();
                     estoque.baixarEstoque(quantidadeUsada);
                     estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(), estoque);
                 }

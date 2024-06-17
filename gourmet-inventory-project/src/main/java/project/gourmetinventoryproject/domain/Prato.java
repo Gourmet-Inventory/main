@@ -22,7 +22,12 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "prato_ingrediente",
+            joinColumns = @JoinColumn(name = "prato_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingrediente_id")
+    )
     private List<Ingrediente> receitaPrato;
     @ElementCollection
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
