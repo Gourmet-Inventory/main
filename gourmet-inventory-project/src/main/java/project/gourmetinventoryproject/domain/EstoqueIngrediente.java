@@ -42,5 +42,9 @@ public class EstoqueIngrediente {
     public void addAlerta(Alerta alerta) {
         Alertas.add(alerta);
     }
+
+    public void baixarEstoque(Double quantidadeUsada) {
+        this.valorTotal -= quantidadeUsada;
+    }
 }
 
