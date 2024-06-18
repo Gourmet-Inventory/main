@@ -22,9 +22,16 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinTable(
+            name = "prato_ingrediente",
+            joinColumns = @JoinColumn(name = "prato_id"),
+            inverseJoinColumns = @JoinColumn(name = "ingrediente_id")
+    )
     private List<Ingrediente> receitaPrato;
-    @Enumerated(EnumType.STRING)
-    private List<AlergicosRestricoes> alergicosRestricoes;
+    @ElementCollection
+    @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
+    @Column(name = "restricao")
+    private List<String> alergicosRestricoes;
     private byte[] foto;
 }

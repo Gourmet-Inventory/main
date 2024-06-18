@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class EmpresaResumidaDto {
-    private Long id;
+    private Long idEmpresa;
     private String nomeFantasia;
 }

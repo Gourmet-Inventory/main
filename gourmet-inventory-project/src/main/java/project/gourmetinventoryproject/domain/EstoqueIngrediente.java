@@ -1,9 +1,11 @@
 package project.gourmetinventoryproject.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -32,7 +34,18 @@ public class EstoqueIngrediente {
     private String localArmazenamento;
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
-    @OneToMany(mappedBy = "estoqueIngrediente")
-    private List<Ingrediente> receitaManipulado;
+    //@OneToMany(mappedBy = "estoqueIngrediente")
+   // private List<Ingrediente> receitaManipulado;
+    @JsonIgnore
+    @OneToMany(mappedBy = "idAlerta")
+    private List<Alerta> Alertas;
+
+    public void addAlerta(Alerta alerta) {
+        Alertas.add(alerta);
+    }
+
+    public void baixarEstoque(Double quantidadeUsada) {
+        this.valorTotal -= quantidadeUsada;
+    }
 }
 

@@ -4,8 +4,7 @@ package project.gourmetinventoryproject.dto.prato;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.gourmetinventoryproject.domain.AlergicosRestricoes;
-import project.gourmetinventoryproject.domain.Empresa;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 
 import java.util.List;
 
@@ -14,10 +13,10 @@ import java.util.List;
 @NoArgsConstructor
 public class PratoConsultaDto {
     private Long idPrato;
-    private Empresa empresa;
     private String nome;
     private String descricao;
     private Double preco;
+    private List<String> alergicosRestricoes;
     private String categoria;
-    private List<AlergicosRestricoes> alergicosRestricoes;
+    private List<IngredienteConsultaDto> receitaPrato;
 }

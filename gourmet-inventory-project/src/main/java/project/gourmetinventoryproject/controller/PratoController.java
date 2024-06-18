@@ -14,8 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
+import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.PratoService;
 
 import java.io.File;
@@ -38,6 +40,8 @@ public class PratoController {
 
     @Autowired
     private ModelMapper mapper;
+    @Autowired
+    private EstoqueIngredienteService estoqueIngredienteService;
 
     @Operation(summary = "Obter lista com todos pratos", method = "GET")
     @ApiResponses(value = {
@@ -64,6 +68,7 @@ public class PratoController {
                 .map(prato-> mapper.map(prato, PratoConsultaDto.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
     }
+
     @Operation(summary = "Buscar prato por ID", method = "GET")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - encontrado com sucesso",
@@ -87,6 +92,7 @@ public class PratoController {
         Prato prato = pratoService.getPratoById(id);
         return new ResponseEntity<>(mapper.map(prato,PratoConsultaDto.class), HttpStatus.OK);
     }
+
     @Operation(summary = "Criar novo prato", method = "POST")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Criado - Prato criado com sucesso",
@@ -110,10 +116,9 @@ public class PratoController {
     })
     @PostMapping("/{idEmpresa}")
     public ResponseEntity<PratoConsultaDto> createPrato(@RequestBody PratoCriacaoDto pratoDto,@PathVariable Long idEmpresa) {
-        var entidade = mapper.map(pratoDto, Prato.class);
-        pratoService.createPrato(entidade,idEmpresa);
-        return new ResponseEntity<>(mapper.map(entidade,PratoConsultaDto.class), HttpStatus.CREATED);
+        return ResponseEntity.status(201).body(pratoService.createPrato(pratoDto,idEmpresa));
     }
+
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Prato atualizado com sucesso",
@@ -137,10 +142,10 @@ public class PratoController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<PratoConsultaDto> updatePrato(@PathVariable Long id, @RequestBody PratoCriacaoDto pratoDto) {
-        var entidade = mapper.map(pratoDto, Prato.class);
-        pratoService.updatePrato(id, entidade);
-        return new ResponseEntity<>(mapper.map(entidade, PratoConsultaDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(pratoService.updatePrato(id, pratoDto), PratoConsultaDto.class), HttpStatus.OK);
     }
+
+
     @Operation(summary = "Deletar prato por ID", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Prato deletado com sucesso",
@@ -164,6 +169,14 @@ public class PratoController {
         pratoService.deletePrato(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/ingredientes/{idEmpresa}")
+    public ResponseEntity<List<EstoqueIngredientePratosSelectDto>> ingredientes (@PathVariable Long idEmpresa){
+        return ResponseEntity.status(200).body(estoqueIngredienteService.getEIngredientesSelect(idEmpresa));
+    }
+
+
+
 //    @PostMapping("/calculate-ingredient-usage")
 //    public Map<Long, Integer> calculateIngredientUsage(@RequestBody List<Long> servedDishesIds) {
 //        return pratoService.calculateIngredientUsage(servedDishesIds);
@@ -226,6 +239,7 @@ public class PratoController {
 
             return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
         } catch (IOException e) {
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

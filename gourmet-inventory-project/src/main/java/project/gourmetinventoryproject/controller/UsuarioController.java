@@ -64,7 +64,6 @@ public class UsuarioController {
     @PostMapping("/login")
     public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
         return ResponseEntity.status(200).body(usuarioService.autenticar(usuarioLoginDto));
-
     }
 
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
