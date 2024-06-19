@@ -72,7 +72,7 @@ public class RelatorioService {
 
     public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
         try {
-            return GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
+            return GerenciadorArquivoCSV.gravaArquivoTxtSaida(data, listaPratos, relatorio);
         } catch (Exception e) {
             return e.getMessage();
         }

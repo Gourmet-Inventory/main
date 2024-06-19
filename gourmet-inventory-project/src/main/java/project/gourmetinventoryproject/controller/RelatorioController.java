@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.service.RelatorioService;
 import project.gourmetinventoryproject.service.UsuarioService;
@@ -23,8 +24,8 @@ public class RelatorioController {
 
     @PostMapping("/gerar/{data}")
     public ResponseEntity<String> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody List<Long> idPratoList) {
-        String arquivo = relatorioService.gerarRelatorio(data, idPratoList);
+        String arquivoGerado = GerenciadorArquivoCSV.downloadArquivoTxt(relatorioService.gerarRelatorio(data, idPratoList));
 
-        return arquivo.equals("saida_" + data + ".csv") ? status(200).body(arquivo) : status(404).build();
+        return arquivoGerado.equals("Download concluído com sucesso!") ? status(200).body(arquivoGerado) : status(404).build();
     }
 }
