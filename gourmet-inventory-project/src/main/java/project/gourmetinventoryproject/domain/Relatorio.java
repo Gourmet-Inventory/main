@@ -16,7 +16,7 @@ public class Relatorio {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idRelatorio;
-    private LocalDate data;
+    private String data;
     @OneToMany
     private List<Prato> pratosSaidos;
     private Double valorBruto;

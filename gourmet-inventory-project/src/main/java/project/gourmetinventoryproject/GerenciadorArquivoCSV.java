@@ -146,7 +146,7 @@ public class GerenciadorArquivoCSV {
         }
     }
 
-    public static String gravaArquivoCsvSaida(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
+    public static String gravaArquivoCsvSaida(String data, List<Prato> listaPratos, Relatorio relatorio) {
         FileWriter arq = null;
         Formatter saida = null;
         Boolean deuRuim = false;
