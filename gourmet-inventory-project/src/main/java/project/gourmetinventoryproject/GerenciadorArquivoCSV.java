@@ -151,7 +151,7 @@ public class GerenciadorArquivoCSV {
         Formatter saida = null;
         boolean deuRuim = false;
 
-        String nomeArq = "saida_" + data + ".txt";
+        String nomeArq = "saida_" + data;
 
         // Bloco try-catch para abrir o arquivo
         try {
