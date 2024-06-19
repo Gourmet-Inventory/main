@@ -22,7 +22,7 @@ public class RelatorioController {
     private RelatorioService relatorioService;
 
     @PostMapping("/gerar")
-    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") String data, @RequestBody List<Long> idPratoList) {
+    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") LocalDate data, @RequestBody List<Long> idPratoList) {
         String arquivo = relatorioService.gerarRelatorio(data, idPratoList);
 
         return arquivo.equals("saida_" + data + ".csv") ? status(200).body(arquivo) : status(404).build();

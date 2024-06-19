@@ -39,7 +39,7 @@ public class RelatorioService {
         return fila;
     }
 
-    public String gerarRelatorio(String data, List<Long> idPratoList) {
+    public String gerarRelatorio(LocalDate data, List<Long> idPratoList) {
         List<Prato> listaPratos = List.of();
         for (Long id : idPratoList) {
             listaPratos.add(pratoService.getPratoById(id));
@@ -72,7 +72,7 @@ public class RelatorioService {
         return downloadFile(data, listaPratos, relatorio);
     }
 
-    public static String downloadFile(String data, List<Prato> listaPratos, Relatorio relatorio) {
+    public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
         try {
             return GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
         } catch (Exception e) {
