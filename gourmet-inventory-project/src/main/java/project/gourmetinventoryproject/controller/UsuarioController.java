@@ -9,11 +9,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Usuario;
 import project.gourmetinventoryproject.dto.usuario.UsuarioConsultaDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioCriacaoDto;
 import project.gourmetinventoryproject.dto.usuario.UsuarioMapper;
+import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioLoginDto;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioTokenDto;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
@@ -30,6 +32,8 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @Operation(summary = "Obter Lista de usuarios", method = "GET")
     @GetMapping("/{idEmpresa}")
@@ -69,14 +73,12 @@ public class UsuarioController {
     @Operation(summary = "Download do arquivo.csv dos usuários com cargo de Administrador", method = "GET")
     @GetMapping("/csv/{nomeArquivo}")
     public ResponseEntity<String> downloadCsvUsuariosAdm(@PathVariable String nomeArquivo) {
-//        if (nomeArquivo.isBlank()){
-//            throw new ResponseStatusException(411, "Preencha um nome para gerar o arquivo", null);
-//        }else {
-            //List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
-            //List<Usuario> usuarioList = usuarioRepository.findAll();
-            //List<UsuarioDetalhesDto> usuarioDetalhesDtoList = UsuarioMapper.toDto(usuarioList);
-            //GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
-       //}
+        if (nomeArquivo.isBlank()){
+            throw new ResponseStatusException(411, "Preencha um nome para gerar o arquivo", null);
+        }else {
+            List<Usuario> usuarioList = usuarioRepository.findByCargoEqualsIgnoreCase("administrador");
+            GerenciadorArquivoCSV.gravaArquivoCsvUsuario(UsuarioMapper.toDto(usuarioList), nomeArquivo);
+       }
         String arquivo = UsuarioService.downloadFile(nomeArquivo);
         return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();
     }

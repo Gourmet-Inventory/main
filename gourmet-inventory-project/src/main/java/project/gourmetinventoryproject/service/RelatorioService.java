@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Prato;
@@ -19,7 +20,6 @@ public class RelatorioService {
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
-
     public Queue<Prato> organizarPratos(List<Prato> pratos) {
         Stack<Prato> pilha = new Stack<>();
         Queue<Prato> fila = new LinkedList<>();
@@ -36,7 +36,7 @@ public class RelatorioService {
         return fila;
     }
 
-    public void gerarRelatorio(LocalDate data, List<Prato> listaPratos) {
+    public String gerarRelatorio(LocalDate data, List<Prato> listaPratos) {
         Queue<Prato> pratos = organizarPratos(listaPratos);
         Relatorio relatorio = new Relatorio();
         relatorio.setData(data);
@@ -59,21 +59,35 @@ public class RelatorioService {
         }
 
         relatorio.setValorBruto(valorBruto);
-        exibeRelatorio(relatorio);
+//        exibeRelatorio(relatorio);
+//        GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
+        return downloadFile(data, listaPratos, relatorio);
     }
 
-    private void exibeRelatorio(Relatorio relatorio) {
-
-        System.out.println("| PRATO             | PREÇO   |");
-        System.out.println("|-------------------|---------|");
-
-        List<Prato> pratos = relatorio.getPratosSaidos();
-        for (Prato prato : pratos) {
-            System.out.printf("| %-18s | %7.2f |\n", prato.getNome(), prato.getPreco());
+    public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
+        try {
+            return GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
+        } catch (Exception e) {
+            return e.getMessage();
         }
-
-        double mediaPreco = pratos.isEmpty() ? 0 : relatorio.getValorBruto() / pratos.size();
-        System.out.println("|-------------------|---------|");
-        System.out.printf("| %-18s | %7.2f |\n", "MÉDIA", mediaPreco);
     }
+
+//    private void exibeRelatorio(Relatorio relatorio) {
+//        double somaPreco = 0;
+//
+//        System.out.println("| PRATO             | PREÇO   |");
+//        System.out.println("|-------------------|---------|");
+//
+//        List<Prato> pratos = relatorio.getPratosSaidos();
+//        for (Prato prato : pratos) {
+//            System.out.printf("| %-18s | %7.2f |\n", prato.getNome(), prato.getPreco());
+//            somaPreco += prato.getPreco();
+//        }
+//
+//        double mediaPreco = pratos.isEmpty() ? 0 : relatorio.getValorBruto() / pratos.size();
+//        System.out.println("|-------------------|---------|");
+//        System.out.printf("| %-18s | %7.2f |\n", "MÉDIA", mediaPreco);
+//        System.out.printf("| %-18s | %7.2f |\n", "SOMA", somaPreco);
+//
+//    }
 }

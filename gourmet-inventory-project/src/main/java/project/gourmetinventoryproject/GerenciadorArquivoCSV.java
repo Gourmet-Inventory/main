@@ -1,8 +1,11 @@
 package project.gourmetinventoryproject;
 
+import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.domain.Relatorio;
 import project.gourmetinventoryproject.dto.usuario.autenticacao.dto.UsuarioDetalhesDto;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 
 public class GerenciadorArquivoCSV {
@@ -141,5 +144,57 @@ public class GerenciadorArquivoCSV {
                 return "Erro ao fechar os fluxos de entrada/saída: " + e.getMessage();
             }
         }
+    }
+
+    public static String gravaArquivoCsvSaida(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
+        FileWriter arq = null;
+        Formatter saida = null;
+        Boolean deuRuim = false;
+
+        String nomeArq = "saida_" + data + ".csv";
+
+        // Bloco try-catch para abrir o arquivo
+        try {
+            arq = new FileWriter(nomeArq);
+            saida = new Formatter(arq);
+        } catch (IOException erro) {
+            System.out.println("Erro ao abrir o arquivo");
+            System.exit(1);
+        }
+
+        // Bloco try-catch para gravar o arquivo
+        try {
+            saida.format("| PRATO             | PREÇO   |\n");
+            saida.format("|-------------------|---------|\n");
+
+            List<Prato> pratos = relatorio.getPratosSaidos();
+            double somaPreco = 0;
+            for (Prato prato : pratos) {
+                saida.format("| %-18s | %7.2f |\n", prato.getNome(), prato.getPreco());
+                somaPreco += prato.getPreco();
+            }
+
+            double mediaPreco = pratos.isEmpty() ? 0 : relatorio.getValorBruto() / pratos.size();
+            saida.format("|-------------------|---------|\n");
+            saida.format("| %-18s | %7.2f |\n", "MÉDIA", mediaPreco);
+            saida.format("| %-18s | %7.2f |\n", "SOMA", somaPreco);
+
+            return nomeArq;
+
+        } catch (FormatterClosedException erro) {
+            System.out.println("Erro ao gravar o arquivo");
+            deuRuim = true;
+        } finally {
+            saida.close();
+            try {
+                arq.close();
+            } catch (IOException erro) {
+                deuRuim = true;
+            }
+            if (deuRuim) {
+                return "Erro ao fechar o arquivo";
+            }
+        }
+        return "Download concluído com sucesso!";
     }
 }

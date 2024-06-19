@@ -1,13 +1,18 @@
 package project.gourmetinventoryproject.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.service.RelatorioService;
+import project.gourmetinventoryproject.service.UsuarioService;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/relatorio")
@@ -18,7 +23,9 @@ public class RelatorioController {
 
 
     @PostMapping("/gerar")
-    public void gerarRelatorio(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data, @RequestBody List<Prato> listaPratos) {
-        relatorioService.gerarRelatorio(data, listaPratos);
+    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data, @RequestBody List<Prato> listaPratos) {
+        String arquivo = relatorioService.gerarRelatorio(data, listaPratos);
+
+        return arquivo.equals("saida_" + data + ".csv") ? status(200).body(arquivo) : status(404).build();
     }
 }
