@@ -41,4 +41,5 @@ public class RelatorioController {
 
         return arquivoGerado.equals("Download concluído com sucesso!") ? status(200).body(arquivoGerado) : status(404).build();
     }
+
 }

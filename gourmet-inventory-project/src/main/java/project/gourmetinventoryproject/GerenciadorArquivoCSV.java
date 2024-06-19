@@ -77,7 +77,7 @@ public class GerenciadorArquivoCSV {
 //            //Leia e formate a saída no console aqui:
 //
 //            // Cabeçalho
-//            System.out.printf("%-4S %-15S %-7S %-5S\n", "id", "nome", "porte", "peso");
+//            System.out.p-k,rintf("%-4S %-15S %-7S %-5S\n", "id", "nome", "porte", "peso");
 //            while (entrada.hasNext()) {
 //                //Corpo
 //
