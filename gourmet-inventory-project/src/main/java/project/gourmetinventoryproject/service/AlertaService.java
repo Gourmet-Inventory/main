@@ -27,7 +27,6 @@ public class AlertaService {
     @Autowired
     private EmpresaService empresaService;
 
-
     @Transactional()
     public List<Alerta> getAllAlerta(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -92,16 +91,19 @@ public class AlertaService {
     @Transactional()
     public void createAlerta(EstoqueIngrediente estoqueIngrediente){
         Alerta alerta = new Alerta();
-        alerta.setEstoqueIngrediente(estoqueIngrediente);
         alerta.setTipoAlerta(tipoAlertaValorTotal(estoqueIngrediente));
+        alerta.setEstoqueIngrediente(estoqueIngrediente);
         estoqueIngrediente.getAlertas().add(alerta);
-        System.out.println(estoqueIngrediente.getAlertas().toArray());
+        saveAlerta(alerta);
+    }
+    public void saveAlerta(Alerta alerta){
         alertaRepository.save(alerta);
     }
 
+
+
     @Transactional()
     public EstoqueIngrediente checarAlerta(EstoqueIngrediente estoqueIngrediente) {
-        System.out.println(estoqueIngrediente.getAlertas().size());
         if (estoqueIngrediente.getAlertas().isEmpty() && tipoAlertaValorTotal(estoqueIngrediente) != null) {
             System.out.println("Entrando na lista vazia e precisa de alerta");
             createAlerta(estoqueIngrediente);

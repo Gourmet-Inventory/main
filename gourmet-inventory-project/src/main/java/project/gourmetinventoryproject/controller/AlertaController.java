@@ -39,42 +39,9 @@ public class AlertaController {
         TiposAlertasDto tiposAlertasDto = alertaService.getTipoAlertas(idEmpresa);
         return new ResponseEntity<>(tiposAlertasDto, HttpStatus.OK);
     }
-
-//    @PostMapping()
-//    //Arrumar alertas duplicados
-//    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(){
-//        List<Alerta> alertas = alertaService.createAlerta();
-//        List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
-//        for (Alerta alerta : alertas) {
-//            alertaConsultaDtos.add(mapper.map(alerta, AlertaConsultaDto.class));
-//        }
-//        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
-//    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAlerta(@PathVariable Long id) {
         alertaService.deleteAlerta(id);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    public String tipoAlerta(EstoqueIngrediente estoqueIngrediente){
-        LocalDate dataAtual = LocalDate.now();
-        LocalDate dataTresDiasDepois = dataAtual.plusDays(3);
-
-        if (estoqueIngrediente.getDtaAviso().isEqual(dataAtual)){
-            return "Dia de Checagem";
-        }
-        if (estoqueIngrediente.getDtaAviso().isBefore(dataTresDiasDepois)){
-            return "Data Proxima";
-        }
-        if (estoqueIngrediente.getValorTotal() <= 10){
-            return "Estoque vazio";
-        }
-        if (estoqueIngrediente.getValorTotal() <= 200){
-            return "Estoque acabando";
-        }
-        else {
-            return null;
-        }
     }
 }

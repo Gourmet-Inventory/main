@@ -18,9 +18,7 @@ public class Alerta {
     private String tipoAlerta;
     @ManyToOne
     @JoinColumn(name = "estoque_ingrediente")
-    @JsonIgnore
     private EstoqueIngrediente estoqueIngrediente;
-
     @Override
     public String toString() {
         return "Alerta{" +

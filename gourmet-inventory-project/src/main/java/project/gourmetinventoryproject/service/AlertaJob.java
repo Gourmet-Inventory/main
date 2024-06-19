@@ -29,21 +29,17 @@ public class AlertaJob {
 
             if (ingrediente.getAlertas().isEmpty() && tipoAlerta(ingrediente) != null) {
                 System.out.println("Entrando na lista vazia e precisa de alerta");
-                alertaService.createAlerta(ingrediente);
+                createAlerta(ingrediente);
                 System.out.println("Alerta criado");
-            } else {
+            }else {
                 System.out.println("Entrando no else");
                 Iterator<Alerta> iterator = ingrediente.getAlertas().iterator();
 
                 while (iterator.hasNext()) {
                     Alerta alerta = iterator.next();
 
-                    if (alerta.getTipoAlerta() != null &&
-                            !alerta.getTipoAlerta().equals("Estoque acabando") &&
-                            !alerta.getTipoAlerta().equals("Estoque vazio")) {
-
+                    if (alerta.getTipoAlerta() != null && !alerta.getTipoAlerta().equals("Estoque acabando") && !alerta.getTipoAlerta().equals("Estoque vazio")) {
                         System.out.println("Checagem máxima");
-
                         if (ingrediente.getDtaAviso().isBefore(dataAtual.plusDays(3))) {
                             System.out.println("Data próxima");
                             alerta.setTipoAlerta("Data proximo");
@@ -74,5 +70,12 @@ public class AlertaJob {
         else {
             return null;
         }
+    }
+    public void createAlerta(EstoqueIngrediente estoqueIngrediente){
+        Alerta alerta = new Alerta();
+        alerta.setEstoqueIngrediente(estoqueIngrediente);
+        alerta.setTipoAlerta(tipoAlerta(estoqueIngrediente));
+        estoqueIngrediente.getAlertas().add(alerta);
+        alertaService.saveAlerta(alerta);
     }
 }

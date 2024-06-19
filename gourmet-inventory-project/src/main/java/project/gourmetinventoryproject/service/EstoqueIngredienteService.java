@@ -74,7 +74,6 @@ public class EstoqueIngredienteService {
             existingEstoqueIngrediente.setDtaCadastro(newEstoqueIngrediente.getDtaCadastro());
             existingEstoqueIngrediente.setDtaAviso(newEstoqueIngrediente.getDtaAviso());
             existingEstoqueIngrediente.setIdItem(id);
-
             return estoqueIngredienteRepository.save(alertaService.checarAlerta(existingEstoqueIngrediente));
         }).orElseThrow(() -> new IdNotFoundException());
 
