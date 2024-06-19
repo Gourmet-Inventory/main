@@ -1,8 +1,10 @@
 package project.gourmetinventoryproject.service;
 
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
@@ -27,22 +29,23 @@ public class EstoqueIngredienteService {
     @Autowired
     private ModelMapper modelMapper;
 
-
+    @Transactional()
     public List<EstoqueIngrediente> getAllEstoqueIngredientes(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         return estoqueIngredienteRepository.findAllByEmpresa(empresa);
     }
+    @Transactional()
     public List<EstoqueIngrediente> getAllEstoqueIngredientes() {
         return estoqueIngredienteRepository.findAll();
     }
-
+    @Transactional()
     public EstoqueIngrediente getEstoqueIngredienteById(Long id) {
         if (estoqueIngredienteRepository.existsById(id)){
             return estoqueIngredienteRepository.findById(id).orElse(null);
         }
         throw new IdNotFoundException();
     }
-
+    @Transactional()
     public List<EstoqueIngredientePratosSelectDto> getEIngredientesSelect(Long idEmpresa){
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         if (empresa == null){
@@ -51,13 +54,13 @@ public class EstoqueIngredienteService {
         List <EstoqueIngrediente> lista= estoqueIngredienteRepository.findAllByEmpresa(empresa);
         return lista.stream().map(estoqueIngrediente -> modelMapper.map(estoqueIngrediente, EstoqueIngredientePratosSelectDto.class)).collect(Collectors.toList());
     }
-
+    @Transactional()
     public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente, Long idEmpresa) {
         EstoqueIngrediente estoqueIngrediente1 = verficarTipo(estoqueIngrediente);
         estoqueIngrediente1.setEmpresa(empresaService.getEmpresasById(idEmpresa));
         return estoqueIngredienteRepository.save(estoqueIngrediente1);
     }
-
+    @Transactional()
     public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente newEstoqueIngrediente) {
         return estoqueIngredienteRepository.findById(id).map(existingEstoqueIngrediente -> {
 
@@ -66,19 +69,18 @@ public class EstoqueIngredienteService {
             existingEstoqueIngrediente.setCategoria(newEstoqueIngrediente.getCategoria());
             existingEstoqueIngrediente.setTipoMedida(newEstoqueIngrediente.getTipoMedida());
             existingEstoqueIngrediente.setValorMedida(newEstoqueIngrediente.getValorMedida());
-            existingEstoqueIngrediente.setValorTotal(newEstoqueIngrediente.getValorTotal());
+            existingEstoqueIngrediente.setValorTotal(verficarTipo(newEstoqueIngrediente).getValorTotal());
             existingEstoqueIngrediente.setLocalArmazenamento(newEstoqueIngrediente.getLocalArmazenamento());
             existingEstoqueIngrediente.setDtaCadastro(newEstoqueIngrediente.getDtaCadastro());
             existingEstoqueIngrediente.setDtaAviso(newEstoqueIngrediente.getDtaAviso());
             existingEstoqueIngrediente.setIdItem(id);
-            alertaService.checarAlerta(existingEstoqueIngrediente);
-            System.out.println(("Atualizando entidade: {}" + existingEstoqueIngrediente));
-            return estoqueIngredienteRepository.save(existingEstoqueIngrediente);
+
+            return estoqueIngredienteRepository.save(alertaService.checarAlerta(existingEstoqueIngrediente));
         }).orElseThrow(() -> new IdNotFoundException());
 
     }
 
-
+    @Transactional()
     public void deleteEstoqueIngrediente(Long id) {
         if (estoqueIngredienteRepository.findById(id).orElse(null) == null){
             throw new IdNotFoundException();
@@ -87,7 +89,7 @@ public class EstoqueIngredienteService {
     }
 
 
-
+    @Transactional()
     public EstoqueIngrediente verficarTipo(EstoqueIngrediente estoqueIngrediente){
         if(estoqueIngrediente.getUnitario() != null){
             estoqueIngrediente.setValorTotal(estoqueIngrediente.getValorMedida() * estoqueIngrediente.getUnitario());

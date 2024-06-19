@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Alerta;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.dto.alerta.AlertaConsultaDto;
+import project.gourmetinventoryproject.dto.alerta.TiposAlertasDto;
 import project.gourmetinventoryproject.service.AlertaService;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 
@@ -33,17 +34,22 @@ public class AlertaController {
                 .map(alerta -> mapper.map(alerta, AlertaConsultaDto.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
     }
-
-    @PostMapping()
-    //Arrumar alertas duplicados
-    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(){
-        List<Alerta> alertas = alertaService.createAlerta();
-        List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
-        for (Alerta alerta : alertas) {
-            alertaConsultaDtos.add(mapper.map(alerta, AlertaConsultaDto.class));
-        }
-        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
+    @GetMapping("/quantidade-tipos-alerta/{idEmpresa}")
+    public ResponseEntity<TiposAlertasDto> getAlertasByTipo(@PathVariable Long idEmpresa) {
+        TiposAlertasDto tiposAlertasDto = alertaService.getTipoAlertas(idEmpresa);
+        return new ResponseEntity<>(tiposAlertasDto, HttpStatus.OK);
     }
+
+//    @PostMapping()
+//    //Arrumar alertas duplicados
+//    public ResponseEntity<List<AlertaConsultaDto>> createAlerta(){
+//        List<Alerta> alertas = alertaService.createAlerta();
+//        List<AlertaConsultaDto> alertaConsultaDtos = new ArrayList<>();
+//        for (Alerta alerta : alertas) {
+//            alertaConsultaDtos.add(mapper.map(alerta, AlertaConsultaDto.class));
+//        }
+//        return alertaConsultaDtos.isEmpty()? new ResponseEntity<>(HttpStatus.NO_CONTENT) :new ResponseEntity<>(alertaConsultaDtos, HttpStatus.CREATED);
+//    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAlerta(@PathVariable Long id) {
