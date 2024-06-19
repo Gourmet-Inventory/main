@@ -9,10 +9,7 @@ import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.domain.Relatorio;
 
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Stack;
+import java.util.*;
 
 @Service
 public class RelatorioService {
@@ -40,7 +37,8 @@ public class RelatorioService {
     }
 
     public String gerarRelatorio(LocalDate data, List<Long> idPratoList) {
-        List<Prato> listaPratos = List.of();
+        List<Prato> listaPratos = new ArrayList<Prato>();
+
         for (Long id : idPratoList) {
             listaPratos.add(pratoService.getPratoById(id));
         }
@@ -48,7 +46,7 @@ public class RelatorioService {
         Queue<Prato> pratos = organizarPratos(listaPratos);
         Relatorio relatorio = new Relatorio();
         relatorio.setData(data);
-        relatorio.getPratosSaidos().addAll(pratos);
+        relatorio.setPratosSaidos(listaPratos);
 
         Double valorBruto = 0.0;
         // Calcular o valor bruto dos pratos

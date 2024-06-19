@@ -21,8 +21,8 @@ public class RelatorioController {
     @Autowired
     private RelatorioService relatorioService;
 
-    @PostMapping("/gerar")
-    public ResponseEntity<String> gerarRelatorio(@RequestParam("data") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody List<Long> idPratoList) {
+    @PostMapping("/gerar/{data}")
+    public ResponseEntity<String> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody List<Long> idPratoList) {
         String arquivo = relatorioService.gerarRelatorio(data, idPratoList);
 
         return arquivo.equals("saida_" + data + ".csv") ? status(200).body(arquivo) : status(404).build();

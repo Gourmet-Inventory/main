@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 @Getter
 @Setter
+@ToString
 public class EstoqueIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
