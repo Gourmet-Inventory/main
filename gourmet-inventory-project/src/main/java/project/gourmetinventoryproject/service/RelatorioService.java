@@ -20,6 +20,9 @@ public class RelatorioService {
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
+    @Autowired
+    private PratoService pratoService;
+
     public Queue<Prato> organizarPratos(List<Prato> pratos) {
         Stack<Prato> pilha = new Stack<>();
         Queue<Prato> fila = new LinkedList<>();
@@ -36,7 +39,12 @@ public class RelatorioService {
         return fila;
     }
 
-    public String gerarRelatorio(LocalDate data, List<Prato> listaPratos) {
+    public String gerarRelatorio(LocalDate data, List<Long> idPratoList) {
+        List<Prato> listaPratos = List.of();
+        for (Long id : idPratoList) {
+            listaPratos.add(pratoService.getPratoById(id));
+        }
+
         Queue<Prato> pratos = organizarPratos(listaPratos);
         Relatorio relatorio = new Relatorio();
         relatorio.setData(data);
