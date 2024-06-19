@@ -21,6 +21,8 @@ public class RelatorioService {
     private PratoService pratoService;
 
     public Queue<Prato> organizarPratos(List<Prato> pratos) {
+        System.out.println("Entrou no método organizarPratos om lista de pratos: " + pratos);
+
         Stack<Prato> pilha = new Stack<>();
         Queue<Prato> fila = new LinkedList<>();
 
@@ -33,10 +35,14 @@ public class RelatorioService {
         while (!pilha.isEmpty()) {
             fila.add(pilha.pop());
         }
+
+        System.out.println("Pratos organizados em fila: " + fila);
         return fila;
     }
 
     public String gerarRelatorio(LocalDate data, List<Long> idPratoList) {
+        System.out.println("Entrou no método gerarRelatorio " + "Data: " + data + " Lista de pratosId: " + idPratoList);
+
         List<Prato> listaPratos = new ArrayList<Prato>();
 
         for (Long id : idPratoList) {
@@ -44,6 +50,8 @@ public class RelatorioService {
         }
 
         Queue<Prato> pratos = organizarPratos(listaPratos);
+        System.out.println("Pratos organizados: " + pratos);
+
         Relatorio relatorio = new Relatorio();
         relatorio.setData(data);
         relatorio.setPratosSaidos(listaPratos);
@@ -65,12 +73,15 @@ public class RelatorioService {
         }
 
         relatorio.setValorBruto(valorBruto);
+        System.out.println("Relatório gerado: " + relatorio);
 //        exibeRelatorio(relatorio);
 //        GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
         return downloadFile(data, listaPratos, relatorio);
     }
 
     public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
+        System.out.println("Entrou no método downloadFile");
+
         try {
             return GerenciadorArquivoCSV.gravaArquivoTxtSaida(data, listaPratos, relatorio);
         } catch (Exception e) {

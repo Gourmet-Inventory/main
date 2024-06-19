@@ -146,6 +146,40 @@ public class GerenciadorArquivoCSV {
         }
     }
 
+    public static String downloadArquivoTxt(String nomeArq) {
+        File arquivoOrigem = new File(nomeArq + ".txt");
+
+        String diretorioDownloads = System.getProperty("user.home") + "/Downloads/";
+        File arquivoDestino = new File(diretorioDownloads + nomeArq + ".txt");
+
+        FileInputStream entrada = null;
+        FileOutputStream saida = null;
+        byte[] buffer = new byte[1024];
+        int length;
+
+        try {
+            entrada = new FileInputStream(arquivoOrigem);
+            saida = new FileOutputStream(arquivoDestino);
+            while ((length = entrada.read(buffer)) > 0) {
+                saida.write(buffer, 0, length);
+            }
+            return "Download concluído com sucesso!";
+        } catch (IOException e) {
+            return "Erro durante o download do arquivo: " + e.getMessage();
+        } finally {
+            try {
+                if (entrada != null) {
+                    entrada.close();
+                }
+                if (saida != null) {
+                    saida.close();
+                }
+            } catch (IOException e) {
+                return "Erro ao fechar os fluxos de entrada/saída: " + e.getMessage();
+            }
+        }
+    }
+
     public static String gravaArquivoTxtSaida(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
         FileWriter arq = null;
         Formatter saida = null;
@@ -164,6 +198,7 @@ public class GerenciadorArquivoCSV {
 
         // Bloco try-catch para gravar o arquivo
         try {
+            saida.format("|-------------------|---------|\n");
             saida.format("| PRATO             | PREÇO   |\n");
             saida.format("|-------------------|---------|\n");
 
@@ -198,37 +233,46 @@ public class GerenciadorArquivoCSV {
         return "Download concluído com sucesso!";
     }
 
-    public static String downloadArquivoTxt(String nomeArq) {
-        File arquivoOrigem = new File(nomeArq + ".txt");
+    public static String gravaArquivoTxtTeste(String nome) {
+        FileWriter arq = null;
+        Formatter saida = null;
+        boolean deuRuim = false;
 
-        String diretorioDownloads = System.getProperty("user.home") + "/Downloads/";
-        File arquivoDestino = new File(diretorioDownloads + nomeArq + ".txt");
+        String nomeArq = nome + ".txt";
 
-        FileInputStream entrada = null;
-        FileOutputStream saida = null;
-        byte[] buffer = new byte[1024];
-        int length;
-
+        // Bloco try-catch para abrir o arquivo
         try {
-            entrada = new FileInputStream(arquivoOrigem);
-            saida = new FileOutputStream(arquivoDestino);
-            while ((length = entrada.read(buffer)) > 0) {
-                saida.write(buffer, 0, length);
-            }
-            return "Download concluído com sucesso!";
-        } catch (IOException e) {
-            return "Erro durante o download do arquivo: " + e.getMessage();
+            arq = new FileWriter(nomeArq);
+            saida = new Formatter(arq);
+        } catch (IOException erro) {
+            System.out.println("Erro ao abrir o arquivo");
+            System.exit(1); // Aqui você pode decidir como lidar com o erro ao abrir o arquivo
+        }
+
+        // Bloco try-catch para gravar o arquivo
+        try {
+            saida.format("|-------------------|---------|\n");
+            saida.format("| PRATO             | PREÇO   |\n");
+            saida.format("|-------------------|---------|\n");
+            saida.format("| Teste             | Teste   |\n");
+            saida.format("|-------------------|---------|\n");
+
+            return nomeArq;
+
+        } catch (FormatterClosedException erro) {
+            System.out.println("Erro ao gravar o arquivo");
+            deuRuim = true;
         } finally {
+            saida.close();
             try {
-                if (entrada != null) {
-                    entrada.close();
-                }
-                if (saida != null) {
-                    saida.close();
-                }
-            } catch (IOException e) {
-                return "Erro ao fechar os fluxos de entrada/saída: " + e.getMessage();
+                arq.close();
+            } catch (IOException erro) {
+                deuRuim = true;
+            }
+            if (deuRuim) {
+                return "Erro ao fechar o arquivo";
             }
         }
+        return "Download concluído com sucesso!";
     }
 }
