@@ -1,5 +1,6 @@
 package project.gourmetinventoryproject.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -18,5 +19,11 @@ public class Alerta {
     @ManyToOne
     @JoinColumn(name = "estoque_ingrediente")
     private EstoqueIngrediente estoqueIngrediente;
-
+    @Override
+    public String toString() {
+        return "Alerta{" +
+                "idAlerta=" + idAlerta +
+                ", tipoAlerta='" + tipoAlerta + '\'' +
+                '}';
+    }
 }

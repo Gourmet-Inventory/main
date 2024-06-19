@@ -2,9 +2,11 @@ package project.gourmetinventoryproject.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.gourmetinventoryproject.domain.Alerta;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
+import project.gourmetinventoryproject.dto.alerta.TiposAlertasDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.AlertaRepository;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
@@ -12,7 +14,9 @@ import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
 
 @Service
 public class AlertaService {
@@ -23,9 +27,7 @@ public class AlertaService {
     @Autowired
     private EmpresaService empresaService;
 
-    @Autowired
-    private EstoqueIngredienteRepository estoqueIngredienteRepository;
-
+    @Transactional()
     public List<Alerta> getAllAlerta(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         List<Alerta> alertasAll = alertaRepository.findAll();
@@ -38,148 +40,117 @@ public class AlertaService {
         }
         return alertasEmpresa;
     }
+    @Transactional()
     public List<Alerta> getAllAlerta() {
         return alertaRepository.findAll();
     }
-
-    public List<Alerta> createAlerta() {
-        List<Alerta> alertas = alertaRepository.findAll();
-        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteRepository.findAll();
-        List<Alerta> newAlertas = new ArrayList<>();
-        if (estoqueIngredientes.isEmpty()) {
-            //estoque vazio
-            System.out.println("Sem alertas para criar");
-        }
-        else {
-            Boolean aletaExiste = false;
-            for (int i = 0; i < estoqueIngredientes.size(); i++) {
-                aletaExiste = false;
-                if (!alertas.isEmpty()){
-                    //validar existencia de alerta para aquele estoque
-                    for (int j = 0; j < alertas.size(); j++) {
-                        if (estoqueIngredientes.get(i).getIdItem().equals(alertas.get(j).getEstoqueIngrediente().getIdItem())) {
-                            aletaExiste = true;
-                            alertas.remove(j);
-                            break;
-                        } else {
-                            aletaExiste = false;
-                        }
-                    }
-                    //Criar alerta
-                    if (tipoAlertaValorTotal(estoqueIngredientes.get(i)) != null && !aletaExiste) {
-                        Alerta alerta = new Alerta();
-                        alerta.setTipoAlerta(tipoAlertaValorTotal(estoqueIngredientes.get(i)));
-                        estoqueIngredientes.get(i).addAlerta(alerta);
-                        alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        newAlertas.add(alerta);
-                        saveAlerta(alerta);
-                    }
-                }
-                else {
-                    //Criar alerta
-                    if (tipoAlertaValorTotal(estoqueIngredientes.get(i)) != null && !aletaExiste) {
-                        Alerta alerta = new Alerta();
-                        alerta.setTipoAlerta(tipoAlertaValorTotal(estoqueIngredientes.get(i)));
-                        alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        estoqueIngredientes.get(i).addAlerta(alerta);
-                        newAlertas.add(alerta);
-                        saveAlerta(alerta);
-                    }
-                }
+    @Transactional()
+    public TiposAlertasDto getTipoAlertas(Long idEmpresa){
+        List<Alerta> alertasAll = getAllAlerta(idEmpresa);
+        TiposAlertasDto tiposAlertasDto = new TiposAlertasDto();
+        int estoqueAcabandoQtd = 0;
+        int estoqueVazioQtd = 0;
+        int diaChecagemQtd = 0;
+        int dataProximaQtd = 0;
+        for (int i = 0; i < alertasAll.size(); i++) {
+            if (alertasAll.get(i).getTipoAlerta().equals("Estoque vazio")) {
+                estoqueVazioQtd++;
             }
-            System.out.println("alertas criados");
+            if (alertasAll.get(i).getTipoAlerta().equals("Estoque acabando")) {
+                estoqueAcabandoQtd++;
+            }
+            if (alertasAll.get(i).getTipoAlerta().equals("Dia de Checagem")) {
+                diaChecagemQtd++;
+            }
+            if (alertasAll.get(i).getTipoAlerta().equals("Data Proxima")) {
+                dataProximaQtd++;
+            }
         }
-        return newAlertas;
-
+        System.out.println(dataProximaQtd );
+        System.out.println(diaChecagemQtd );
+        System.out.println(estoqueAcabandoQtd );
+        System.out.println(estoqueVazioQtd );
+        int somaTotalAlertas = estoqueAcabandoQtd + estoqueVazioQtd +diaChecagemQtd + dataProximaQtd;
+        if (somaTotalAlertas > 0){
+            tiposAlertasDto.setEstoqueAcabandoQtd(estoqueAcabandoQtd);
+            tiposAlertasDto.setEstoqueVazioQtd(estoqueVazioQtd);
+            tiposAlertasDto.setDiaChecagemQtd(diaChecagemQtd);
+            tiposAlertasDto.setDataProximaQtd(dataProximaQtd);
+            tiposAlertasDto.setSomaTotalAlertar(somaTotalAlertas);
+        }
+        return tiposAlertasDto;
     }
 
-    public Alerta saveAlerta(Alerta alerta){
-        return alertaRepository.save(alerta);
-    }
-
+    @Transactional()
     public void deleteAlerta(Long id) {
         if (alertaRepository.findById(id).orElse(null) == null){
             throw new IdNotFoundException();
         }
         alertaRepository.deleteById(id);
     }
-    public EstoqueIngrediente checarAlerta(EstoqueIngrediente estoqueIngrediente){
-        if (estoqueIngrediente.getAlertas().isEmpty() && tipoAlertaValorTotal(estoqueIngrediente) != null){
-            createAlerta();
-            return estoqueIngrediente;
-        }
-        if (estoqueIngrediente.getAlertas().size() == 2){
-            if(estoqueIngrediente.getUnitario() != null){
-                if (estoqueIngrediente.getValorTotal() >= 0 && estoqueIngrediente.getValorTotal() < 0){
-                    for (int i = 0; i < estoqueIngrediente.getAlertas().size(); i++) {
-                        if (estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque vazio"){
-                            deleteAlerta(estoqueIngrediente.getAlertas().get(i).getIdAlerta());
-                            return estoqueIngrediente;
-                        }
-                    }
-                    Alerta alerta = new Alerta();
-                    alerta.setTipoAlerta("Estoque acabando");
-                    alerta.setEstoqueIngrediente(estoqueIngrediente);
-                    estoqueIngrediente.getAlertas().add(alerta);
-                    saveAlerta(alerta);
-                    return estoqueIngrediente;
-                }
-                if (estoqueIngrediente.getValorTotal() >= 60){
-                    for (int i = 0; i < estoqueIngrediente.getAlertas().size(); i++) {
-                        if (estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque acabando" || estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque vazio"){
-                            deleteAlerta(estoqueIngrediente.getAlertas().get(i).getIdAlerta());
-                            return estoqueIngrediente;
-                        }
-                    }
-                }
-            }
-            if(estoqueIngrediente.getUnitario() == null){
-                if (estoqueIngrediente.getValorTotal() >= 0 && estoqueIngrediente.getValorTotal() < 2){
-                    for (int i = 0; i < estoqueIngrediente.getAlertas().size(); i++) {
-                        if (estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque vazio"){
-                            deleteAlerta(estoqueIngrediente.getAlertas().get(i).getIdAlerta());
-                        }
-                    }
-                    Alerta alerta = new Alerta();
-                    alerta.setTipoAlerta("Estoque acabando");
-                    alerta.setEstoqueIngrediente(estoqueIngrediente);
-                    estoqueIngrediente.getAlertas().add(alerta);
-                    saveAlerta(alerta);
-                    return estoqueIngrediente;
-                }
-                if (estoqueIngrediente.getValorTotal() >= 2){
-                    for (int i = 0; i < estoqueIngrediente.getAlertas().size(); i++) {
-                        if (estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque acabando" || estoqueIngrediente.getAlertas().get(i).getTipoAlerta() == "Estoque vazio"){
-                            deleteAlerta(estoqueIngrediente.getAlertas().get(i).getIdAlerta());
-                        }
-                    }
-                }
-            }
-        }
-        else {
+    @Transactional()
+    public void createAlerta(EstoqueIngrediente estoqueIngrediente){
+        Alerta alerta = new Alerta();
+        alerta.setTipoAlerta(tipoAlertaValorTotal(estoqueIngrediente));
+        alerta.setEstoqueIngrediente(estoqueIngrediente);
+        estoqueIngrediente.getAlertas().add(alerta);
+        saveAlerta(alerta);
+    }
+    public void saveAlerta(Alerta alerta){
+        alertaRepository.save(alerta);
+    }
 
+
+
+    @Transactional()
+    public EstoqueIngrediente checarAlerta(EstoqueIngrediente estoqueIngrediente) {
+        if (estoqueIngrediente.getAlertas().isEmpty() && tipoAlertaValorTotal(estoqueIngrediente) != null) {
+            System.out.println("Entrando na lista vazia e precisa de alerta");
+            createAlerta(estoqueIngrediente);
+            System.out.println("Alerta criado");
+            return estoqueIngrediente;
+        } else {
+            System.out.println("Entrando no else");
+            Iterator<Alerta> iterator = estoqueIngrediente.getAlertas().iterator();
+
+            while (iterator.hasNext()) {
+                Alerta alerta = iterator.next();
+                if (!alerta.getTipoAlerta().equals("Data Proxima") && !alerta.getTipoAlerta().equals("Dia Checagem")) {
+                    System.out.println("checagem maxima");
+                    if (estoqueIngrediente.getValorTotal() > 60) {
+                        iterator.remove();
+                        deleteAlerta(alerta.getIdAlerta());
+                    } else if (estoqueIngrediente.getValorTotal() <= 0) {
+                        alerta.setTipoAlerta("Estoque vazio");
+                    } else {
+                        alerta.setTipoAlerta("Estoque acabando");
+                    }
+                }
+            }
+            System.out.println("Saindo do for de checagem estoque");
         }
         return estoqueIngrediente;
     }
-
+    @Transactional()
     public String tipoAlertaValorTotal(EstoqueIngrediente estoqueIngrediente){
-        if(estoqueIngrediente.getUnitario() != null){
+        if(estoqueIngrediente.getUnitario() == null){
             if (estoqueIngrediente.getValorTotal() <= 0){
                 return "Estoque vazio";
             }
             if (estoqueIngrediente.getValorTotal() <= 60){
                 return "Estoque acabando";
             }
+            return null;
         }
-        if(estoqueIngrediente.getUnitario() == null){
+        else{
             if (estoqueIngrediente.getValorTotal() <= 0){
                 return "Estoque vazio";
             }
             if (estoqueIngrediente.getValorTotal() <= 2){
                 return "Estoque acabando";
             }
+            return null;
         }
-        return null;
 
     }
 }

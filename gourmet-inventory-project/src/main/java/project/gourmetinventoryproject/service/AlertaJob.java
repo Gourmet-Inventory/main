@@ -1,81 +1,81 @@
 package project.gourmetinventoryproject.service;
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import project.gourmetinventoryproject.domain.Alerta;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 
 @Component
-public class AlertaJob implements Job{
+public class AlertaJob {
+
     @Autowired
     private AlertaService alertaService;
-
 
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
+    @Scheduled(fixedRate = 10000)
+    public void alertarDiarios() {
+        LocalDate dataAtual = LocalDate.now();
+        List<EstoqueIngrediente> estoqueIngrediente = estoqueIngredienteService.getAllEstoqueIngredientes();
 
-    @Async
-    @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-        List<Alerta> alertas = alertaService.getAllAlerta();
-        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes();
-        if (estoqueIngredientes.isEmpty()) {
-            System.out.println("Sem alertas para criar");
-        }
-        else {
-            Boolean aletaExiste = false;
-            for (int i = 0; i < estoqueIngredientes.size(); i++) {
-                aletaExiste = false;
-                if (!alertas.isEmpty()){
-                    for (int j = 0; j < alertas.size(); j++) {
-                        if (estoqueIngredientes.get(i).getIdItem().equals(alertas.get(j).getEstoqueIngrediente().getIdItem())) {
-                            aletaExiste = true;
-                            alertas.remove(j);
-                            break;
+        for (EstoqueIngrediente ingrediente : estoqueIngrediente) {
+            System.out.println("Entrando no for principal");
+
+            if (ingrediente.getAlertas().isEmpty() && tipoAlerta(ingrediente) != null) {
+                System.out.println("Entrando na lista vazia e precisa de alerta");
+                createAlerta(ingrediente);
+                System.out.println("Alerta criado");
+            }else {
+                System.out.println("Entrando no else");
+                Iterator<Alerta> iterator = ingrediente.getAlertas().iterator();
+
+                while (iterator.hasNext()) {
+                    Alerta alerta = iterator.next();
+
+                    if (alerta.getTipoAlerta() != null && !alerta.getTipoAlerta().equals("Estoque acabando") && !alerta.getTipoAlerta().equals("Estoque vazio")) {
+                        System.out.println("Checagem máxima");
+                        if (ingrediente.getDtaAviso().isBefore(dataAtual.plusDays(3))) {
+                            System.out.println("Data próxima");
+                            alerta.setTipoAlerta("Data proximo");
+                        } else if (ingrediente.getDtaAviso().isEqual(dataAtual)) {
+                            System.out.println("Dia de checagem");
+                            alerta.setTipoAlerta("Dia checagem");
                         } else {
-                            aletaExiste = false;
+                            System.out.println("Deletar alerta");
+                            iterator.remove();
+                            alertaService.deleteAlerta(alerta.getIdAlerta());
                         }
                     }
-                    //Criar alerta
-                    if (tipoAlerta(estoqueIngredientes.get(i)) != null && !aletaExiste) {
-                        Alerta alerta = new Alerta();
-                        alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
-                        alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        alertaService.saveAlerta(alerta);
-                    }
                 }
-                else {
-                    if (tipoAlerta(estoqueIngredientes.get(i)) != null && !aletaExiste) {
-                        Alerta alerta = new Alerta();
-                        alerta.setTipoAlerta(tipoAlerta(estoqueIngredientes.get(i)));
-                        alerta.setEstoqueIngrediente(estoqueIngredientes.get(i));
-                        alertaService.saveAlerta(alerta);
-                    }
-                }
+                System.out.println("Saindo do for de checagem de estoque");
             }
-            System.out.println("alertas criados");
         }
-
+        System.out.println("Alertas criados");
     }
+
     public String tipoAlerta(EstoqueIngrediente estoqueIngrediente){
         LocalDate dataAtual = LocalDate.now();
-        LocalDate dataTresDiasDepois = dataAtual.plusDays(3);
         if (estoqueIngrediente.getDtaAviso().isEqual(dataAtual)){
             return "Dia de Checagem";
         }
-        if (estoqueIngrediente.getDtaAviso().isBefore(dataTresDiasDepois)){
+        if (estoqueIngrediente.getDtaAviso().isBefore(dataAtual.plusDays(3))){
             return "Data Proxima";
         }
         else {
             return null;
         }
+    }
+    public void createAlerta(EstoqueIngrediente estoqueIngrediente){
+        Alerta alerta = new Alerta();
+        alerta.setEstoqueIngrediente(estoqueIngrediente);
+        alerta.setTipoAlerta(tipoAlerta(estoqueIngrediente));
+        estoqueIngrediente.getAlertas().add(alerta);
+        alertaService.saveAlerta(alerta);
     }
 }
