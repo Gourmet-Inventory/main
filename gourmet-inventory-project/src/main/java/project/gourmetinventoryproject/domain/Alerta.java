@@ -16,9 +16,11 @@ public class Alerta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idAlerta;
     private String tipoAlerta;
-    @ManyToOne
-    @JoinColumn(name = "estoque_ingrediente")
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "estoque_ingrediente", nullable = true)
     private EstoqueIngrediente estoqueIngrediente;
+
     @Override
     public String toString() {
         return "Alerta{" +
