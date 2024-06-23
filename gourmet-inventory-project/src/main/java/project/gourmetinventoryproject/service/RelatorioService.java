@@ -73,6 +73,7 @@ public class RelatorioService {
         }
 
         relatorio.setValorBruto(valorBruto);
+        
         System.out.println("Relatório gerado: " + relatorio);
 //        exibeRelatorio(relatorio);
 //        GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);

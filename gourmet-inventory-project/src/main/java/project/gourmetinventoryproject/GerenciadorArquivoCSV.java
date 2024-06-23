@@ -147,7 +147,7 @@ public class GerenciadorArquivoCSV {
     }
 
     public static String downloadArquivoTxt(String nomeArq) {
-        File arquivoOrigem = new File(nomeArq + ".txt");
+        File arquivoOrigem = new File(nomeArq);
 
         String diretorioDownloads = System.getProperty("user.home") + "/Downloads/";
         File arquivoDestino = new File(diretorioDownloads + nomeArq + ".txt");
