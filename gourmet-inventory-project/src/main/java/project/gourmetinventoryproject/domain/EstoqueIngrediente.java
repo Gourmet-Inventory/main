@@ -53,7 +53,7 @@ public class EstoqueIngrediente {
         Alertas.add(alerta);
     }
     public void baixarEstoque(Double quantidadeUsada) {
-        this.valorTotal -= quantidadeUsada;
+        this.valorMedida -= quantidadeUsada;
     }
 
     @Override
