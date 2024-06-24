@@ -146,7 +146,7 @@ public class GerenciadorArquivoCSV {
         }
     }
 
-    public static String downloadArquivoTxt(String nomeArq) {
+    public static File downloadArquivoTxt(String nomeArq) {
         File arquivoOrigem = new File(nomeArq);
 
         String diretorioDownloads = System.getProperty("user.home") + "/Downloads/";
@@ -163,9 +163,9 @@ public class GerenciadorArquivoCSV {
             while ((length = entrada.read(buffer)) > 0) {
                 saida.write(buffer, 0, length);
             }
-            return "Download concluído com sucesso!";
+            return arquivoDestino;
         } catch (IOException e) {
-            return "Erro durante o download do arquivo: " + e.getMessage();
+            return new File("Erro durante o download do arquivo: " + e.getMessage());
         } finally {
             try {
                 if (entrada != null) {
@@ -175,7 +175,7 @@ public class GerenciadorArquivoCSV {
                     saida.close();
                 }
             } catch (IOException e) {
-                return "Erro ao fechar os fluxos de entrada/saída: " + e.getMessage();
+                return new File("Erro ao fechar os fluxos de entrada/saída: " + e.getMessage());
             }
         }
     }

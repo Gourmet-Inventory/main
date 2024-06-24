@@ -22,7 +22,7 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany
     @JoinTable(
             name = "prato_ingrediente",
             joinColumns = @JoinColumn(name = "prato_id"),
