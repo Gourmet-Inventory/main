@@ -19,7 +19,7 @@ public class AlertaJob {
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 86400000)
     public void alertarDiarios() {
         LocalDate dataAtual = LocalDate.now();
         List<EstoqueIngrediente> estoqueIngrediente = estoqueIngredienteService.getAllEstoqueIngredientes();
@@ -56,7 +56,6 @@ public class AlertaJob {
                 System.out.println("Saindo do for de checagem de estoque");
             }
         }
-        System.out.println("Alertas criados");
     }
 
     public String tipoAlerta(EstoqueIngrediente estoqueIngrediente){
