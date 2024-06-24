@@ -68,7 +68,7 @@ public class RelatorioService {
                     Double quantidadeUsada = ingrediente.getValorMedida();
                     estoque.baixarEstoque(quantidadeUsada);
                     estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(), estoque);
-                    estoqueIngredienteService.deleteEstoqueIngredienteIfEsgotado(estoque.getIdItem());
+                    estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
                 }
             }
         }

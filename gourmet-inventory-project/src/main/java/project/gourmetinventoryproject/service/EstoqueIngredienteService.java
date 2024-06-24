@@ -99,13 +99,14 @@ public class EstoqueIngredienteService {
     }
 
     @Transactional()
-    public void deleteEstoqueIngredienteIfEsgotado(Long id) {
+    public void setValorMedidaIfNegativo(Long id) {
         EstoqueIngrediente estoqueIngrediente = estoqueIngredienteRepository.findById(id).orElse(null);
         if (estoqueIngrediente == null){
             throw new IdNotFoundException();
         }
         if (estoqueIngrediente.getValorMedida() <= 0) {
-            estoqueIngredienteRepository.deleteById(id);
+            estoqueIngrediente.setValorMedida(0.0);
+            estoqueIngredienteRepository.save(estoqueIngrediente);
         }
     }
 
