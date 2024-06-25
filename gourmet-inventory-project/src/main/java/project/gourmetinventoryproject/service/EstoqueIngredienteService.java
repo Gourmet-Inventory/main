@@ -61,15 +61,16 @@ public class EstoqueIngredienteService {
         return estoqueIngredienteRepository.save(estoqueIngrediente1);
     }
     @Transactional()
-    public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente newEstoqueIngrediente) {
+    public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente) {
         return estoqueIngredienteRepository.findById(id).map(existingEstoqueIngrediente -> {
-
+            EstoqueIngrediente newEstoqueIngrediente = verficarTipo(estoqueIngrediente);
             existingEstoqueIngrediente.setLote(newEstoqueIngrediente.getLote());
             existingEstoqueIngrediente.setNome(newEstoqueIngrediente.getNome());
             existingEstoqueIngrediente.setCategoria(newEstoqueIngrediente.getCategoria());
             existingEstoqueIngrediente.setTipoMedida(newEstoqueIngrediente.getTipoMedida());
             existingEstoqueIngrediente.setValorMedida(newEstoqueIngrediente.getValorMedida());
-            existingEstoqueIngrediente.setValorTotal(verficarTipo(newEstoqueIngrediente).getValorTotal());
+            existingEstoqueIngrediente.setUnitario(newEstoqueIngrediente.getUnitario());
+            existingEstoqueIngrediente.setValorTotal(newEstoqueIngrediente.getValorTotal());
             existingEstoqueIngrediente.setLocalArmazenamento(newEstoqueIngrediente.getLocalArmazenamento());
             existingEstoqueIngrediente.setDtaCadastro(newEstoqueIngrediente.getDtaCadastro());
             existingEstoqueIngrediente.setDtaAviso(newEstoqueIngrediente.getDtaAviso());

@@ -29,7 +29,7 @@ public class EstoqueIngredienteCriacaoDto {
     @NotBlank
     private String categoria;
     private Medidas tipoMedida;
-    private Integer unidades;
+    private Integer unitario;
     @NotNull
     private Double valorMedida;
     private String localArmazenamento;
