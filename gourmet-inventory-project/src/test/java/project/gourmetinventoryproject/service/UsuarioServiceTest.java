@@ -70,7 +70,6 @@ class UsuarioServiceTest {
         Usuario usuario = new Usuario();
         usuario.setCargo("Cargo");
         usuario.setCelular("Celular");
-        usuario.setCpf("Cpf");
         usuario.setEmail("jane.doe@example.org");
         usuario.setIdUsuario(1L);
         usuario.setNome("Nome");
@@ -80,7 +79,6 @@ class UsuarioServiceTest {
         UsuarioCriacaoDto usuarioCriacaoDto = new UsuarioCriacaoDto();
         usuarioCriacaoDto.setCargo("Cargo");
         usuarioCriacaoDto.setCelular("Celular");
-        usuarioCriacaoDto.setCpf("Cpf");
         usuarioCriacaoDto.setEmail("jane.doe@example.org");
         usuarioCriacaoDto.setNome("Nome");
         usuarioCriacaoDto.setSenha("Senha");

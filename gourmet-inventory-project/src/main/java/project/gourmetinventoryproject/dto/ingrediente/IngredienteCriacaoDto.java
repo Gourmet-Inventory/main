@@ -10,8 +10,8 @@ import project.gourmetinventoryproject.domain.Medidas;
 @Setter
 @NoArgsConstructor
 public class IngredienteCriacaoDto {
-    private EstoqueIngrediente estoqueIngrediente;
+    private Long idItem;
     private Medidas tipoMedida;
-    private String valorMedida;
+    private Double valorMedida;
 }
 

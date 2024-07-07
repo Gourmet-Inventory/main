@@ -1,43 +1,51 @@
 package project.gourmetinventoryproject.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.domain.Receita;
-import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.PratoRepository;
-import project.gourmetinventoryproject.repository.ReceitaRepository;
 
 @ContextConfiguration(classes = {PratoService.class})
 @ExtendWith(SpringExtension.class)
 @DisabledInAotMode
 class PratoServiceDiffblueTest {
     @MockBean
-    private ReceitaRepository receitaRepository;
+    private EmpresaService empresaService;
+
+    @MockBean
+    private IngredienteService ingredienteService;
+
+    @MockBean
+    private ModelMapper modelMapper;
 
     @MockBean
     private PratoRepository pratoRepository;
@@ -46,48 +54,72 @@ class PratoServiceDiffblueTest {
     private PratoService pratoService;
 
     /**
-     * Method under test: {@link PratoService#getAllPratos()}
+     * Method under test: {@link PratoService#getAllPratos(Long)}
      */
     @Test
     void testGetAllPratos() {
         // Arrange
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+        when(empresaService.getEmpresasById(Mockito.<Long>any())).thenReturn(empresa);
         ArrayList<Prato> pratoList = new ArrayList<>();
-        when(pratoRepository.findAll()).thenReturn(pratoList);
+        when(pratoRepository.findAllByEmpresa(Mockito.<Empresa>any())).thenReturn(pratoList);
 
         // Act
-        List<Prato> actualAllPratos = pratoService.getAllPratos();
+        List<Prato> actualAllPratos = pratoService.getAllPratos(1L);
 
         // Assert
-        verify(pratoRepository).findAll();
+        verify(pratoRepository).findAllByEmpresa(isA(Empresa.class));
+        verify(empresaService).getEmpresasById(eq(1L));
         assertTrue(actualAllPratos.isEmpty());
         assertSame(pratoList, actualAllPratos);
     }
 
     /**
-     * Method under test: {@link PratoService#getAllPratos()}
+     * Method under test: {@link PratoService#getAllPratos(Long)}
      */
     @Test
     void testGetAllPratos2() {
         // Arrange
-        when(pratoRepository.findAll()).thenThrow(new IdNotFoundException());
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+        when(empresaService.getEmpresasById(Mockito.<Long>any())).thenReturn(empresa);
+        when(pratoRepository.findAllByEmpresa(Mockito.<Empresa>any())).thenThrow(new IdNotFoundException());
 
         // Act and Assert
-        assertThrows(IdNotFoundException.class, () -> pratoService.getAllPratos());
-        verify(pratoRepository).findAll();
+        assertThrows(IdNotFoundException.class, () -> pratoService.getAllPratos(1L));
+        verify(pratoRepository).findAllByEmpresa(isA(Empresa.class));
+        verify(empresaService).getEmpresasById(eq(1L));
     }
 
     /**
      * Method under test: {@link PratoService#getPratoById(Long)}
      */
     @Test
-    void testGetPratoById() {
+    void testGetPratoById() throws UnsupportedEncodingException {
         // Arrange
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
         Optional<Prato> ofResult = Optional.of(prato);
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
@@ -130,115 +162,109 @@ class PratoServiceDiffblueTest {
     }
 
     /**
-     * Method under test: {@link PratoService#createPrato(Prato)}
+     * Method under test: {@link PratoService#createPrato(PratoCriacaoDto, Long)}
      */
     @Test
-    void testCreatePrato() {
+    void testCreatePrato() throws UnsupportedEncodingException {
         // Arrange
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+        when(empresaService.getEmpresasById(Mockito.<Long>any())).thenReturn(empresa);
+        when(ingredienteService.createIngrediente(Mockito.<List<IngredienteCriacaoDto>>any()))
+                .thenReturn(new ArrayList<>());
+
+        Empresa empresa2 = new Empresa();
+        empresa2.setCnpj("Cnpj");
+        empresa2.setIdEmpresa(1L);
+        empresa2.setNomeFantasia("Nome Fantasia");
+        empresa2.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa2);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
-        when(pratoRepository.save(Mockito.<Prato>any())).thenReturn(prato);
-        when(pratoRepository.findByNomeIgnoreCase(Mockito.<String>any())).thenReturn(new ArrayList<>());
+        prato.setReceitaPrato(new ArrayList<>());
+        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<Prato>>any())).thenReturn(prato);
+        when(pratoRepository.save(Mockito.<Prato>any())).thenThrow(new IdNotFoundException());
 
-        Prato prato2 = new Prato();
+        PratoCriacaoDto prato2 = new PratoCriacaoDto();
+        prato2.setAlergicosRestricoes(new ArrayList<>());
         prato2.setCategoria("Categoria");
         prato2.setDescricao("Descricao");
-        prato2.setIdPrato(1L);
         prato2.setNome("Nome");
         prato2.setPreco(10.0d);
+        prato2.setReceitaPrato(new ArrayList<>());
 
-        // Act
-        Prato actualCreatePratoResult = pratoService.createPrato(prato2);
-
-        // Assert
+        // Act and Assert
+        assertThrows(IdNotFoundException.class, () -> pratoService.createPrato(prato2, 1L));
+        verify(modelMapper).map(isA(Object.class), isA(Class.class));
         verify(pratoRepository).save(isA(Prato.class));
-        verify(pratoRepository).findByNomeIgnoreCase(eq("Nome"));
-        assertSame(prato, actualCreatePratoResult);
+        verify(empresaService).getEmpresasById(eq(1L));
+        verify(ingredienteService).createIngrediente(isA(List.class));
     }
 
     /**
-     * Method under test: {@link PratoService#createPrato(Prato)}
+     * Method under test: {@link PratoService#updatePrato(Long, PratoCriacaoDto)}
      */
     @Test
-    void testCreatePrato2() {
+    void testUpdatePrato() throws UnsupportedEncodingException {
         // Arrange
+        when(ingredienteService.createIngrediente(Mockito.<List<IngredienteCriacaoDto>>any()))
+                .thenReturn(new ArrayList<>());
+
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
-
-        ArrayList<Prato> pratoList = new ArrayList<>();
-        pratoList.add(prato);
-        when(pratoRepository.findByNomeIgnoreCase(Mockito.<String>any())).thenReturn(pratoList);
-
-        Prato prato2 = new Prato();
-        prato2.setCategoria("Categoria");
-        prato2.setDescricao("Descricao");
-        prato2.setIdPrato(1L);
-        prato2.setNome("Nome");
-        prato2.setPreco(10.0d);
-
-        // Act and Assert
-        assertThrows(ElementAlreadyExistException.class, () -> pratoService.createPrato(prato2));
-        verify(pratoRepository).findByNomeIgnoreCase(eq("Nome"));
-    }
-
-    /**
-     * Method under test: {@link PratoService#createPrato(Prato)}
-     */
-    @Test
-    void testCreatePrato3() {
-        // Arrange
-        when(pratoRepository.findByNomeIgnoreCase(Mockito.<String>any())).thenThrow(new ElementAlreadyExistException());
-
-        Prato prato = new Prato();
-        prato.setCategoria("Categoria");
-        prato.setDescricao("Descricao");
-        prato.setIdPrato(1L);
-        prato.setNome("Nome");
-        prato.setPreco(10.0d);
-
-        // Act and Assert
-        assertThrows(ElementAlreadyExistException.class, () -> pratoService.createPrato(prato));
-        verify(pratoRepository).findByNomeIgnoreCase(eq("Nome"));
-    }
-
-    /**
-     * Method under test: {@link PratoService#updatePrato(Long, Prato)}
-     */
-    @Test
-    void testUpdatePrato() {
-        // Arrange
-        Prato prato = new Prato();
-        prato.setCategoria("Categoria");
-        prato.setDescricao("Descricao");
-        prato.setIdPrato(1L);
-        prato.setNome("Nome");
-        prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
         Optional<Prato> ofResult = Optional.of(prato);
 
+        Empresa empresa2 = new Empresa();
+        empresa2.setCnpj("Cnpj");
+        empresa2.setIdEmpresa(1L);
+        empresa2.setNomeFantasia("Nome Fantasia");
+        empresa2.setTelefone("Telefone");
+
         Prato prato2 = new Prato();
+        prato2.setAlergicosRestricoes(new ArrayList<>());
         prato2.setCategoria("Categoria");
         prato2.setDescricao("Descricao");
+        prato2.setEmpresa(empresa2);
+        prato2.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato2.setIdPrato(1L);
         prato2.setNome("Nome");
         prato2.setPreco(10.0d);
+        prato2.setReceitaPrato(new ArrayList<>());
         when(pratoRepository.save(Mockito.<Prato>any())).thenReturn(prato2);
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
 
-        Prato prato3 = new Prato();
+        PratoCriacaoDto prato3 = new PratoCriacaoDto();
+        prato3.setAlergicosRestricoes(new ArrayList<>());
         prato3.setCategoria("Categoria");
         prato3.setDescricao("Descricao");
-        prato3.setIdPrato(1L);
         prato3.setNome("Nome");
         prato3.setPreco(10.0d);
+        prato3.setReceitaPrato(new ArrayList<>());
 
         // Act
         Prato actualUpdatePratoResult = pratoService.updatePrato(1L, prato3);
@@ -247,42 +273,58 @@ class PratoServiceDiffblueTest {
         verify(pratoRepository).existsById(eq(1L));
         verify(pratoRepository).findById(eq(1L));
         verify(pratoRepository).save(isA(Prato.class));
+        verify(ingredienteService).createIngrediente(isA(List.class));
         assertSame(prato2, actualUpdatePratoResult);
     }
 
     /**
-     * Method under test: {@link PratoService#updatePrato(Long, Prato)}
+     * Method under test: {@link PratoService#updatePrato(Long, PratoCriacaoDto)}
      */
     @Test
-    void testUpdatePrato2() {
+    void testUpdatePrato2() throws UnsupportedEncodingException {
         // Arrange
+        when(ingredienteService.createIngrediente(Mockito.<List<IngredienteCriacaoDto>>any()))
+                .thenReturn(new ArrayList<>());
+
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
         Optional<Prato> ofResult = Optional.of(prato);
         when(pratoRepository.save(Mockito.<Prato>any())).thenThrow(new IdNotFoundException());
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
 
-        Prato prato2 = new Prato();
+        PratoCriacaoDto prato2 = new PratoCriacaoDto();
+        prato2.setAlergicosRestricoes(new ArrayList<>());
         prato2.setCategoria("Categoria");
         prato2.setDescricao("Descricao");
-        prato2.setIdPrato(1L);
         prato2.setNome("Nome");
         prato2.setPreco(10.0d);
+        prato2.setReceitaPrato(new ArrayList<>());
 
         // Act and Assert
         assertThrows(IdNotFoundException.class, () -> pratoService.updatePrato(1L, prato2));
         verify(pratoRepository).existsById(eq(1L));
         verify(pratoRepository).findById(eq(1L));
         verify(pratoRepository).save(isA(Prato.class));
+        verify(ingredienteService).createIngrediente(isA(List.class));
     }
 
     /**
-     * Method under test: {@link PratoService#updatePrato(Long, Prato)}
+     * Method under test: {@link PratoService#updatePrato(Long, PratoCriacaoDto)}
      */
     @Test
     void testUpdatePrato3() {
@@ -291,12 +333,13 @@ class PratoServiceDiffblueTest {
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(emptyResult);
         when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
 
-        Prato prato = new Prato();
+        PratoCriacaoDto prato = new PratoCriacaoDto();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
-        prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
 
         // Act and Assert
         assertThrows(IdNotFoundException.class, () -> pratoService.updatePrato(1L, prato));
@@ -305,37 +348,27 @@ class PratoServiceDiffblueTest {
     }
 
     /**
-     * Method under test: {@link PratoService#updatePrato(Long, Prato)}
-     */
-    @Test
-    void testUpdatePrato4() {
-        // Arrange
-        when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(false);
-
-        Prato prato = new Prato();
-        prato.setCategoria("Categoria");
-        prato.setDescricao("Descricao");
-        prato.setIdPrato(1L);
-        prato.setNome("Nome");
-        prato.setPreco(10.0d);
-
-        // Act and Assert
-        assertThrows(IdNotFoundException.class, () -> pratoService.updatePrato(1L, prato));
-        verify(pratoRepository).existsById(eq(1L));
-    }
-
-    /**
      * Method under test: {@link PratoService#deletePrato(Long)}
      */
     @Test
-    void testDeletePrato() {
+    void testDeletePrato() throws UnsupportedEncodingException {
         // Arrange
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
         Optional<Prato> ofResult = Optional.of(prato);
         doNothing().when(pratoRepository).deleteById(Mockito.<Long>any());
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
@@ -346,21 +379,30 @@ class PratoServiceDiffblueTest {
         // Assert that nothing has changed
         verify(pratoRepository).deleteById(eq(1L));
         verify(pratoRepository).findById(eq(1L));
-        assertTrue(pratoService.getAllPratos().isEmpty());
     }
 
     /**
      * Method under test: {@link PratoService#deletePrato(Long)}
      */
     @Test
-    void testDeletePrato2() {
+    void testDeletePrato2() throws UnsupportedEncodingException {
         // Arrange
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
+
         Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
         prato.setCategoria("Categoria");
         prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
         prato.setIdPrato(1L);
         prato.setNome("Nome");
         prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
         Optional<Prato> ofResult = Optional.of(prato);
         doThrow(new IdNotFoundException()).when(pratoRepository).deleteById(Mockito.<Long>any());
         when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
@@ -386,95 +428,124 @@ class PratoServiceDiffblueTest {
     }
 
     /**
-     * Method under test: {@link PratoService#calculateIngredientUsage(List)}
+     * Method under test:
+     * {@link PratoService#generateExcelReport(List, int, String)}
      */
     @Test
-    void testCalculateIngredientUsage() {
-        // Arrange, Act and Assert
-        assertTrue(pratoService.calculateIngredientUsage(new ArrayList<>()).isEmpty());
+    @Disabled("TODO: Complete this test")
+    void testGenerateExcelReport() throws IOException {
+        // TODO: Diffblue Cover was only able to create a partial test for this method:
+        //   Reason: Sandboxing policy violation.
+        //   Diffblue Cover ran code in your project that tried
+        //     to access files (file '\directory\foo.txt', permission 'write').
+        //   Diffblue Cover's default sandboxing policy disallows this in order to prevent
+        //   your code from damaging your system environment.
+        //   See https://diff.blue/R011 to resolve this issue.
+
+        // Arrange and Act
+        pratoService.generateExcelReport(new ArrayList<>(), 10, "/directory/foo.txt");
     }
 
     /**
-     * Method under test: {@link PratoService#calculateIngredientUsage(List)}
+     * Method under test: {@link PratoService#updatePratoFoto(Long, byte[])}
      */
     @Test
-    void testCalculateIngredientUsage2() {
+    void testUpdatePratoFoto() throws UnsupportedEncodingException {
         // Arrange
-        when(receitaRepository.findByIdPrato(Mockito.<Long>any())).thenReturn(new ArrayList<>());
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
 
-        ArrayList<Long> servedDishesIds = new ArrayList<>();
-        servedDishesIds.add(1L);
+        Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
+        prato.setCategoria("Categoria");
+        prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
+        prato.setIdPrato(1L);
+        prato.setNome("Nome");
+        prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
+        Optional<Prato> ofResult = Optional.of(prato);
+
+        Empresa empresa2 = new Empresa();
+        empresa2.setCnpj("Cnpj");
+        empresa2.setIdEmpresa(1L);
+        empresa2.setNomeFantasia("Nome Fantasia");
+        empresa2.setTelefone("Telefone");
+
+        Prato prato2 = new Prato();
+        prato2.setAlergicosRestricoes(new ArrayList<>());
+        prato2.setCategoria("Categoria");
+        prato2.setDescricao("Descricao");
+        prato2.setEmpresa(empresa2);
+        prato2.setFoto("AXAXAXAX".getBytes("UTF-8"));
+        prato2.setIdPrato(1L);
+        prato2.setNome("Nome");
+        prato2.setPreco(10.0d);
+        prato2.setReceitaPrato(new ArrayList<>());
+        when(pratoRepository.save(Mockito.<Prato>any())).thenReturn(prato2);
+        when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
+        when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
 
         // Act
-        Map<Long, Integer> actualCalculateIngredientUsageResult = pratoService.calculateIngredientUsage(servedDishesIds);
+        Prato actualUpdatePratoFotoResult = pratoService.updatePratoFoto(1L, "AXAXAXAX".getBytes("UTF-8"));
 
         // Assert
-        verify(receitaRepository).findByIdPrato(eq(1L));
-        assertTrue(actualCalculateIngredientUsageResult.isEmpty());
+        verify(pratoRepository).existsById(eq(1L));
+        verify(pratoRepository).findById(eq(1L));
+        verify(pratoRepository).save(isA(Prato.class));
+        assertSame(prato, actualUpdatePratoFotoResult);
+        byte[] expectedFoto = "AXAXAXAX".getBytes("UTF-8");
+        assertArrayEquals(expectedFoto, actualUpdatePratoFotoResult.getFoto());
     }
 
     /**
-     * Method under test: {@link PratoService#calculateIngredientUsage(List)}
+     * Method under test: {@link PratoService#updatePratoFoto(Long, byte[])}
      */
     @Test
-    void testCalculateIngredientUsage3() {
+    void testUpdatePratoFoto2() throws UnsupportedEncodingException {
         // Arrange
-        Receita receita = new Receita();
-        receita.setId(1L);
-        receita.setIdIngrediente(1L);
-        receita.setIdPrato(1L);
-        receita.setManipulavel(true);
-        receita.setQuantidade(1);
+        Empresa empresa = new Empresa();
+        empresa.setCnpj("Cnpj");
+        empresa.setIdEmpresa(1L);
+        empresa.setNomeFantasia("Nome Fantasia");
+        empresa.setTelefone("Telefone");
 
-        ArrayList<Receita> receitaList = new ArrayList<>();
-        receitaList.add(receita);
-        when(receitaRepository.findByIdPrato(Mockito.<Long>any())).thenReturn(receitaList);
-
-        ArrayList<Long> servedDishesIds = new ArrayList<>();
-        servedDishesIds.add(1L);
-
-        // Act
-        Map<Long, Integer> actualCalculateIngredientUsageResult = pratoService.calculateIngredientUsage(servedDishesIds);
-
-        // Assert
-        verify(receitaRepository).findByIdPrato(eq(1L));
-        assertEquals(1, actualCalculateIngredientUsageResult.size());
-        assertEquals(1, actualCalculateIngredientUsageResult.get(1L).intValue());
-    }
-
-    /**
-     * Method under test: {@link PratoService#calculateIngredientUsage(List)}
-     */
-    @Test
-    void testCalculateIngredientUsage4() {
-        // Arrange
-        when(receitaRepository.findByIdPrato(Mockito.<Long>any())).thenReturn(new ArrayList<>());
-
-        ArrayList<Long> servedDishesIds = new ArrayList<>();
-        servedDishesIds.add(0L);
-        servedDishesIds.add(1L);
-
-        // Act
-        Map<Long, Integer> actualCalculateIngredientUsageResult = pratoService.calculateIngredientUsage(servedDishesIds);
-
-        // Assert
-        verify(receitaRepository, atLeast(1)).findByIdPrato(Mockito.<Long>any());
-        assertTrue(actualCalculateIngredientUsageResult.isEmpty());
-    }
-
-    /**
-     * Method under test: {@link PratoService#calculateIngredientUsage(List)}
-     */
-    @Test
-    void testCalculateIngredientUsage5() {
-        // Arrange
-        when(receitaRepository.findByIdPrato(Mockito.<Long>any())).thenThrow(new IdNotFoundException());
-
-        ArrayList<Long> servedDishesIds = new ArrayList<>();
-        servedDishesIds.add(1L);
+        Prato prato = new Prato();
+        prato.setAlergicosRestricoes(new ArrayList<>());
+        prato.setCategoria("Categoria");
+        prato.setDescricao("Descricao");
+        prato.setEmpresa(empresa);
+        prato.setFoto("AXAXAXAX".getBytes("UTF-8"));
+        prato.setIdPrato(1L);
+        prato.setNome("Nome");
+        prato.setPreco(10.0d);
+        prato.setReceitaPrato(new ArrayList<>());
+        Optional<Prato> ofResult = Optional.of(prato);
+        when(pratoRepository.save(Mockito.<Prato>any())).thenThrow(new IdNotFoundException());
+        when(pratoRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
+        when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(true);
 
         // Act and Assert
-        assertThrows(IdNotFoundException.class, () -> pratoService.calculateIngredientUsage(servedDishesIds));
-        verify(receitaRepository).findByIdPrato(eq(1L));
+        assertThrows(IdNotFoundException.class, () -> pratoService.updatePratoFoto(1L, "AXAXAXAX".getBytes("UTF-8")));
+        verify(pratoRepository).existsById(eq(1L));
+        verify(pratoRepository).findById(eq(1L));
+        verify(pratoRepository).save(isA(Prato.class));
+    }
+
+    /**
+     * Method under test: {@link PratoService#updatePratoFoto(Long, byte[])}
+     */
+    @Test
+    void testUpdatePratoFoto3() throws UnsupportedEncodingException {
+        // Arrange
+        when(pratoRepository.existsById(Mockito.<Long>any())).thenReturn(false);
+
+        // Act and Assert
+        assertThrows(IdNotFoundException.class, () -> pratoService.updatePratoFoto(1L, "AXAXAXAX".getBytes("UTF-8")));
+        verify(pratoRepository).existsById(eq(1L));
     }
 }

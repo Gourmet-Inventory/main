@@ -68,7 +68,7 @@ public class UsuarioService {
         return listaDto;
     }
 
-    public ResponseEntity<Void> deleteUsuario(Long id){ //???
+    public ResponseEntity<Void> deleteUsuario(Long id){
         if (usuarioRepository.existsById(id)) {
             usuarioRepository.deleteById(id);
             return status(200).build();
@@ -87,9 +87,6 @@ public class UsuarioService {
                 if (usuarioCriacaoDto.getCargo() != null) {
                     usuarioExistente.setCargo(usuarioCriacaoDto.getCargo());
                 }
-                if (usuarioCriacaoDto.getCpf() != null) {
-                    usuarioExistente.setCpf(usuarioCriacaoDto.getCpf());
-                }
                 if (usuarioCriacaoDto.getEmail() != null) {
                     usuarioExistente.setEmail(usuarioCriacaoDto.getEmail());
                 }
@@ -103,25 +100,18 @@ public class UsuarioService {
 
 
                 usuarioRepository.save(usuarioExistente);
-
                 return ResponseEntity.status(200).build();
             } else {
                 return ResponseEntity.notFound().build();
             }
         }
 
-
-
-    public ResponseEntity<Object> getEmpresasUsuario(){
-        return null;
-    }
-
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findByEmail(usuarioLoginDto.getEmail());
 
         if (usuarioOptional.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não cadastrado", null);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não cadastrado", null);
         } else {
             final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
                     usuarioLoginDto.getEmail(), usuarioLoginDto.getSenha());

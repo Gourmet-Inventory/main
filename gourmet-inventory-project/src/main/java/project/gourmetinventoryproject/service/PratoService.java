@@ -1,38 +1,54 @@
 package project.gourmetinventoryproject.service;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import project.gourmetinventoryproject.domain.Empresa;
+import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.domain.Receita;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
+import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.repository.PratoRepository;
-import project.gourmetinventoryproject.repository.ReceitaRepository;
 import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 import java.util.HashMap;
 
-import java.util.List;
-import java.util.Optional;
 
-import static org.springframework.http.ResponseEntity.status;
 
 @Service
 public class PratoService {
 
     @Autowired
-    private PratoRepository pratoRepository;
-    @Autowired
-    private ReceitaRepository receitaRepository;
 
-    public List<Prato> getAllPratos() {
-        return pratoRepository.findAll();
+    private PratoRepository pratoRepository;
+
+    @Autowired
+    private EmpresaService empresaService;
+
+    @Autowired
+    private IngredienteService ingredienteService;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    public List<Prato> getAllPratos(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        return pratoRepository.findAllByEmpresa(empresa);
     }
 
     public Prato getPratoById(Long id) {
@@ -44,16 +60,20 @@ public class PratoService {
 
     }
 
-    public Prato createPrato(Prato prato) {
-        if (pratoRepository.findByNomeIgnoreCase(prato.getNome()).isEmpty()){
-            return pratoRepository.save(prato);
+    public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long empresa) {
+        Empresa idEmpresa = empresaService.getEmpresasById(empresa);
+        if (idEmpresa.equals(null)){
+            throw new IdNotFoundException();
         }
-        throw new ElementAlreadyExistException();
-
-
+        System.out.println(prato);
+        List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
+        Prato pratoNovo = modelMapper.map(prato, Prato.class);
+        pratoNovo.setReceitaPrato(ingredientes);
+        pratoNovo.setEmpresa(idEmpresa);
+        return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
     }
 
-    public Prato updatePrato(Long id, Prato prato) {
+    public Prato updatePrato(Long id, PratoCriacaoDto prato) {
         if (pratoRepository.existsById(id)){
             Optional<Prato> existingPratoOptional = pratoRepository.findById(id);
             if (existingPratoOptional.isPresent()) {
@@ -62,6 +82,8 @@ public class PratoService {
                 existingPrato.setDescricao(prato.getDescricao());
                 existingPrato.setPreco(prato.getPreco());
                 existingPrato.setCategoria(prato.getCategoria());
+                existingPrato.setAlergicosRestricoes(prato.getAlergicosRestricoes());
+                existingPrato.setReceitaPrato(ingredienteService.createIngrediente(prato.getReceitaPrato()));
                 return pratoRepository.save(existingPrato);
             } else {
                 throw new IdNotFoundException();
@@ -78,55 +100,121 @@ public class PratoService {
         pratoRepository.deleteById(id);
     }
 
-    public Map<Long, Integer> calculateIngredientUsage(List<Long> servedDishesIds) {
-        // Cria um mapa para armazenar o uso de ingredientes.
-        // Chave: ID do ingrediente (Long)
-        // Valor: Quantidade do ingrediente usado (Integer)
-        Map<Long, Integer> ingredientUsage = new HashMap<>();
+//    public Map<Long, Integer> calculateIngredientUsage(List<Long> servedDishesIds) {
+//        // Cria um mapa para armazenar o uso de ingredientes.
+//        // Chave: ID do ingrediente (Long)
+//        // Valor: Quantidade do ingrediente usado (Integer)
+//        Map<Long, Integer> ingredientUsage = new HashMap<>();
+//
+//        // Itera sobre todos os IDs de pratos servidos fornecidos como entrada para o método.
+//        for (Long dishId : servedDishesIds) {
+//            // Obtém a lista de receitas associadas ao prato atual usando o ID do prato.
+//            // Supõe-se que receitaRepository.findByIdPrato(dishId) retorne uma lista de objetos do tipo Receita.
+//            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
+//
+//            // Itera sobre todas as receitas associadas ao prato atual.
+//            for (Receita recipe : recipes) {
+//                // Atualiza o mapa ingredientUsage:
+//                // Se o ingrediente já estiver presente no mapa, o valor existente é substituído pela soma do valor existente e da quantidade do ingrediente na receita atual.
+//                // Se o ingrediente não estiver presente, ele é adicionado ao mapa com a quantidade da receita atual.
+//                ingredientUsage.merge(recipe.getIdIngrediente(), recipe.getQuantidade(), Integer::sum);
+//            }
+//        }
+//
+//
+//        return ingredientUsage;
+//    }
 
-        // Itera sobre todos os IDs de pratos servidos fornecidos como entrada para o método.
-        for (Long dishId : servedDishesIds) {
-            // Obtém a lista de receitas associadas ao prato atual usando o ID do prato.
-            // Supõe-se que receitaRepository.findByIdPrato(dishId) retorne uma lista de objetos do tipo Receita.
-            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
 
-            // Itera sobre todas as receitas associadas ao prato atual.
-            for (Receita recipe : recipes) {
-                // Atualiza o mapa ingredientUsage:
-                // Se o ingrediente já estiver presente no mapa, o valor existente é substituído pela soma do valor existente e da quantidade do ingrediente na receita atual.
-                // Se o ingrediente não estiver presente, ele é adicionado ao mapa com a quantidade da receita atual.
-                ingredientUsage.merge(recipe.getIdIngrediente(), recipe.getQuantidade(), Integer::sum);
-            }
+//    public int[][] generateIngredientUsageReport(List<Long> servedDishesIds, int numberOfIngredients) {
+//        int[][] ingredientUsageReport = new int[servedDishesIds.size()][numberOfIngredients];
+//
+//        for (int i = 0; i < servedDishesIds.size(); i++) {
+//            Long dishId = servedDishesIds.get(i);
+//            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
+//
+//            for (Receita recipe : recipes) {
+//                int ingredientIndex = recipe.getIdIngrediente().intValue() - 1;
+//                int quantity = recipe.getQuantidade();
+//                ingredientUsageReport[i][ingredientIndex] += quantity;
+//            }
+//        }
+//
+//        return ingredientUsageReport;
+//
+//        /*Resultado esperado
+//                    | Ingrediente 1 | Ingrediente 2 | Ingrediente 3 | Ingrediente 4 |
+//            ----------------------------------------------------------------------
+//            Prato 1 |       1       |       3       |       0       |       1       |
+//            Prato 2 |       0       |       4       |       2       |       0       |
+//            Prato 3 |       3       |       0       |       8       |       7       |
+//        */
+//    }
+
+//    public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
+//        // Criar um novo workbook do Excel
+//        Workbook workbook = new XSSFWorkbook();
+//
+//        // Criar uma nova planilha
+//        Sheet sheet = workbook.createSheet("Relatório de Uso de Ingredientes");
+//
+//        // Cabeçalho
+//        Row headerRow = sheet.createRow(0);
+//        for (int i = 0; i < numberOfIngredients; i++) {
+//            Cell cell = headerRow.createCell(i + 1);
+//            cell.setCellValue("Ingrediente " + (i + 1));
+//        }
+//
+////        // Preencher os dados do relatório
+////        int[][] ingredientUsageReport = generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
+////        for (int i = 0; i < servedDishesIds.size(); i++) {
+////            Row row = sheet.createRow(i + 1);
+////            row.createCell(0).setCellValue("Prato " + (i + 1));
+////            for (int j = 0; j < numberOfIngredients; j++) {
+////                row.createCell(j + 1).setCellValue(ingredientUsageReport[i][j]);
+////            }
+////        }
+//
+//        // Escrever os dados no arquivo
+//        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+//            workbook.write(fileOut);
+//        }
+//
+//        // Fechar o workbook
+//        workbook.close();
+//    }
+
+    public void generateExcelReport(List<Long> servedDishesIds, int numberOfIngredients, String filePath) throws IOException {
+        // Criar um novo workbook do Excel
+        Workbook workbook = new XSSFWorkbook();
+
+        // Criar uma nova planilha
+        Sheet sheet = workbook.createSheet("Relatório de Uso de Ingredientes");
+
+        // Cabeçalho
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < numberOfIngredients; i++) {
+            Cell cell = headerRow.createCell(i + 1);
+            cell.setCellValue("Ingrediente " + (i + 1));
         }
 
-        // Retorna ingredientUsage, que contém o uso de ingredientes calculado para todos os pratos servidos.
-        return ingredientUsage;
-    }
+//        // Preencher os dados do relatório
+//        int[][] ingredientUsageReport = generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
+//        for (int i = 0; i < servedDishesIds.size(); i++) {
+//            Row row = sheet.createRow(i + 1);
+//            row.createCell(0).setCellValue("Prato " + (i + 1));
+//            for (int j = 0; j < numberOfIngredients; j++) {
+//                row.createCell(j + 1).setCellValue(ingredientUsageReport[i][j]);
+//            }
+//        }
 
-
-    public int[][] generateIngredientUsageReport(List<Long> servedDishesIds, int numberOfIngredients) {
-        int[][] ingredientUsageReport = new int[servedDishesIds.size()][numberOfIngredients];
-
-        for (int i = 0; i < servedDishesIds.size(); i++) {
-            Long dishId = servedDishesIds.get(i);
-            List<Receita> recipes = receitaRepository.findByIdPrato(dishId);
-
-            for (Receita recipe : recipes) {
-                int ingredientIndex = recipe.getIdIngrediente().intValue() - 1;
-                int quantity = recipe.getQuantidade();
-                ingredientUsageReport[i][ingredientIndex] += quantity;
-            }
+        // Escrever os dados no arquivo
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
         }
 
-        return ingredientUsageReport;
-
-        /*Resultado esperado
-                    | Ingrediente 1 | Ingrediente 2 | Ingrediente 3 | Ingrediente 4 |
-            ----------------------------------------------------------------------
-            Prato 1 |       1       |       3       |       0       |       1       |
-            Prato 2 |       0       |       4       |       2       |       0       |
-            Prato 3 |       3       |       0       |       8       |       7       |
-        */
+        // Fechar o workbook
+        workbook.close();
     }
 
     public Prato updatePratoFoto(@PathVariable Long codigo, @RequestBody byte[] novaFoto) {
