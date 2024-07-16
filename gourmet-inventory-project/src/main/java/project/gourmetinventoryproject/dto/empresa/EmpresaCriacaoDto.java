@@ -22,7 +22,4 @@ public class EmpresaCriacaoDto {
     @NotBlank
     @Pattern(regexp = "^\\(\\d{2}\\) (?:9\\d{4}|\\d{4})-\\d{4}$")
     private String telefone;
-
-    @NotBlank
-    private Long responsavelId;
 }

@@ -24,8 +24,10 @@ public class Usuario {
     private Long idUsuario;
     private String nome;
     private String cargo;
-    private String cpf;
+    @Column(name = "email", unique = true)
     private String email;
     private String celular;
     private String senha;
+    @ManyToOne
+    private Empresa empresa;
 }

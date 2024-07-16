@@ -2,22 +2,23 @@ package project.gourmetinventoryproject.controller.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opencsv.CSVWriter;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import project.gourmetinventoryproject.domain.NutritionData;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
 
-import java.io.FileWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class NutricaoAPIController {
@@ -25,13 +26,22 @@ public class NutricaoAPIController {
     @Autowired
     private EstoqueIngredienteController estoqueIngredienteController;
 
-    @GetMapping("/consulta-nutricao-api")
-    public List<NutritionData> fetchNutritionDataFromAPI() throws IOException {
-        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes();
+    @GetMapping("/consulta-nutricao-api/{idEmpresa}")
+    public ResponseEntity<byte[]> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
+        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
         List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
 
-        List<NutritionData> nutritionDataList = new ArrayList<>();
+        if (estoqueIngredientes == null || estoqueIngredientes.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        // Lista para armazenar os dados finais que serão usados para gerar o Excel
+        List<List<Object>> excelData = new ArrayList<>();
+
+        // Fila para processar os dados antes de adicioná-los à lista excelData
+        Queue<List<Object>> dataQueue = new LinkedList<>();
+
+        // Processar os dados obtidos da API e adicioná-los à fila
         for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
             String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
             URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
@@ -57,67 +67,149 @@ public class NutricaoAPIController {
                     double fiber = node.path("fiber_g").asDouble();
                     double sugar = node.path("sugar_g").asDouble();
 
-                    NutritionData nutritionData = new NutritionData(name, calories, servingSize, totalFat, saturatedFat, protein, sodium, potassium, cholesterol, totalCarbohydrates, fiber, sugar);
-                    nutritionDataList.add(nutritionData);
+                    // Adicionar os dados à fila para processamento posterior
+                    List<Object> rowData = new ArrayList<>();
+                    rowData.add(name);
+                    rowData.add(calories);
+                    rowData.add(servingSize);
+                    rowData.add(totalFat);
+                    rowData.add(saturatedFat);
+                    rowData.add(protein);
+                    rowData.add(sodium);
+                    rowData.add(potassium);
+                    rowData.add(cholesterol);
+                    rowData.add(totalCarbohydrates);
+                    rowData.add(fiber);
+                    rowData.add(sugar);
+
+                    dataQueue.offer(rowData);
                 }
+            } catch (IOException e) {
+                // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
+                e.printStackTrace();
+                continue;
             }
         }
 
-        // Ordenar a lista de dados de nutrição
-        mergeSort(nutritionDataList);
-
-        // Salvar a lista ordenada em um arquivo CSV
-        String[] header = {"Name", "Calories", "Serving Size", "Total Fat", "Saturated Fat", "Protein", "Sodium", "Potassium", "Cholesterol", "Total Carbohydrates", "Fiber", "Sugar"};
-        try (CSVWriter writer = new CSVWriter(new FileWriter("nutrition_data.csv"))) {
-            writer.writeNext(header);
-
-            for (NutritionData nutritionData : nutritionDataList) {
-                String[] line = {
-                        nutritionData.getName(),
-                        String.valueOf(nutritionData.getCalories()),
-                        String.valueOf(nutritionData.getServingSize()),
-                        String.valueOf(nutritionData.getTotalFat()),
-                        String.valueOf(nutritionData.getSaturatedFat()),
-                        String.valueOf(nutritionData.getProtein()),
-                        String.valueOf(nutritionData.getSodium()),
-                        String.valueOf(nutritionData.getPotassium()),
-                        String.valueOf(nutritionData.getCholesterol()),
-                        String.valueOf(nutritionData.getTotalCarbohydrates()),
-                        String.valueOf(nutritionData.getFiber()),
-                        String.valueOf(nutritionData.getSugar())
-                };
-                writer.writeNext(line);
-            }
+        // Processar os dados da fila e adicionar à lista excelData
+        while (!dataQueue.isEmpty()) {
+            excelData.add(dataQueue.poll());
         }
 
-        return nutritionDataList;
+        // Ordenar os dados usando Merge Sort
+        mergeSort(excelData, 0, excelData.size() - 1);
+
+        // Criar um arquivo Excel
+        byte[] excelBytes = createExcel(excelData);
+
+        // Definir headers para a resposta HTTP
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=nutrition_data.xlsx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        // Retornar a resposta HTTP com o conteúdo do arquivo Excel
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(excelBytes);
     }
 
-    private void mergeSort(List<NutritionData> list) {
-        if (list.size() > 1) {
-            int meio = list.size() / 2;
-            List<NutritionData> esquerda = new ArrayList<>(list.subList(0, meio));
-            List<NutritionData> direita = new ArrayList<>(list.subList(meio, list.size()));
+    private void mergeSort(List<List<Object>> arr, int l, int r) {
+        if (l < r) {
+            // Encontrar o ponto médio
+            int m = l + (r - l) / 2;
 
-            mergeSort(esquerda);
-            mergeSort(direita);
+            // Ordenar a primeira e a segunda metade
+            mergeSort(arr, l, m);
+            mergeSort(arr, m + 1, r);
 
-            int i = 0, j = 0, k = 0;
-            while (i < esquerda.size() && j < direita.size()) {
-                if (esquerda.get(i).getName().compareToIgnoreCase(direita.get(j).getName()) < 0) {
-                    list.set(k++, esquerda.get(i++));
-                } else {
-                    list.set(k++, direita.get(j++));
+            // Mesclar as partes ordenadas
+            merge(arr, l, m, r);
+        }
+    }
+
+    private void merge(List<List<Object>> arr, int l, int m, int r) {
+        // Tamanhos dos subarrays a serem mesclados
+        int n1 = m - l + 1;
+        int n2 = r - m;
+
+        // Arrays temporários
+        List<List<Object>> L = new ArrayList<>(n1);
+        List<List<Object>> R = new ArrayList<>(n2);
+
+        // Copiar dados para arrays temporários L[] e R[]
+        for (int i = 0; i < n1; ++i) {
+            L.add(arr.get(l + i));
+        }
+        for (int j = 0; j < n2; ++j) {
+            R.add(arr.get(m + 1 + j));
+        }
+
+        // Índices iniciais dos subarrays L[] e R[]
+        int i = 0, j = 0;
+
+        // Índice inicial do subarray mesclado
+        int k = l;
+        while (i < n1 && j < n2) {
+            // Comparar os elementos L.get(i) e R.get(j) e colocar o menor em arr.get(k)
+            if (((String) L.get(i).get(0)).compareTo((String) R.get(j).get(0)) <= 0) {
+                arr.set(k, L.get(i));
+                i++;
+            } else {
+                arr.set(k, R.get(j));
+                j++;
+            }
+            k++;
+        }
+
+        // Copiar os elementos restantes de L[], se houver
+        while (i < n1) {
+            arr.set(k, L.get(i));
+            i++;
+            k++;
+        }
+
+        // Copiar os elementos restantes de R[], se houver
+        while (j < n2) {
+            arr.set(k, R.get(j));
+            j++;
+            k++;
+        }
+    }
+
+    private byte[] createExcel(List<List<Object>> excelData) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Nutrition Data");
+
+            // Cabeçalho
+            Row headerRow = sheet.createRow(0);
+            String[] header = {"Nome Ingrediente/Prato", "Calorias", "Tamanho da Porção", "Gordura Total", "Gordura Saturada", "Proteína", "Sódio", "Potássio", "Colesterol", "Carboidratos Totais", "Fibra", "Açúcar"};
+            for (int i = 0; i < header.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(header[i]);
+            }
+
+            // Dados
+            int rowNum = 1;
+            for (List<Object> rowData : excelData) {
+                Row row = sheet.createRow(rowNum++);
+                int colNum = 0;
+                for (Object field : rowData) {
+                    Cell cell = row.createCell(colNum++);
+                    if (field instanceof String) {
+                        cell.setCellValue((String) field);
+                    } else if (field instanceof Double) {
+                        cell.setCellValue((Double) field);
+                    } else if (field instanceof Integer) {
+                        cell.setCellValue((Integer) field);
+                    }
+                    // Adicione mais verificações conforme necessário para outros tipos de dados
                 }
             }
 
-            while (i < esquerda.size()) {
-                list.set(k++, esquerda.get(i++));
-            }
-
-            while (j < direita.size()) {
-                list.set(k++, direita.get(j++));
-            }
+            workbook.write(outputStream);
         }
+
+        return outputStream.toByteArray();
     }
 }

@@ -14,7 +14,6 @@ public class UsuarioMapper {
 
         usuario.setNome(usuarioCriacaoDto.getNome());
         usuario.setCargo(usuarioCriacaoDto.getCargo());
-        usuario.setCpf(usuarioCriacaoDto.getCpf());
         usuario.setEmail(usuarioCriacaoDto.getEmail());
         usuario.setCelular(usuarioCriacaoDto.getCelular());
         usuario.setSenha(usuarioCriacaoDto.getSenha());
@@ -22,20 +21,22 @@ public class UsuarioMapper {
     }
 
     public static List<UsuarioDetalhesDto> toDto(List<Usuario> usuarioList) {
-        List<UsuarioDetalhesDto> usuarioDetalhesDtoList = usuarioList
+        return usuarioList
                 .stream()
-                .map(usuario -> new UsuarioDetalhesDto(usuario))
+                .map(UsuarioDetalhesDto::new)
                 .collect(Collectors.toList());
-        return usuarioDetalhesDtoList;
     }
 
     public static UsuarioTokenDto of(Usuario usuario, String token) {
         UsuarioTokenDto usuarioTokenDto = new UsuarioTokenDto() ;
 
-        usuarioTokenDto.setUserId( usuario.getIdUsuario());
+        usuarioTokenDto.setIdUsuario( usuario.getIdUsuario());
         usuarioTokenDto.setEmail(usuario.getEmail());
         usuarioTokenDto.setNome(usuario.getNome()); 
         usuarioTokenDto. setToken(token);
+        usuarioTokenDto.setCargo(usuario.getCargo());
+
+
         return usuarioTokenDto;
     }
 }

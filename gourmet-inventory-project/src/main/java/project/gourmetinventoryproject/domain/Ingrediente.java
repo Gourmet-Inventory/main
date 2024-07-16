@@ -19,6 +19,6 @@ public class Ingrediente {
     private EstoqueIngrediente estoqueIngrediente;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
-    private String valorMedida;
+    private Double valorMedida;
 }
 
