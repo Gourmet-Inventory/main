@@ -49,12 +49,6 @@ public class FornecedorService {
 
         FornecedorCriacaoDto userAux = new Gson().fromJson(jsonCep.toString(), FornecedorCriacaoDto.class);
 
-        fornecedorCriacaoDto.setCep(userAux.getCep());
-        fornecedorCriacaoDto.setLogradouro(userAux.getLogradouro());
-        fornecedorCriacaoDto.setComplemento(userAux.getComplemento());
-        fornecedorCriacaoDto.setBairro(userAux.getBairro());
-        fornecedorCriacaoDto.setLocalidade(userAux.getLocalidade());
-        fornecedorCriacaoDto.setUf(userAux.getUf());
         //
 
         Fornecedor novoFornecedor = modelMapper.map(fornecedorCriacaoDto, Fornecedor.class);
