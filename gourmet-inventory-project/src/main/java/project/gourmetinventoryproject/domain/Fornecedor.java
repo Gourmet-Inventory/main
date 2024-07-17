@@ -19,7 +19,14 @@ public class Fornecedor {
     private Long idFornecedor;
     private String nomeFornecedor;
     private String cnpj;
+    
+    private String cep;
     private String logradouro;
+    private String complemento;
+    private String bairro;
+    private String localidade;
+    private String uf;
+
     private String numeracaoLogradouro;
     private String telefone;
     private String categoria;
