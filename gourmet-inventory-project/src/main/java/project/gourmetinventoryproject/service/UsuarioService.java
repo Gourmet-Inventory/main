@@ -52,7 +52,8 @@ public class UsuarioService {
 
     public void postUsuario(UsuarioCriacaoDto usuarioCriacaoDto){
         Empresa empresa = empresaRepository.findById(usuarioCriacaoDto.getIdEmpresa()).orElseThrow(()-> new IdNotFoundException());
-        Usuario novoUsuario = modelMapper.map(usuarioCriacaoDto, Usuario.class);
+//        Usuario novoUsuario = modelMapper.map(usuarioCriacaoDto, Usuario.class);
+        Usuario novoUsuario = UsuarioMapper.of(usuarioCriacaoDto);
         String senhaCriptografada = passwordEncoder.encode(novoUsuario.getSenha());
         novoUsuario.setSenha(senhaCriptografada);
         novoUsuario.setEmpresa(empresa);
@@ -104,7 +105,7 @@ public class UsuarioService {
             } else {
                 return ResponseEntity.notFound().build();
             }
-        }
+    }
 
     public UsuarioTokenDto autenticar(UsuarioLoginDto usuarioLoginDto) {
 
