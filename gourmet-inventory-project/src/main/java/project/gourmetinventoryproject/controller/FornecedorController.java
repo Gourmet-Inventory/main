@@ -20,10 +20,16 @@ public class FornecedorController {
     private FornecedorService fornecedorService;
 
     @PostMapping
-    public ResponseEntity<Void> postFornecedor(@RequestBody FornecedorCriacaoDto novoFornecedor){
-        fornecedorService.postFornecedor(novoFornecedor);
-        return status(201).build();
+    public ResponseEntity<Void> postFornecedor(@RequestBody FornecedorCriacaoDto novoFornecedor) {
+        try {
+            fornecedorService.postFornecedor(novoFornecedor);
+            return status(201).build();
+        } catch (Exception e) {
+            // Aqui você pode adicionar um log da exceção, retornar um status apropriado, etc.
+            return status(500).build(); // Status 500 indica erro interno do servidor
+        }
     }
+
 
     @GetMapping
     public ResponseEntity<List<Fornecedor>> getFornecedor(){
