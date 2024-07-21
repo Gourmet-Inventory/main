@@ -27,4 +27,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Query("select u from Usuario u where u.empresa.idEmpresa = ?1")
     List<Usuario> findAllByidEmpresa(Long id);
+
+    @Query("select u from Usuario u where u.empresa.idEmpresa = ?1 and u.cargo = ?2" )
+    List<Usuario> findAllByidEmpresaAndCargo(Long id,String cargo);
 }

@@ -3,9 +3,8 @@ package project.gourmetinventoryproject.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.gourmetinventoryproject.domain.Alerta;
-import project.gourmetinventoryproject.domain.Empresa;
-import project.gourmetinventoryproject.domain.EstoqueIngrediente;
+import project.gourmetinventoryproject.controller.EmailController;
+import project.gourmetinventoryproject.domain.*;
 import project.gourmetinventoryproject.dto.alerta.TiposAlertasDto;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.AlertaRepository;
@@ -26,6 +25,12 @@ public class AlertaService {
 
     @Autowired
     private EmpresaService empresaService;
+
+    @Autowired
+    private EmailController emailController;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Transactional()
     public List<Alerta> getAllAlerta(Long idEmpresa) {
@@ -89,12 +94,13 @@ public class AlertaService {
         alertaRepository.deleteById(id);
     }
     @Transactional()
-    public void createAlerta(EstoqueIngrediente estoqueIngrediente){
+    public Alerta createAlerta(EstoqueIngrediente estoqueIngrediente){
         Alerta alerta = new Alerta();
         alerta.setTipoAlerta(tipoAlertaValorTotal(estoqueIngrediente));
         alerta.setEstoqueIngrediente(estoqueIngrediente);
         estoqueIngrediente.getAlertas().add(alerta);
         saveAlerta(alerta);
+        return alerta;
     }
     public void saveAlerta(Alerta alerta){
         alertaRepository.save(alerta);
@@ -106,8 +112,9 @@ public class AlertaService {
     public EstoqueIngrediente checarAlerta(EstoqueIngrediente estoqueIngrediente) {
         if (estoqueIngrediente.getAlertas().isEmpty() && tipoAlertaValorTotal(estoqueIngrediente) != null) {
             System.out.println("Entrando na lista vazia e precisa de alerta");
-            createAlerta(estoqueIngrediente);
+            Alerta alerta = createAlerta(estoqueIngrediente);
             System.out.println("Alerta criado");
+            emailAlerta(estoqueIngrediente, alerta);
             return estoqueIngrediente;
         } else {
             System.out.println("Entrando no else");
@@ -122,14 +129,45 @@ public class AlertaService {
                         deleteAlerta(alerta.getIdAlerta());
                     } else if (estoqueIngrediente.getValorTotal() <= 0) {
                         alerta.setTipoAlerta("Estoque vazio");
+                        emailAlerta(estoqueIngrediente, alerta);
                     } else {
                         alerta.setTipoAlerta("Estoque acabando");
+                        emailAlerta(estoqueIngrediente, alerta);
                     }
                 }
             }
             System.out.println("Saindo do for de checagem estoque");
         }
         return estoqueIngrediente;
+    }
+
+    public void emailAlerta(EstoqueIngrediente ingrediente, Alerta alerta){
+        List<Usuario> usuarios = usuarioService.getUsuariosTeste(ingrediente.getEmpresa().getIdEmpresa());
+        System.out.println("Lista de usuario pegada");
+        for (int i = 0; i < usuarios.size() ; i++) {
+            System.out.println("dentro do for");
+            if (usuarios.get(i).getCargo().equals("administrador")){
+                emailController.sendEmail(new Email(usuarios.get(i).getEmail(),"Alerta "+alerta.getTipoAlerta(),
+                        """
+                        ALERTA 
+                      --------------------------------------------------------------------------------
+                      O estoque de %s está em estado de alerta devido a %s.
+                      
+                      Este aviso indica que medidas podem ser necessárias nas próximas 24 horas para garantir que não haja problemas no sistema!
+                      
+                      Por favor, verifique o estoque imediatamente e tome as ações necessárias para evitar problemas maiores.
+                      
+                      --------------------------------------------------------------------------------
+                      Obrigado pela sua atenção,
+                      Equipe Gourmet Inventory
+                      """.formatted(ingrediente.getNome(), alerta.getTipoAlerta())));
+                System.out.println("email enviador para "+ usuarios.get(i).getEmail());
+            }
+            else{
+                System.out.println("Usuario "+usuarios.get(i).getEmail()+" nao admin");
+            }
+
+        }
     }
     @Transactional()
     public String tipoAlertaValorTotal(EstoqueIngrediente estoqueIngrediente){

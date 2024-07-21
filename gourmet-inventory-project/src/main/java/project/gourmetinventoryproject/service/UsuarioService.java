@@ -67,6 +67,22 @@ public class UsuarioService {
             List<UsuarioConsultaDto> listaDto = modelMapper.map(lista,new TypeToken<List<UsuarioConsultaDto>>(){}.getType());
         return listaDto;
     }
+    public List<Usuario> getUsuariosTeste(Long idEmpresa){
+        List<Usuario> lista = usuarioRepository.findAllByidEmpresa(idEmpresa);
+            if (lista.isEmpty()){
+                throw new ResponseStatusException(HttpStatusCode.valueOf(204));
+            }
+        return lista;
+    }
+    public List<Usuario> getUsuariosAdmin(Long idEmpresa){
+        List<Usuario> lista = usuarioRepository.findAllByidEmpresaAndCargo(idEmpresa,"Administrador");
+        if (lista.isEmpty()){
+            System.out.println("Nenhum usuario admin");
+            throw new ResponseStatusException(HttpStatusCode.valueOf(204));
+        }
+        System.out.println(lista.get(0));
+        return lista;
+    }
 
     public ResponseEntity<Void> deleteUsuario(Long id){
         if (usuarioRepository.existsById(id)) {
