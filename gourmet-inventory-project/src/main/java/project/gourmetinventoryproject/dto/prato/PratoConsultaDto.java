@@ -1,9 +1,7 @@
 package project.gourmetinventoryproject.dto.prato;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 
 import java.util.List;
@@ -11,6 +9,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class PratoConsultaDto {
     private Long idPrato;
     private String nome;
