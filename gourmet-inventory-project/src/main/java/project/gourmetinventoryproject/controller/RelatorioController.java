@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.domain.Relatorio;
+import project.gourmetinventoryproject.dto.saida.SaidaDTO;
+import project.gourmetinventoryproject.repository.RelatorioRepositoy;
 import project.gourmetinventoryproject.service.RelatorioService;
 import project.gourmetinventoryproject.service.UsuarioService;
 
@@ -23,24 +26,47 @@ public class RelatorioController {
     @Autowired
     private RelatorioService relatorioService;
 
-    @PostMapping("/gerar/{data}")
-    public ResponseEntity<File> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody List<Long> idPratoList) {
-        String relatorioGerado = relatorioService.gerarRelatorio(data, idPratoList);
-        System.out.println(relatorioGerado);
-        File arquivoGerado = GerenciadorArquivoCSV.downloadArquivoTxt(relatorioGerado);
-        System.out.println(arquivoGerado);
+    @Autowired
+    private RelatorioRepositoy relatorioRepositoy;
 
-        return ResponseEntity.status(200).body(arquivoGerado);
+    @PostMapping("/gerar/{data}")
+        public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
+            relatorioService.gerarRelatorio(data,relatorio);
+            return ResponseEntity.status(200).build();
+        }
+
+        @GetMapping
+        public ResponseEntity<List<Relatorio>> getAllRelatorios(){
+            List<Relatorio> lista = relatorioRepositoy.findAll();
+            return ResponseEntity.status(200).body(lista);
+        }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarRelatorio(@PathVariable Long id) {
+        try {
+            relatorioService.deletarRelatorio(id);
+            return ResponseEntity.ok("Relatório deletado com sucesso.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
-//    @GetMapping("txtTeste/{nome}")
-//    //public ResponseEntity<String> gerarTxt(@PathVariable String nome) {
-//        GerenciadorArquivoCSV.gravaArquivoTxtTeste(nome);
+//        @GetMapping("/alertas")
+//        public ResponseEntity<byte[]> gerarRelatorioAlertas(){
+//            relatorioService.gerarRelatorioAlertas()
 //
-//        String arquivoGerado = GerenciadorArquivoCSV.downloadArquivoTxt(nome);
-//        System.out.println(arquivoGerado);
+//            return ResponseEntity.ok()
+//                    .headers(headers)
+//                    .body(excelBytes);
+//        }
 //
-//        return arquivoGerado.equals("Download concluído com sucesso!") ? status(200).body(arquivoGerado) : status(404).build();
+//    @GetMapping("/Saidos")
+//    public ResponseEntity<byte[]> gerarRelatorioSaidos(){
+//        relatorioService.gerarRelatorioSaidos()
+//
+//        return ResponseEntity.ok()
+//                .headers(headers)
+//                .body(excelBytes);
 //    }
 
 }

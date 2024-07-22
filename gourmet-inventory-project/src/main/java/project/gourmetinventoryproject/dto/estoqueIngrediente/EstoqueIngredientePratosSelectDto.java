@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class EstoqueIngredientePratosSelectDto {
+public class    EstoqueIngredientePratosSelectDto {
     private Long idItem;
     private String nome;
     private String lote;
