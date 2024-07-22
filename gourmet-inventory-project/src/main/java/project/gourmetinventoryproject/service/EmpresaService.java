@@ -10,6 +10,7 @@ import project.gourmetinventoryproject.repository.EmpresaRepository;
 import project.gourmetinventoryproject.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.ResponseEntity.status;
 
@@ -25,9 +26,9 @@ public class    EmpresaService {
     ModelMapper mapper = new ModelMapper();
 
 
-    public void postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
+    public Empresa postEmpresa(EmpresaCriacaoDto empresaCriacaoDto) {
         Empresa novaEmpresa = mapper.map(empresaCriacaoDto, Empresa.class);
-        empresaRepository.save(novaEmpresa);
+        return  empresaRepository.save(novaEmpresa) !=null ? novaEmpresa : null;
     }
 
 //    public void save(Empresa empresa, Integer idUsuario) {

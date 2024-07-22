@@ -1,10 +1,7 @@
 package project.gourmetinventoryproject.dto.prato;
 
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Ingrediente;
@@ -17,6 +14,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @ToString
+@AllArgsConstructor
+@Builder
 public class PratoCriacaoDto {
     private String nome;
     private String descricao;

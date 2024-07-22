@@ -1,15 +1,15 @@
 package project.gourmetinventoryproject.dto.empresa;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.br.CNPJ;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class EmpresaCriacaoDto {
 
     @NotBlank

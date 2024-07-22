@@ -34,7 +34,6 @@ import java.util.HashMap;
 public class PratoService {
 
     @Autowired
-
     private PratoRepository pratoRepository;
 
     @Autowired
@@ -57,7 +56,6 @@ public class PratoService {
             return pratoOptional.orElse(null);
         }
         throw new IdNotFoundException();
-
     }
 
     public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long empresa) {
@@ -227,5 +225,17 @@ public class PratoService {
             pratoRepository.save(prato);
         }
         return prato;
+    }
+
+
+    //PARA TESTES
+    public void setEmpresaService(EmpresaService empresaService) {
+        this.empresaService = empresaService;
+    }
+    public void setIngredienteService(IngredienteService ingredienteService) {
+        this.ingredienteService = ingredienteService;
+    }
+    public void setModelMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 }

@@ -6,9 +6,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import project.gourmetinventoryproject.domain.Alerta;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Medidas;
@@ -19,6 +17,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class EstoqueIngredienteCriacaoDto {
     @NotBlank
