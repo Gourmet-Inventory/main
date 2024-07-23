@@ -111,5 +111,12 @@ public class EstoqueIngredienteService {
         }
     }
 
+    public List<EstoqueIngrediente> getAllEstoqueIngredienteByMonth(Long idEmpresa,int mes){
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteRepository.findAllByDtaAvisoMonth(mes , empresa);
+        return estoqueIngredientes;
+
+    }
+
 }
 

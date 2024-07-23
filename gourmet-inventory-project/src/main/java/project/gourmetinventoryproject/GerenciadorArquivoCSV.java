@@ -202,7 +202,7 @@ public class GerenciadorArquivoCSV {
             saida.format("| PRATO             | PREÇO   |\n");
             saida.format("|-------------------|---------|\n");
 
-            List<Prato> pratos = relatorio.getPratosSaidos();
+            List<Prato> pratos = relatorio.getPratoList();
             double somaPreco = 0;
             for (Prato prato : pratos) {
                 saida.format("| %-18s | %7.2f |\n", prato.getNome(), prato.getPreco());

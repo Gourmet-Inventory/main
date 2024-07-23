@@ -1,13 +1,15 @@
 package project.gourmetinventoryproject.service;
 
+import com.opencsv.CSVWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
-import project.gourmetinventoryproject.domain.EstoqueIngrediente;
-import project.gourmetinventoryproject.domain.Ingrediente;
-import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.domain.Relatorio;
+import project.gourmetinventoryproject.domain.*;
+import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
+import project.gourmetinventoryproject.repository.RelatorioRepositoy;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -19,6 +21,12 @@ public class RelatorioService {
 
     @Autowired
     private PratoService pratoService;
+    @Autowired
+    private EstoqueIngredienteRepository estoqueIngredienteRepository;
+    @Autowired
+    private RelatorioRepositoy relatorioRepositoy;
+    @Autowired
+    private EmpresaService empresaService;
 
     public Queue<Prato> organizarPratos(List<Prato> pratos) {
         System.out.println("Entrou no método organizarPratos om lista de pratos: " + pratos);
@@ -54,7 +62,7 @@ public class RelatorioService {
 
         Relatorio relatorio = new Relatorio();
         relatorio.setData(data);
-        relatorio.setPratosSaidos(listaPratos);
+        relatorio.setPratoList(listaPratos);
 
         Double valorBruto = 0.0;
         // Calcular o valor bruto dos pratos
@@ -79,6 +87,32 @@ public class RelatorioService {
 //        exibeRelatorio(relatorio);
 //        GerenciadorArquivoCSV.gravaArquivoCsvSaida(data, listaPratos, relatorio);
         return downloadFile(data, listaPratos, relatorio);
+    }
+    public String generateCsvEstoque(Long idEmpresa, int mes) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<EstoqueIngrediente> estoques = estoqueIngredienteRepository.findAllByDtaAvisoMonth(mes,empresa);
+        StringWriter stringWriter = new StringWriter();
+        stringWriter.append("Nome,Data\n");
+
+        for (EstoqueIngrediente estoque : estoques) {
+            stringWriter.append(estoque.getNome()).append(",")
+                    .append(estoque.getDtaAviso().toString()).append("\n");
+        }
+        return stringWriter.toString();
+    }
+    public String generateCsvTotalMes(Long idEmpresa, int mes) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Relatorio> relatorios = relatorioRepositoy.findAllByDataMonth(mes,empresa);
+        StringWriter stringWriter = new StringWriter();
+        stringWriter.append("Nome Prato,Preço \n");
+        Double total = 0.0;
+        for (int i = 0; i < relatorios.size(); i++) {
+            total += relatorios.get(i).getPratoList().get(i).getPreco();
+            stringWriter.append(relatorios.get(i).getPratoList().get(i).getNome()).append(",")
+                    .append(relatorios.get(i).getPratoList().get(i).getPreco().toString()).append("\n");
+        }
+        stringWriter.append("Total,"+ total +" \n");
+        return stringWriter.toString();
     }
 
     public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
