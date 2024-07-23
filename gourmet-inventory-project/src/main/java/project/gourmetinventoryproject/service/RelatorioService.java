@@ -3,11 +3,10 @@ package project.gourmetinventoryproject.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.*;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
-import project.gourmetinventoryproject.repository.RelatorioRepositoy;
+import project.gourmetinventoryproject.repository.RelatorioRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -25,7 +24,7 @@ public class RelatorioService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private RelatorioRepositoy relatorioRepositoy;
+    private RelatorioRepository relatorioRepository;
     @Autowired
     private EmpresaService empresaService;
 
@@ -73,8 +72,16 @@ public class RelatorioService {
         relatorio.setValorBruto(valorBruto);
 
         try {
-            relatorioRepositoy.save(relatorio);
-            System.out.println("Relatório gerado: " + relatorio);
+            Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
+
+            if (antigo != null ){
+                List<Prato> listPrato = antigo.getPratoList();
+                listPrato.addAll(listaPratos);
+                antigo.setPratoList(listPrato);
+                relatorioRepository.save(antigo);
+            }else {
+            relatorioRepository.save(relatorio);
+            System.out.println("Relatório gerado: " + relatorio);}
         } catch (Exception e) {
             System.err.println("Erro ao salvar o relatório: " + e.getMessage());
 
@@ -82,9 +89,9 @@ public class RelatorioService {
     }
 
     public void deletarRelatorio(Long idRelatorio) {
-        Optional<Relatorio> relatorio = relatorioRepositoy.findById(idRelatorio);
+        Optional<Relatorio> relatorio = relatorioRepository.findById(idRelatorio);
         if (relatorio.isPresent()) {
-            relatorioRepositoy.deleteById(idRelatorio);
+            relatorioRepository.deleteById(idRelatorio);
         } else {
             throw new RuntimeException("Relatório com ID " + idRelatorio + " não encontrado.");
         }

@@ -1,19 +1,14 @@
 package project.gourmetinventoryproject.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import project.gourmetinventoryproject.GerenciadorArquivoCSV;
-import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.domain.Relatorio;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
-import project.gourmetinventoryproject.repository.RelatorioRepositoy;
+import project.gourmetinventoryproject.repository.RelatorioRepository;
 import project.gourmetinventoryproject.service.RelatorioService;
-import project.gourmetinventoryproject.service.UsuarioService;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,7 +22,7 @@ public class RelatorioController {
     private RelatorioService relatorioService;
 
     @Autowired
-    private RelatorioRepositoy relatorioRepositoy;
+    private RelatorioRepository relatorioRepository;
 
     @PostMapping("/gerar/{data}")
         public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
@@ -37,7 +32,7 @@ public class RelatorioController {
 
         @GetMapping
         public ResponseEntity<List<Relatorio>> getAllRelatorios(){
-            List<Relatorio> lista = relatorioRepositoy.findAll();
+            List<Relatorio> lista = relatorioRepository.findAll();
             return ResponseEntity.status(200).body(lista);
         }
 
