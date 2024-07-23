@@ -3,11 +3,14 @@ package project.gourmetinventoryproject.service;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import project.gourmetinventoryproject.GerenciadorArquivoCSV;
 import project.gourmetinventoryproject.domain.*;
+import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.RelatorioRepository;
 
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -19,14 +22,35 @@ public class RelatorioService {
 
     @Autowired
     private PratoService pratoService;
-
     @Autowired
-    private ModelMapper modelMapper;
-
+    private EstoqueIngredienteRepository estoqueIngredienteRepository;
     @Autowired
     private RelatorioRepository relatorioRepository;
     @Autowired
     private EmpresaService empresaService;
+    @Autowired
+    private ModelMapper modelMapper;
+
+
+    public Queue<Prato> organizarPratos(List<Prato> pratos) {
+        System.out.println("Entrou no método organizarPratos om lista de pratos: " + pratos);
+
+        Stack<Prato> pilha = new Stack<>();
+        Queue<Prato> fila = new LinkedList<>();
+
+        // Inserindo os itens da lista na pilha
+        for (Prato prato : pratos) {
+            pilha.push(prato);
+        }
+
+        // Transferindo os itens da pilha para a fila
+        while (!pilha.isEmpty()) {
+            fila.add(pilha.pop());
+        }
+
+        System.out.println("Pratos organizados em fila: " + fila);
+        return fila;
+    }
 
     public void gerarRelatorio(LocalDate data, SaidaDTO relatorioDTO) {
         System.out.println("Entrou no método gerarRelatorio " + "Data: " + data + " Lista de pratosId: " + relatorioDTO.getIdPratoList());
@@ -80,8 +104,8 @@ public class RelatorioService {
                 antigo.setPratoList(listPrato);
                 relatorioRepository.save(antigo);
             }else {
-            relatorioRepository.save(relatorio);
-            System.out.println("Relatório gerado: " + relatorio);}
+                relatorioRepository.save(relatorio);
+                System.out.println("Relatório gerado: " + relatorio);}
         } catch (Exception e) {
             System.err.println("Erro ao salvar o relatório: " + e.getMessage());
 
@@ -97,36 +121,51 @@ public class RelatorioService {
         }
     }
 
+    public String generateCsvEstoque(Long idEmpresa, int mes) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<EstoqueIngrediente> estoques = estoqueIngredienteRepository.findAllByDtaAvisoMonth(mes,empresa);
+        StringWriter stringWriter = new StringWriter();
+        stringWriter.append("Nome,Data\n");
 
-
-
-    public Queue<Prato> organizarPratos(List<Prato> pratos) {
-        System.out.println("Entrou no método organizarPratos com lista de pratos: " + pratos);
-
-        Stack<Prato> pilha = new Stack<>();
-        Queue<Prato> fila = new LinkedList<>();
-
-        // Inserindo os itens da lista na pilha
-        for (Prato prato : pratos) {
-            pilha.push(prato);
+        for (EstoqueIngrediente estoque : estoques) {
+            stringWriter.append(estoque.getNome()).append(",")
+                    .append(estoque.getDtaAviso().toString()).append("\n");
         }
-
-        // Transferindo os itens da pilha para a fila
-        while (!pilha.isEmpty()) {
-            fila.add(pilha.pop());
+        return stringWriter.toString();
+    }
+    public String generateCsvTotalMes(Long idEmpresa, int mes) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Relatorio> relatorios = relatorioRepository.findAllByDataMonth(mes,empresa);
+        StringWriter stringWriter = new StringWriter();
+        stringWriter.append("Nome Prato,Preço \n");
+        Double total = 0.0;
+        for (int i = 0; i < relatorios.size(); i++) {
+            total += relatorios.get(i).getPratoList().get(i).getPreco();
+            stringWriter.append(relatorios.get(i).getPratoList().get(i).getNome()).append(",")
+                    .append(relatorios.get(i).getPratoList().get(i).getPreco().toString()).append("\n");
         }
-
-        System.out.println("Pratos organizados em fila: " + fila);
-        return fila;
+        stringWriter.append("Total,"+ total +" \n");
+        return stringWriter.toString();
     }
 
-//    public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
-//        System.out.println("Entrou no método downloadFile");
+
+
+//    private void exibeRelatorio(Relatorio relatorio) {
+//        double somaPreco = 0;
+//
+//        System.out.println("| PRATO             | PREÇO   |");
+//        System.out.println("|-------------------|---------|");
 //
 //        try {
 //            return GerenciadorArquivoCSV.gravaArquivoTxtSaida(data, listaPratos, relatorio);
 //        } catch (Exception e) {
 //            return e.getMessage();
 //        }
+//
+//        double mediaPreco = pratos.isEmpty() ? 0 : relatorio.getValorBruto() / pratos.size();
+//        System.out.println("|-------------------|---------|");
+//        System.out.printf("| %-18s | %7.2f |\n", "MÉDIA", mediaPreco);
+//        System.out.printf("| %-18s | %7.2f |\n", "SOMA", somaPreco);
+//
 //    }
 }

@@ -12,4 +12,5 @@ import java.util.Optional;
 @Repository
 public interface AlertaRepository extends JpaRepository<Alerta, Long> {
 
+
 }
