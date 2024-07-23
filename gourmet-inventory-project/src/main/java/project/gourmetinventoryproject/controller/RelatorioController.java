@@ -72,4 +72,18 @@ public class RelatorioController {
         headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
+
+    @GetMapping("/ingredientes/{idRelatorio}")
+    public ResponseEntity<byte[]> downloadCsvIngredientes(@PathVariable Long idRelatorio) {
+        try {
+            String csvContent = relatorioService.generateCsvIngredientes(idRelatorio);
+            byte[] bytes = csvContent.getBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ingredientes.csv");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
