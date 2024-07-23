@@ -125,7 +125,7 @@ public class RelatorioService {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         List<EstoqueIngrediente> estoques = estoqueIngredienteRepository.findAllByDtaAvisoMonth(mes,empresa);
         StringWriter stringWriter = new StringWriter();
-        stringWriter.append("Nome,Data\n");
+        stringWriter.append("Nome,Data Aviso\n");
 
         for (EstoqueIngrediente estoque : estoques) {
             stringWriter.append(estoque.getNome()).append(",")
@@ -137,12 +137,15 @@ public class RelatorioService {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         List<Relatorio> relatorios = relatorioRepository.findAllByDataMonth(mes,empresa);
         StringWriter stringWriter = new StringWriter();
-        stringWriter.append("Nome Prato,Preço \n");
+        stringWriter.append("Nome Prato, Preço \n");
         Double total = 0.0;
         for (int i = 0; i < relatorios.size(); i++) {
-            total += relatorios.get(i).getPratoList().get(i).getPreco();
-            stringWriter.append(relatorios.get(i).getPratoList().get(i).getNome()).append(",")
-                    .append(relatorios.get(i).getPratoList().get(i).getPreco().toString()).append("\n");
+            for (int j = 0; j < relatorios.get(i).getPratoList().size(); j++) {
+                total += relatorios.get(i).getPratoList().get(j).getPreco();
+                stringWriter.append(relatorios.get(i).getPratoList().get(j).getNome()).append(",")
+                        .append(relatorios.get(i).getPratoList().get(j).getPreco().toString()).append(",")
+                            .append(relatorios.get(i).getData().toString()).append("\n");
+            }
         }
         stringWriter.append("Total,"+ total +" \n");
         return stringWriter.toString();

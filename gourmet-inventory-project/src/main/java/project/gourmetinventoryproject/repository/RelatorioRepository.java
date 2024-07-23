@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface RelatorioRepository extends JpaRepository<Relatorio, Long> {
      Relatorio findByDataAndEmpresa(LocalDate data, Empresa empresa);
-     @Query("SELECT r FROM Relatorio r WHERE MONTH(r.data) = :month AND r.empresa = :empresa")
+     @Query("SELECT r FROM Relatorio r WHERE MONTH(r.data) = :month AND r.empresa = :empresa ORDER BY r.data")
      List<Relatorio> findAllByDataMonth(@Param("month") int month, @Param("empresa") Empresa empresa);
 
 }
