@@ -120,6 +120,9 @@ public class RelatorioService {
         return fila;
     }
 
+    public void gerarRelatorioIndividual(Long idRelatorio) {
+    }
+
 //    public static String downloadFile(LocalDate data, List<Prato> listaPratos, Relatorio relatorio) {
 //        System.out.println("Entrou no método downloadFile");
 //

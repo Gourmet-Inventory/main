@@ -46,6 +46,12 @@ public class RelatorioController {
         }
     }
 
+    @GetMapping("/{idRelatorio}")
+        public ResponseEntity<byte[]> gerarRelatorioInd(@PathVariable Long idRelatorio){
+            relatorioService.gerarRelatorioIndividual(idRelatorio);
+            return ResponseEntity.status(200).build();
+        }
+
 //        @GetMapping("/alertas")
 //        public ResponseEntity<byte[]> gerarRelatorioAlertas(){
 //            relatorioService.gerarRelatorioAlertas()
@@ -55,7 +61,7 @@ public class RelatorioController {
 //                    .body(excelBytes);
 //        }
 //
-//    @GetMapping("/Saidos")
+//    @GetMapping("/saidos")
 //    public ResponseEntity<byte[]> gerarRelatorioSaidos(){
 //        relatorioService.gerarRelatorioSaidos()
 //
