@@ -20,7 +20,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     @Transactional
     @Modifying
-    Void deleteById(long id);
+    void deleteById(Long id);
 
     List<Usuario> findByCargoEqualsIgnoreCase(String cargo);
 

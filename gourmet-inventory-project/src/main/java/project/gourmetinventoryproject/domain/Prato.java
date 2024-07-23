@@ -1,9 +1,7 @@
 package project.gourmetinventoryproject.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,6 +9,9 @@ import java.util.List;
 @Data
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Prato {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
