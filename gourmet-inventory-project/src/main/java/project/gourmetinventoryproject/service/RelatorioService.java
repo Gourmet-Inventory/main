@@ -31,7 +31,11 @@ public class RelatorioService {
     @Autowired
     private ModelMapper modelMapper;
 
-
+    public List<Relatorio> getAllRelatoriosByEmpresa(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Relatorio> lista = relatorioRepository.findAllByEmpresa(empresa);
+        return lista;
+    }
     public Queue<Prato> organizarPratos(List<Prato> pratos) {
         System.out.println("Entrou no método organizarPratos om lista de pratos: " + pratos);
 
@@ -156,7 +160,6 @@ public class RelatorioService {
                 .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
 
         Map<String, Double> ingredienteQuantidades = new HashMap<>();
-
 
         for (Prato prato : relatorio.getPratoList()) {
             // Itera sobre os ingredientes de cada prato

@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Relatorio;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
 import project.gourmetinventoryproject.repository.RelatorioRepository;
+import project.gourmetinventoryproject.service.EmpresaService;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.RelatorioService;
 
@@ -30,6 +32,8 @@ public class RelatorioController {
 
     @Autowired
     private RelatorioRepository relatorioRepository;
+    @Autowired
+    private EmpresaService empresaService;
 
     @PostMapping("/gerar/{data}")
     public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
@@ -38,8 +42,8 @@ public class RelatorioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Relatorio>> getAllRelatorios() {
-        List<Relatorio> lista = relatorioRepository.findAll();
+    public ResponseEntity<List<Relatorio>> getAllRelatorios(Long idEmpresa) {
+        List<Relatorio> lista = relatorioService.getAllRelatoriosByEmpresa(idEmpresa);
         return ResponseEntity.status(200).body(lista);
     }
 

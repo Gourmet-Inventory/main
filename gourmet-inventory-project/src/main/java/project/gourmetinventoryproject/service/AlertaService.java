@@ -130,9 +130,11 @@ public class AlertaService {
                     } else if (estoqueIngrediente.getValorTotal() <= 0) {
                         alerta.setTipoAlerta("Estoque vazio");
                         emailAlerta(estoqueIngrediente, alerta);
+                        System.out.println("Email mandado estoque vazio");
                     } else {
                         alerta.setTipoAlerta("Estoque acabando");
                         emailAlerta(estoqueIngrediente, alerta);
+                        System.out.println("Email mandado estoque acabando");
                     }
                 }
             }
@@ -145,7 +147,6 @@ public class AlertaService {
         List<Usuario> usuarios = usuarioService.getUsuariosTeste(ingrediente.getEmpresa().getIdEmpresa());
         System.out.println("Lista de usuario pegada");
         for (int i = 0; i < usuarios.size() ; i++) {
-            System.out.println("dentro do for");
             if (usuarios.get(i).getCargo().equals("administrador")){
                 emailController.sendEmail(new Email(usuarios.get(i).getEmail(),"Alerta "+alerta.getTipoAlerta(),
                         """
@@ -166,8 +167,8 @@ public class AlertaService {
             else{
                 System.out.println("Usuario "+usuarios.get(i).getEmail()+" nao admin");
             }
-
         }
+        System.out.println("saindo for email");
     }
     @Transactional()
     public String tipoAlertaValorTotal(EstoqueIngrediente estoqueIngrediente){
