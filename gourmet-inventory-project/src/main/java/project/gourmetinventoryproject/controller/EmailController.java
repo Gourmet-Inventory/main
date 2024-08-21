@@ -33,17 +33,20 @@ public class EmailController {
     @PostMapping("/contact")
     public ResponseEntity<String> handleContactForm(@RequestBody ContactForm contactForm) {
         try {
-            // Formate o corpo do e-mail com os dados recebidos
             String subject = "Contato de " + contactForm.fullName();
             String body = String.format(
-                    "Nome: %s\nEmail: %s\nTelefone: %s\nEmpresa: %s",
+                            "Olá,\n" +
+                            "Recebemos uma nova submissão através do formulário de contato do nosso site. Aqui estão os detalhes fornecidos:\n\n" +
+                            "Nome: %s\nEmail: %s\nTelefone: %s\nEmpresa: %s\n\n" +
+                            "Se precisar de mais informações ou quiser entrar em contato com o remetente, por favor, utilize o e-mail ou telefone fornecidos.\n\n"+
+                            "Atenciosamente, \n" +
+                            "GourMail! :D",
                     contactForm.fullName(),
                     contactForm.email(),
                     contactForm.phone(),
                     contactForm.company()
             );
 
-            // Enviar e-mail usando o EmailService
             Email email = new Email("gourmetinventorysmtp@gmail.com", subject, body);
             emailService.sendEmail(email);
 
