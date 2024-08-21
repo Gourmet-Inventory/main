@@ -14,8 +14,8 @@ import java.util.Optional;
 @Repository
 public interface AlertaRepository extends JpaRepository<Alerta, Long> {
 
-    @Query("SELECT a FROM Alerta a WHERE a.estoqueIngrediente.empresa = :empresa AND a.tipoAlerta = :tipoAlerta")
-    List<Alerta> findAllByEmpresaAndTipoAlerta(@Param("empresa") Empresa empresa, @Param("tipoAlerta") String tipoAlerta);
+    @Query("SELECT a FROM Alerta a WHERE a.estoqueIngrediente.empresa = :empresa AND a.tipoAlerta = 'Estoque vazio' Or a.tipoAlerta = 'Estoque acabando'")
+    List<Alerta> findAllByEmpresaAndTipoAlerta(@Param("empresa") Empresa empresa);
 
 
 }

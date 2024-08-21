@@ -3,15 +3,14 @@ package project.gourmetinventoryproject.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.*;
-import project.gourmetinventoryproject.dto.alerta.ItemListaComprasDto;
+import project.gourmetinventoryproject.domain.ItemListaCompras;
 import project.gourmetinventoryproject.repository.AlertaRepository;
+import project.gourmetinventoryproject.repository.ItemsComprasRepository;
 import project.gourmetinventoryproject.repository.RelatorioRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ListaComprasService {
@@ -20,33 +19,58 @@ public class ListaComprasService {
     @Autowired
     private EmpresaService empresaService;
     @Autowired
-    private RelatorioService relatorioService;
+    private ItemsComprasRepository itemsComprasRepository;
     @Autowired
     private RelatorioRepository relatorioRepository;
 
-
-    public List<ItemListaComprasDto> getListaCompras(Long idEmpresa,LocalDate dataInicio,LocalDate dataFim) {
+    public  List<ItemListaCompras> getItemCompras(Long idEmpresa){
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
-        List<Alerta> alertas = alertaRepository.findAllByEmpresaAndTipoAlerta(empresa,"Estoque acabando");
-        List<Relatorio> relatorios = relatorioRepository.findAllByDataMonthRange(dataInicio.getMonthValue(),dataFim.getMonthValue(),empresa);
-        List<ItemListaComprasDto> dtos = new ArrayList<>();
-        System.out.println("Iniciando for lista de compras");
-        for (int i = 0; i < alertas.size(); i++) {
-            ItemListaComprasDto item = createItemListaCompras(alertas.get(i),relatorios);
-            dtos.add(item);
-            System.out.println("Adicionando itens a lista de compras");
-        }
-        return dtos;
+        List<ItemListaCompras> itemListaCompras = itemsComprasRepository.findAllByEmpresa(empresa);
+        return itemListaCompras;
     }
 
-    public ItemListaComprasDto createItemListaCompras(Alerta alerta, List<Relatorio> relatorios) {
+    public void postListaCompras( LocalDate dataInicio, LocalDate dataFim,Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Alerta> alertas = alertaRepository.findAllByEmpresaAndTipoAlerta(empresa);
+        List<Relatorio> relatorios = relatorioRepository.findAllByDataMonthRange(dataInicio.getMonthValue(),dataFim.getMonthValue(),empresa);
+        List<ItemListaCompras> itens = itemsComprasRepository.findAllByEmpresa(empresa);
+        System.out.println("Iniciando for lista de compras");
+        System.out.println(alertas.size());
+        if (!alertas.isEmpty()){
+            for (int i = 0; i < alertas.size(); i++) {
+                System.out.println("dentro do for");
+                ItemListaCompras item = createItemListaCompras(alertas.get(i), relatorios, itens);
+                itemsComprasRepository.save(item);
+                System.out.println("Adicionando itens a lista de compras");
+            }
+        }
+    }
+
+    public ItemListaCompras createItemListaCompras(Alerta alerta, List<Relatorio> relatorios,List<ItemListaCompras> itens) {
+        System.out.println("criar item");
+        if (!itens.isEmpty()) {
+            for (int i = 0; i < itens.size(); i++) {
+                if (alerta.getEstoqueIngrediente().equals(itens.get(i).getEstoqueIngrediente())) {
+                    System.out.println("Atualizando item");
+                    ItemListaCompras itemListaCompras = new ItemListaCompras();
+                    itemListaCompras.setIdItemLista(itens.get(i).getIdItemLista());
+                    itemListaCompras.setNome(itens.get(i).getNome());
+                    itemListaCompras.setQtdMedia(calcularMedia(itens.get(i).getEstoqueIngrediente().getEmpresa().getIdEmpresa(),alerta,relatorios));
+                    itemListaCompras.setEstoqueIngrediente(itens.get(i).getEstoqueIngrediente());
+                    System.out.println("objeto criado"+ itemListaCompras);
+                    return itemListaCompras;
+                }
+            }
+        }
         System.out.println("Criando objeto item lista compra");
-        ItemListaComprasDto itemListaComprasDto = new ItemListaComprasDto();
-        itemListaComprasDto.setNome(alerta.getEstoqueIngrediente().getNome());
-        itemListaComprasDto.setQtdMedia(calcularMedia(alerta.getEstoqueIngrediente().getEmpresa().getIdEmpresa(),alerta,relatorios));
-        itemListaComprasDto.setEstoqueIngrediente(alerta.getEstoqueIngrediente());
-        System.out.println("objeto criado"+itemListaComprasDto);
-        return itemListaComprasDto;
+        ItemListaCompras itemListaCompras = new ItemListaCompras();
+        itemListaCompras.setNome(alerta.getEstoqueIngrediente().getNome());
+        itemListaCompras.setQtdMedia(calcularMedia(alerta.getEstoqueIngrediente().getEmpresa().getIdEmpresa(), alerta, relatorios));
+        itemListaCompras.setEstoqueIngrediente(alerta.getEstoqueIngrediente());
+        System.out.println("objeto criado" + itemListaCompras);
+        return itemListaCompras;
+
+
     }
     public Integer calcularMedia(Long idEmpresa,Alerta alerta,List<Relatorio> relatorios){
         System.out.println("calculador media");
@@ -66,6 +90,12 @@ public class ListaComprasService {
         Integer media = (int) (Math.floor(total)/qtd);
         System.out.println("Media"+ media);
         return media ;
+
+    }
+    public void deleteItemCompras(List<ItemListaCompras> itemListaCompras) {
+        for (ItemListaCompras item : itemListaCompras) {
+            itemsComprasRepository.delete(item);
+        }
 
     }
 
