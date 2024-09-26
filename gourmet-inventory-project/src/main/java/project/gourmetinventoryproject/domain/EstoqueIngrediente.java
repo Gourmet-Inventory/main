@@ -23,16 +23,14 @@ public class EstoqueIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idItem;
-    @NotBlank
-    private String lote;
-    private Boolean manipulado;
-    @NotBlank
-    private String nome;
     @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;
-    @NotBlank
-    private String categoria;
+    private Boolean manipulado;
+    private String nome;
+    private String lote;
+    @Enumerated(EnumType.STRING)
+    private CategoriaEstoque categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
