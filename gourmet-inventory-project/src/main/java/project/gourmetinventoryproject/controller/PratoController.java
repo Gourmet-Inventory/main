@@ -10,8 +10,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
@@ -19,6 +21,7 @@ import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.PratoService;
+import project.gourmetinventoryproject.service.S3Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +45,8 @@ public class PratoController {
     private ModelMapper mapper;
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
+    @Autowired
+    private S3Service s3Service;
 
     @Operation(summary = "Obter lista com todos pratos", method = "GET")
     @ApiResponses(value = {
@@ -188,16 +193,7 @@ public class PratoController {
 //        return new ResponseEntity<>(report, HttpStatus.OK);
 //    }
 
-    @PatchMapping(value = "/foto/{id}",
-            consumes = {"image/jpeg", "image/png", "image/webp", "image/gif"})
-    public ResponseEntity<Void> updatePratoFoto(@PathVariable Long id, @RequestBody byte[] novaFoto) {
-        Prato prato = pratoService.updatePratoFoto(id, novaFoto);
 
-        if ( prato != null){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
 
     @GetMapping("/alergicos")
     public List<AlergicosRestricoes> getAlergicos() {
@@ -243,5 +239,16 @@ public class PratoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
+    @PostMapping(value = "/imagem-prato/{idPrato}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Long idPrato) {
+        try {
+            String key = s3Service.uploadFile(file);
+            Prato prato = pratoService.getPratoById(idPrato);
+            prato.setFoto("https://gourmet-inventory-bucket.s3.amazonaws.com/" + key);
+            return ResponseEntity.ok("Imagem enviada com sucesso: " + key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
+        }
+    }
 }

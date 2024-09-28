@@ -215,18 +215,6 @@ public class PratoService {
         workbook.close();
     }
 
-    public Prato updatePratoFoto(@PathVariable Long codigo, @RequestBody byte[] novaFoto) {
-        Prato prato;
-        if (pratoRepository.existsById(codigo) == false){
-            throw new IdNotFoundException();
-        } else {
-            prato = pratoRepository.findById(codigo).get();
-            prato.setFoto(novaFoto);
-            pratoRepository.save(prato);
-        }
-        return prato;
-    }
-
 
     //PARA TESTES
     public void setEmpresaService(EmpresaService empresaService) {
