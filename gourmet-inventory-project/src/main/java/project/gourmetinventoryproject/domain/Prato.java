@@ -35,4 +35,5 @@ public class Prato {
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
     private String foto;
+    private String URLAssinada;
 }

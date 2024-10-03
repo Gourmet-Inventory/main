@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +20,6 @@ import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.PratoService;
-import project.gourmetinventoryproject.service.S3Service;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,10 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @RequestMapping("/pratos")
@@ -40,13 +36,11 @@ public class PratoController {
 
     @Autowired
     private PratoService pratoService;
-
     @Autowired
     private ModelMapper mapper;
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
-    @Autowired
-    private S3Service s3Service;
+
 
     @Operation(summary = "Obter lista com todos pratos", method = "GET")
     @ApiResponses(value = {
@@ -119,10 +113,16 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PostMapping("/{idEmpresa}")
-    public ResponseEntity<PratoConsultaDto> createPrato(@RequestBody PratoCriacaoDto pratoDto,@PathVariable Long idEmpresa) {
-        return ResponseEntity.status(201).body(pratoService.createPrato(pratoDto,idEmpresa));
+    @PostMapping(value = "/{idEmpresa}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PratoConsultaDto> createPrato(
+            @RequestBody PratoCriacaoDto pratoDto,
+            @PathVariable Long idEmpresa,
+            @RequestPart(value = "imagem", required = false) MultipartFile foto) {
+
+        System.out.println("Entrando no createPrato");
+        return ResponseEntity.status(HttpStatus.CREATED).body(pratoService.createPrato(pratoDto, idEmpresa, foto));
     }
+
 
     @Operation(summary = "Atualizar prato por ID", method = "PUT")
     @ApiResponses(value = {
@@ -186,13 +186,12 @@ public class PratoController {
 //    public Map<Long, Integer> calculateIngredientUsage(@RequestBody List<Long> servedDishesIds) {
 //        return pratoService.calculateIngredientUsage(servedDishesIds);
 //    }
-    
+
 //    @PostMapping("/generate-ingredient-usage-report")
 //    public ResponseEntity<int[][]> generateIngredientUsageReport(@RequestBody List<Long> servedDishesIds, @RequestParam int numberOfIngredients) {
 //        int[][] report = pratoService.generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
 //        return new ResponseEntity<>(report, HttpStatus.OK);
 //    }
-
 
 
     @GetMapping("/alergicos")
@@ -207,7 +206,6 @@ public class PratoController {
         String downloadsDir = System.getProperty("user.dir") + "/downloads";
         String filePath = downloadsDir + "/ingredientUsageReport.xlsx";
 
-        // Create downloads directory if it doesn't exist
         File dir = new File(downloadsDir);
         if (!dir.exists()) {
             dir.mkdirs();
@@ -239,27 +237,7 @@ public class PratoController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    @PostMapping(value = "/imagem-prato/{idPrato}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file, @PathVariable Long idPrato) {
-        try {
-            Prato prato = pratoService.getPratoById(idPrato);
-            String key = s3Service.uploadFile(file,prato);
-            return ResponseEntity.ok("Imagem enviada com sucesso: " + key);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
-        }
-    }
 
-//UPDATE FOTO PRATO////////
-    @PatchMapping(value = "/foto/{idPrato}", consumes = "multipart/form-data")
-    public ResponseEntity<String> updatePratoFoto(@PathVariable Long idPrato, @RequestBody MultipartFile file) throws IOException {
-        Prato prato = pratoService.getPratoById(idPrato);
-        try {
-            String key = s3Service.updateFile(prato.getFoto(),file,prato);
-            return new ResponseEntity<>("Imagem alterada com sucesso", HttpStatus.OK);
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
-                  }
-    }
+
+
 }
