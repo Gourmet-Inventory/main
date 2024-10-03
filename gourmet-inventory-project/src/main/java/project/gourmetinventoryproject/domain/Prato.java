@@ -34,5 +34,6 @@ public class Prato {
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
-    private byte[] foto;
+    private String foto;
+    private String URLAssinada;
 }

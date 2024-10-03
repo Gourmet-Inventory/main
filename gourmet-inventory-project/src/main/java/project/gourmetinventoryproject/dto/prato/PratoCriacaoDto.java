@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.dto.prato;
 
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Ingrediente;
@@ -23,4 +24,5 @@ public class PratoCriacaoDto {
     private String categoria;
     private List<IngredienteCriacaoDto> receitaPrato;
     private List<String> alergicosRestricoes;
+    private MultipartFile foto;
 }
