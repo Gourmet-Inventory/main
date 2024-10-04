@@ -7,26 +7,25 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.repository.PratoRepository;
-import project.gourmetinventoryproject.exception.ElementAlreadyExistException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Map;
-import java.util.HashMap;
 
 
 
@@ -45,9 +44,30 @@ public class PratoService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private S3Service s3Service;
+
     public List<Prato> getAllPratos(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         return pratoRepository.findAllByEmpresa(empresa);
+    }
+    public List<Prato> getAllPratosImagem(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Prato> pratos = pratoRepository.findAllByEmpresa(empresa);
+        List<Prato> pratosImagem = pratoRepository.findAllByEmpresa(empresa);
+        for(Prato prato : pratos) {
+            if (prato.getFoto() != null){
+                String fotoUrl = prato.getFoto();
+                String key = fotoUrl.substring(fotoUrl.lastIndexOf("/") + 1);
+                String urlAssinada = s3Service.generatePresignedUrl(key);
+                prato.setURLAssinada(urlAssinada);
+                pratoRepository.save(prato);
+            }
+            pratosImagem.add(prato);
+
+        }
+
+        return pratosImagem;
     }
 
     public Prato getPratoById(Long id) {
@@ -58,18 +78,58 @@ public class PratoService {
         throw new IdNotFoundException();
     }
 
-    public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long empresa) {
+    public String getImagemPrato(@PathVariable Long idPrato) throws IOException {
+        Prato prato = getPratoById(idPrato);
+        String fotoUrl = prato.getFoto();
+        String key = fotoUrl.substring(fotoUrl.lastIndexOf("/") + 1);
+        String urlAssinada = s3Service.generatePresignedUrl(key);
+        prato.setURLAssinada(urlAssinada);
+        pratoRepository.save(prato);
+        return urlAssinada;
+    }
+
+    public ResponseEntity<String> updateImagemPrato(@PathVariable Long idPrato, @RequestBody MultipartFile file) throws IOException {
+        Prato prato = getPratoById(idPrato);
+        try {
+            s3Service.updateFile(prato.getFoto(),file,prato);
+            return new ResponseEntity<>("Imagem alterada com sucesso", HttpStatus.OK);
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
+        }
+    }
+
+    public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long empresa,MultipartFile foto) {
         Empresa idEmpresa = empresaService.getEmpresasById(empresa);
         if (idEmpresa.equals(null)){
+            System.out.println("Empresa não encontrada");
             throw new IdNotFoundException();
         }
-        System.out.println(prato);
+        if (foto == null){
+            System.out.println("Foto não encontrada");
+            List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
+            Prato pratoNovo = modelMapper.map(prato, Prato.class);
+            pratoNovo.setReceitaPrato(ingredientes);
+            pratoNovo.setEmpresa(idEmpresa);
+            return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
+        }
+        System.out.println("Foto encontrada");
         List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
         Prato pratoNovo = modelMapper.map(prato, Prato.class);
         pratoNovo.setReceitaPrato(ingredientes);
         pratoNovo.setEmpresa(idEmpresa);
-        return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
+        return  modelMapper.map(uploadImagePrato(foto,pratoNovo),PratoConsultaDto.class);
+
     }
+    public ResponseEntity<String> uploadImagePrato(@RequestParam("file") MultipartFile file, @PathVariable Prato prato) {
+        try {
+            String key = s3Service.uploadFile(file,prato);
+            return ResponseEntity.ok("Imagem enviada com sucesso: " + key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
+        }
+    }
+
 
     public Prato updatePrato(Long id, PratoCriacaoDto prato) {
         if (pratoRepository.existsById(id)){

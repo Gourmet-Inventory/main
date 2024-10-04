@@ -20,4 +20,5 @@ public class PratoConsultaDto {
     private String categoria;
     private List<IngredienteConsultaDto> receitaPrato;
     private String foto;
+    private String URLAssinada;
 }

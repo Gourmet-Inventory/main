@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
-public class AWSInvalid extends RuntimeException {
-    public AWSInvalid() {
-        super("Credenciais inválidas");
+public class CustomException extends RuntimeException {
+    private int errorCode;
+    public CustomException(String mensagem, int errorCode) {
+        super(mensagem);
+        this.errorCode = errorCode;
     }
 }
