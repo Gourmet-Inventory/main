@@ -1,5 +1,8 @@
 package project.gourmetinventoryproject.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -14,8 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
+import project.gourmetinventoryproject.domain.ByteArrayMultipartFile;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoCriacaoDto;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
@@ -28,11 +33,14 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.io.ByteArrayInputStream;
 
 
 @RestController
 @RequestMapping("/pratos")
 public class PratoController {
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private PratoService pratoService;
@@ -63,6 +71,14 @@ public class PratoController {
     @GetMapping("/{idEmpresa}")
     public ResponseEntity<List<PratoConsultaDto>> getAllPratos(@PathVariable Long idEmpresa) {
         List<Prato> pratos = pratoService.getAllPratos(idEmpresa);
+        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
+                .map(prato-> mapper.map(prato, PratoConsultaDto.class))
+                .collect(Collectors.toList()), HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllImagem/{idEmpresa}")
+    public ResponseEntity<List<PratoConsultaDto>> getAllPratosImagem(@PathVariable Long idEmpresa) {
+        List<Prato> pratos = pratoService.getAllPratosImagem(idEmpresa);
         return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
                 .map(prato-> mapper.map(prato, PratoConsultaDto.class))
                 .collect(Collectors.toList()), HttpStatus.OK);
@@ -115,12 +131,28 @@ public class PratoController {
     })
     @PostMapping(value = "/{idEmpresa}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PratoConsultaDto> createPrato(
-            @RequestBody PratoCriacaoDto pratoDto,
             @PathVariable Long idEmpresa,
-            @RequestPart(value = "imagem", required = false) MultipartFile foto) {
-
+            @RequestParam String nome,
+            @RequestParam String descricao,
+            @RequestParam Double preco,
+            @RequestParam String categoria,
+            @RequestParam(value ="AlergicosRestricoes" , required = false)String alergicosRestricoes,
+            @RequestParam(value = "receita", required = false) String receitaPrato,
+            @RequestParam(value = "imagem", required = false) MultipartFile foto) throws JsonProcessingException {
         System.out.println("Entrando no createPrato");
-        return ResponseEntity.status(HttpStatus.CREATED).body(pratoService.createPrato(pratoDto, idEmpresa, foto));
+        PratoCriacaoDto prato = new PratoCriacaoDto();
+        System.out.println(nome + " " + descricao + " " + preco + " " + categoria + " " + receitaPrato + " " + foto + alergicosRestricoes);
+        prato.setNome(nome);
+        prato.setDescricao(descricao);
+        prato.setPreco(preco);
+        prato.setCategoria(categoria);
+        prato.setAlergicosRestricoes(objectMapper.readValue(alergicosRestricoes, new TypeReference<List<String>>() {}));
+        prato.setReceitaPrato(objectMapper.readValue(receitaPrato, new TypeReference<List<IngredienteCriacaoDto>>() {}));
+        prato.setFoto(foto);
+        System.out.println(prato);
+        // Criação do prato
+        PratoConsultaDto createdPrato = pratoService.createPrato(prato, idEmpresa, foto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPrato);
     }
 
 

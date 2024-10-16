@@ -28,33 +28,35 @@ public class S3Service {
     private S3Client s3Client;
     private S3Presigner s3Presigner;
 
-    private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
-    private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-    private final String sessionToken = System.getenv("AWS_SESSION_TOKEN");
-    private final String bucketName = System.getenv("AWS_S3_BUCKET");
-    private final String region = System.getenv("AWS_REGION");
+    private final String accessKey = System.getenv("aws_access_key_id");
+    private final String secretKey = System.getenv("aws_secret_access_key");
+    private final String sessionToken = System.getenv("aws_session_token");
+    private final String bucketName = System.getenv("aws_s3_bucket");
+    private final String region = System.getenv("aws_region");
 
     @Autowired
     private PratoRepository pratoRepository;
+    protected Boolean aws = true;
 
     @PostConstruct
     public void init() {
-        System.out.println(System.getenv("AWS_SESSION_TOKEN"));
-        if (accessKey == null || secretKey == null || sessionToken == null || bucketName == null || region == null) {
-            System.out.println("Credenciais vazias");
-        } else {
-            AwsSessionCredentials awsCreds = AwsSessionCredentials.create(accessKey, secretKey, sessionToken);
-            AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(awsCreds);
+        if (aws){
+            if (accessKey == null || secretKey == null || sessionToken == null || bucketName == null || region == null) {
+                System.out.println("Credenciais vazias");
+            } else {
+                AwsSessionCredentials awsCreds = AwsSessionCredentials.create(accessKey, secretKey, sessionToken);
+                AwsCredentialsProvider credentialsProvider = StaticCredentialsProvider.create(awsCreds);
 
-            this.s3Client = S3Client.builder()
-                    .region(Region.of(region))
-                    .credentialsProvider(credentialsProvider)
-                    .build();
+                this.s3Client = S3Client.builder()
+                        .region(Region.of(region))
+                        .credentialsProvider(credentialsProvider)
+                        .build();
 
-            this.s3Presigner = S3Presigner.builder()
-                    .region(Region.of(region))
-                    .credentialsProvider(credentialsProvider)
-                    .build();
+                this.s3Presigner = S3Presigner.builder()
+                        .region(Region.of(region))
+                        .credentialsProvider(credentialsProvider)
+                        .build();
+            }
         }
     }
 

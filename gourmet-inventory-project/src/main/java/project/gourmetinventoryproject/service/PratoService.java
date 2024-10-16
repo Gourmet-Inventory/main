@@ -51,6 +51,24 @@ public class PratoService {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         return pratoRepository.findAllByEmpresa(empresa);
     }
+    public List<Prato> getAllPratosImagem(Long idEmpresa) {
+        Empresa empresa = empresaService.getEmpresasById(idEmpresa);
+        List<Prato> pratos = pratoRepository.findAllByEmpresa(empresa);
+        List<Prato> pratosImagem = pratoRepository.findAllByEmpresa(empresa);
+        for(Prato prato : pratos) {
+            if (prato.getFoto() != null){
+                String fotoUrl = prato.getFoto();
+                String key = fotoUrl.substring(fotoUrl.lastIndexOf("/") + 1);
+                String urlAssinada = s3Service.generatePresignedUrl(key);
+                prato.setURLAssinada(urlAssinada);
+                pratoRepository.save(prato);
+            }
+            pratosImagem.add(prato);
+
+        }
+
+        return pratosImagem;
+    }
 
     public Prato getPratoById(Long id) {
         if (pratoRepository.existsById(id)){
@@ -68,16 +86,6 @@ public class PratoService {
         prato.setURLAssinada(urlAssinada);
         pratoRepository.save(prato);
         return urlAssinada;
-    }
-
-    public ResponseEntity<String> uploadImagePrato(@RequestParam("file") MultipartFile file, @PathVariable Prato prato) {
-        try {
-            String key = s3Service.uploadFile(file,prato);
-            return ResponseEntity.ok("Imagem enviada com sucesso: " + key);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
-        }
     }
 
     public ResponseEntity<String> updateImagemPrato(@PathVariable Long idPrato, @RequestBody MultipartFile file) throws IOException {
@@ -112,6 +120,16 @@ public class PratoService {
         return  modelMapper.map(uploadImagePrato(foto,pratoNovo),PratoConsultaDto.class);
 
     }
+    public ResponseEntity<String> uploadImagePrato(@RequestParam("file") MultipartFile file, @PathVariable Prato prato) {
+        try {
+            String key = s3Service.uploadFile(file,prato);
+            return ResponseEntity.ok("Imagem enviada com sucesso: " + key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro ao enviar imagem: " + e.getMessage());
+        }
+    }
+
 
     public Prato updatePrato(Long id, PratoCriacaoDto prato) {
         if (pratoRepository.existsById(id)){
