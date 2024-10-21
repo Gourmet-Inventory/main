@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
-import project.gourmetinventoryproject.domain.ByteArrayMultipartFile;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;

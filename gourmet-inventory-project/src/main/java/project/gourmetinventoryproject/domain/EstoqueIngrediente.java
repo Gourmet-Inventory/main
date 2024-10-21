@@ -29,21 +29,18 @@ public class EstoqueIngrediente {
     private Boolean manipulado;
     private String nome;
     private String lote;
+    private String marca;
     @Enumerated(EnumType.STRING)
     private CategoriaEstoque categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
-    @NotNull
     private Double valorMedida;
     private Double valorTotal;
     private String localArmazenamento;
-    @PastOrPresent
     private LocalDate dtaCadastro;
-    @FutureOrPresent
     private LocalDate dtaAviso;
-    //@OneToMany(mappedBy = "estoqueIngrediente")
-   // private List<Ingrediente> receitaManipulado;
+    private String descricao;
     @OneToMany(mappedBy = "idAlerta", fetch=FetchType.EAGER)
     @JsonIgnore
     private List<Alerta> Alertas;
