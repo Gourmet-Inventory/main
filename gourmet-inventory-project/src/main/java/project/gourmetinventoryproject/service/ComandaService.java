@@ -44,6 +44,7 @@ public class ComandaService {
                 .orElseThrow(() -> new RuntimeException("Prato not found"));
 
         comanda.getItens().add(prato);
+        comanda.calcularTotal();
         return comandaRepository.save(comanda);
     }
 
@@ -54,6 +55,7 @@ public class ComandaService {
                 .orElseThrow(() -> new RuntimeException("Prato not found"));
 
         comanda.getItens().remove(prato);
+        comanda.calcularTotal();
         return comandaRepository.save(comanda);
     }
 

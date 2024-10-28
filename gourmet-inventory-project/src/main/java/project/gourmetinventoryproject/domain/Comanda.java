@@ -11,6 +11,7 @@ public class Comanda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToMany
     @JoinTable(
             name = "comanda_prato",
@@ -19,5 +20,11 @@ public class Comanda {
     )
     private List<Prato> itens;
     private String status;
+    private Double total = 0.0;
 
+    public void calcularTotal() {
+        this.total = itens.stream()
+                .mapToDouble(Prato::getPreco)
+                .sum();
+    }
 }
