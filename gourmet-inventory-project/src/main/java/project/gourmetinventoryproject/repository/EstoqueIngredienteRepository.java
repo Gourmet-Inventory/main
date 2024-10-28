@@ -15,5 +15,10 @@ public interface EstoqueIngredienteRepository extends JpaRepository<EstoqueIngre
     List<EstoqueIngrediente> findByNomeAndValorMedida(String nomeIngrediente, double quantidadeIngrediente);
 
     List<EstoqueIngrediente> findAllByEmpresa(Empresa empresa);
+
+    @Query("SELECT e FROM EstoqueIngrediente e WHERE MONTH(e.dtaAviso) = :month AND e.empresa = :empresa")
+    List<EstoqueIngrediente> findAllByDtaAvisoMonth(@Param("month") int month, @Param("empresa") Empresa empresa);
+
+//    List<EstoqueIngrediente> findAllByDtaAvisoMonth(int month);
 }
 

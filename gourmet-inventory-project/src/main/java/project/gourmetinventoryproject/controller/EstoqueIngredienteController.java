@@ -10,6 +10,7 @@ import org.modelmapper.ModelMapper;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteCriacaoDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
+import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,8 @@ public class EstoqueIngredienteController {
 
     @Autowired
     private ModelMapper mapper;
+    @Autowired
+    private EstoqueIngredienteRepository estoqueIngredienteRepository;
 
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
@@ -85,13 +88,13 @@ public class EstoqueIngredienteController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="201", description = "Criado - Estoque de ingredientes criado com sucesso",
                     content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"}")})}),
+                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07\"}")})}),
             @ApiResponse(responseCode ="409", description = "Conflito - Estoque de ingredientes já existe",
                     content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"}")})}),
+                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"UNIDADE\",\"valorMedida\":200,\"unidade\":2,\"valorTotal\":400,\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07\"}")})}),
             @ApiResponse(responseCode ="400", description = "Requisição inválida - Parâmetros incorretos",
                     content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":\"String\",\"valorTotal\":\"String\",\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07T19:58:51.560Z\"}")})}),
+                            examples = {@ExampleObject(value = "{\"lote\":\"5A\",\"nome\":\"Arroz\",\"categoria\":\"Grãos\",\"tipoMedida\":\"Diferente do enum\",\"valorMedida\":\"String\",\"valorTotal\":\"String\",\"localArmazenamento\":\"Estoque\",\"dtaCadastro\":\"2024-05-07\",\"dtaAviso\":\"2024-05-07\"}")})}),
             @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
@@ -168,6 +171,11 @@ public class EstoqueIngredienteController {
     @GetMapping("/estoque-select/{id}")
     public ResponseEntity<List<EstoqueIngredientePratosSelectDto>> getEstoqueSelect(@PathVariable Long id){
         return ResponseEntity.status(200).body(estoqueIngredienteService.getEIngredientesSelect(id));
+    }
+    @GetMapping("/Teste")
+    public List<EstoqueIngrediente> getAllEstoqueIngredienteByMonth(Long  idEmpresa,int mes){
+        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredienteByMonth(idEmpresa,mes);
+        return estoqueIngredientes;
     }
 }
 

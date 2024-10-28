@@ -7,6 +7,7 @@ import project.gourmetinventoryproject.dto.empresa.EmpresaResumidaDto;
 @Getter
 @NoArgsConstructor
 public class UsuarioConsultaDto {
+    private Long idUsuario;
     private String nome;
     private String cargo;
     private String email;
