@@ -50,6 +50,16 @@ public class ComandaController {
         }
     }
 
+    @PostMapping("/{comandaId}/addPrato/{pratoId}")
+    public ResponseEntity<Comanda> addPratoToComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
+        return new ResponseEntity<>(comandaService.addPratoToComanda(comandaId, pratoId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{comandaId}/removePrato/{pratoId}")
+    public ResponseEntity<Comanda> removePratoFromComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
+        return new ResponseEntity<>(comandaService.removePratoFromComanda(comandaId, pratoId), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComanda(@PathVariable Long id) {
         log.info("Deletando comanda com id: {}", id);
