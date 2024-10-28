@@ -35,4 +35,6 @@ public class Prato {
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
     private byte[] foto;
+    @ManyToMany(mappedBy = "itens")
+    private List<Comanda> comandas;
 }
