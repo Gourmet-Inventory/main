@@ -60,6 +60,12 @@ public class ComandaController {
         return new ResponseEntity<>(comandaService.removePratoFromComanda(comandaId, pratoId), HttpStatus.OK);
     }
 
+    @PatchMapping("/{comandaId}/status")
+    public ResponseEntity<Comanda> updateComandaStatus(@PathVariable Long comandaId, @RequestParam String status) {
+        Comanda updatedComanda = comandaService.updateStatus(comandaId, status);
+        return new ResponseEntity<>(updatedComanda, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteComanda(@PathVariable Long id) {
         log.info("Deletando comanda com id: {}", id);

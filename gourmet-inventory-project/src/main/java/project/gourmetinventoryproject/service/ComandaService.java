@@ -57,6 +57,14 @@ public class ComandaService {
         return comandaRepository.save(comanda);
     }
 
+    public Comanda updateStatus(Long comandaId, String newStatus) {
+        Comanda comanda = comandaRepository.findById(comandaId)
+                .orElseThrow(() -> new RuntimeException("Comanda not found"));
+
+        comanda.setStatus(newStatus);
+        return comandaRepository.save(comanda);
+    }
+
     public void deleteComanda(Long id) {
         if (!comandaRepository.existsById(id)) {
             throw new RuntimeException("Comanda not found");
