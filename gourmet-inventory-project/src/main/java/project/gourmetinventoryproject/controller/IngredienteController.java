@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/ingredientes")
+@RequestMapping("/api/ingredientes")
 public class IngredienteController {
 
     @Autowired

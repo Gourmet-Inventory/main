@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping("/pratos")
+@RequestMapping("/api/pratos")
 public class PratoController {
 
     @Autowired

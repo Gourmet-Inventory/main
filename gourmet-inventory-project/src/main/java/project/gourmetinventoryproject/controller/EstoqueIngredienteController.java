@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/estoque-ingrediente")
+@RequestMapping("/api/estoque-ingrediente")
 public class EstoqueIngredienteController {
 
     @Autowired
@@ -178,4 +178,8 @@ public class EstoqueIngredienteController {
         return estoqueIngredientes;
     }
 }
+
+
+
+
 

@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/relatorio")
+@RequestMapping("/api/relatorio")
 public class RelatorioController {
 
     @Autowired
