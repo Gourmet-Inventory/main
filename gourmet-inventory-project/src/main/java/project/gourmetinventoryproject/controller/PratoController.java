@@ -36,7 +36,7 @@ import java.io.ByteArrayInputStream;
 
 
 @RestController
-@RequestMapping("/pratos")
+@RequestMapping("/api/pratos")
 public class PratoController {
 
     ObjectMapper objectMapper = new ObjectMapper();

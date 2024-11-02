@@ -12,7 +12,7 @@ import project.gourmetinventoryproject.domain.Email;
 import project.gourmetinventoryproject.service.EmailService;
 
 @RestController
-@RequestMapping("/email")
+@RequestMapping("/api/email")
 public class EmailController {
     private final EmailService emailService;
 

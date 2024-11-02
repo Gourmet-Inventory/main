@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/alerta")
+@RequestMapping("/api/alerta")
 public class AlertaController {
 
     @Autowired
