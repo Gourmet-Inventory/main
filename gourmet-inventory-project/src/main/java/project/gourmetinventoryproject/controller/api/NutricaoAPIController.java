@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.util.*;
 
 @RestController
+@RequestMapping("/api")
 public class NutricaoAPIController {
 
     @Autowired

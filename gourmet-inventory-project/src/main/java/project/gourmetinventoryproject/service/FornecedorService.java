@@ -30,26 +30,7 @@ public class FornecedorService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public void postFornecedor(FornecedorCriacaoDto fornecedorCriacaoDto) throws Exception {
-
-        //Consumindo API externa ViaCep
-        URL url = new URL("https://viacep.com.br/ws/"+ fornecedorCriacaoDto.getCep() +"/json/");
-        URLConnection connection = url.openConnection();
-        InputStream is = connection.getInputStream();
-        BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-
-        String cep = "";
-        StringBuilder jsonCep = new StringBuilder();
-
-        while ((cep = br.readLine()) != null){
-            jsonCep.append(cep);
-        }
-
-        System.out.println(jsonCep.toString());
-
-        FornecedorCriacaoDto userAux = new Gson().fromJson(jsonCep.toString(), FornecedorCriacaoDto.class);
-
-        //
+    public void postFornecedor(FornecedorCriacaoDto fornecedorCriacaoDto){
 
         Fornecedor novoFornecedor = modelMapper.map(fornecedorCriacaoDto, Fornecedor.class);
         fornecedorRepository.save(novoFornecedor);

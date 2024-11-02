@@ -27,7 +27,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     @Autowired
@@ -62,7 +62,7 @@ public class UsuarioController {
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Logado com sucesso",
                     content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "{\"email\": \"peterson@example.com\",\"senha\": \"123456\"}")})}),
+                            examples = {@ExampleObject(value = "{\"email\": \"maranhopeterson@gmail.com\",\"senha\": \"123456\"}")})}),
             @ApiResponse(responseCode ="404", description = "Usuario não encontrado")
     })
     @PostMapping("/login")
@@ -81,5 +81,10 @@ public class UsuarioController {
        }
         String arquivo = UsuarioService.downloadFile(nomeArquivo);
         return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();
+    }
+
+    @GetMapping("/teste")
+    public String teste() {
+        return "sucesso!!!!";
     }
 }

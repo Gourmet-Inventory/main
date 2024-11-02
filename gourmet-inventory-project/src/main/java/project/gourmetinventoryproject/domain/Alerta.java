@@ -19,6 +19,7 @@ public class Alerta {
     @ManyToOne()
     @JoinColumn(name = "estoque_ingrediente")
     private EstoqueIngrediente estoqueIngrediente;
+
     @Override
     public String toString() {
         return "Alerta{" +
