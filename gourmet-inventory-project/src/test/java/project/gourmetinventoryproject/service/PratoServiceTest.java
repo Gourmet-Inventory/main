@@ -64,6 +64,7 @@ public class PratoServiceTest {
                 .localArmazenamento("Local Teste")
                 .dtaCadastro(LocalDate.of(2023, 1, 1))
                 .dtaAviso(LocalDate.of(2023, 12, 10))
+                .marca("Marca Teste")
                 .build();
 
         estoqueIngrediente = EstoqueIngrediente.builder()
@@ -78,6 +79,7 @@ public class PratoServiceTest {
                 .localArmazenamento("Local Teste")
                 .dtaCadastro(LocalDate.of(2023, 1, 1))
                 .dtaAviso(LocalDate.of(2023, 12, 10))
+                .marca("Marca Teste")
                 .build();
 
         ingrediente = Ingrediente.builder()

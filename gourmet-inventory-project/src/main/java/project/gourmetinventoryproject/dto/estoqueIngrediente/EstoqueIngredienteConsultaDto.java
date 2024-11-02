@@ -1,19 +1,13 @@
 package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-
-import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import project.gourmetinventoryproject.domain.Alerta;
 import project.gourmetinventoryproject.domain.Empresa;
-import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Medidas;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -36,5 +30,5 @@ public class EstoqueIngredienteConsultaDto {
     private LocalDate dtaAviso;
    // private List<Ingrediente> receitaManipulado;
     private List<Alerta> Alertas;
-
+    private String marca;
 }

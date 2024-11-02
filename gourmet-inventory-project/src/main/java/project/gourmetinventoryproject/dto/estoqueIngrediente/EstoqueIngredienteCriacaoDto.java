@@ -37,5 +37,6 @@ public class EstoqueIngredienteCriacaoDto {
     private LocalDate dtaCadastro;
     @FutureOrPresent
     private LocalDate dtaAviso;
-
+    @NotBlank
+    private String marca;
 }

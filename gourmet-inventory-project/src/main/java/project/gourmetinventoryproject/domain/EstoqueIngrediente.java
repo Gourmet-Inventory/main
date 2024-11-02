@@ -49,6 +49,7 @@ public class EstoqueIngrediente {
     @OneToMany(mappedBy = "idAlerta", fetch=FetchType.EAGER)
     @JsonIgnore
     private List<Alerta> Alertas;
+    private String marca;
     public void addAlerta(Alerta alerta) {
         Alertas.add(alerta);
     }
@@ -72,6 +73,7 @@ public class EstoqueIngrediente {
                 ", localArmazenamento='" + localArmazenamento + '\'' +
                 ", dtaCadastro=" + dtaCadastro +
                 ", dtaAviso=" + dtaAviso +
+                ", marca='" + marca + '\'' +
                 '}';
     }
 }
