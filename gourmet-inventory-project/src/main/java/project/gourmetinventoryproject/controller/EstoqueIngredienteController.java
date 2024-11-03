@@ -7,9 +7,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteCriacaoDto;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.*;
+import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +27,11 @@ public class EstoqueIngredienteController {
 
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
-
     @Autowired
     private ModelMapper mapper;
     @Autowired
     private EstoqueIngredienteRepository estoqueIngredienteRepository;
+
 
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
     @ApiResponses(value = {
@@ -53,13 +52,12 @@ public class EstoqueIngredienteController {
                             examples = {@ExampleObject(value = "")})})
     })
 
-
     @GetMapping("/{idEmpresa}")
-    public ResponseEntity<List<EstoqueIngredienteConsultaDto>> getAllEstoqueIngredientes(@PathVariable Long idEmpresa) {
-        List<EstoqueIngrediente> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
-        return estoqueIngredientes.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(estoqueIngredientes.stream()
-                .map(estoqueIngrediente -> mapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class))
-                .collect(Collectors.toList()), HttpStatus.OK);
+    public ResponseEntity<List<Object>> getAllEstoqueIngredientes(@PathVariable Long idEmpresa) {
+        List<Object> estoqueIngredientes = estoqueIngredienteService.getAllEstoqueIngredientes(idEmpresa);
+        return estoqueIngredientes.isEmpty() ?
+                new ResponseEntity<>(null, HttpStatus.NO_CONTENT) :
+                new ResponseEntity<>(estoqueIngredientes, HttpStatus.OK);
     }
     @Operation(summary = "Buscar estoque de ingredientes por ID", method = "GET")
     @ApiResponses(value = {
@@ -113,6 +111,18 @@ public class EstoqueIngredienteController {
         return new ResponseEntity<>(dtoResposta, HttpStatus.CREATED);
     }
 
+    @PostMapping("/manipulado/{idEmpresa}")
+    public ResponseEntity<EstoqueIngredienteManipuladoConsultaDto> createEstoqueIngredienteManipulado(@PathVariable Long idEmpresa, @RequestBody @Valid EstoqueReceitaManipuladoCriacao estoqueIngredienteManipulado) {
+        var entidade = mapper.map(estoqueIngredienteManipulado.getEstoqueIngredienteCriacaoDto(), EstoqueIngrediente.class);
+
+        ReceitaCriacaoDto  receitaCriacaoDto = estoqueIngredienteManipulado.getReceitaCriacaoDto();
+        EstoqueIngredienteManipuladoConsultaDto estoqueManipulado = estoqueIngredienteService.createEstoqueIngredienteManipulado(entidade, idEmpresa,receitaCriacaoDto);
+        return new ResponseEntity<>(estoqueManipulado, HttpStatus.CREATED);
+
+
+    }
+
+
     @Operation(summary = "Atualizar estoque de ingredientes", method = "PUT")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes atualizado com sucesso",
@@ -144,7 +154,23 @@ public class EstoqueIngredienteController {
         return new ResponseEntity<>(mapper.map(updatedEstoqueIngrediente, EstoqueIngredienteConsultaDto.class), HttpStatus.OK);
     }
 
-   @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
+    @PutMapping("/atualizar-estoque-manipulado/{id}")
+    public ResponseEntity<EstoqueIngredienteManipuladoConsultaDto> updateEstoqueIngredienteManipulado(
+            @PathVariable Long id,
+            @RequestBody EstoqueReceitaManipuladoCriacao estoqueIngredienteManipuladoDto) {
+
+        System.out.println("Recebida requisição para atualizar estoque manipulado com ID: " + id);
+
+        EstoqueIngredienteManipuladoConsultaDto updatedEstoqueIngredienteDto =
+                estoqueIngredienteService.updateEstoqueIngredienteManipulado(id, estoqueIngredienteManipuladoDto);
+
+        System.out.println("Entidade manipulada atualizada: " + updatedEstoqueIngredienteDto);
+
+        return new ResponseEntity<>(updatedEstoqueIngredienteDto, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "Deletar estoque de ingredientes", method = "DELETE")
     @ApiResponses(value = {
             @ApiResponse(responseCode ="200", description = "Sucesso - Estoque de ingredientes deletado com sucesso",
                     content = {@Content(mediaType = "text/plain",

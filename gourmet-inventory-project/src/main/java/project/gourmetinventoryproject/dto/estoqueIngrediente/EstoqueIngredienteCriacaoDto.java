@@ -24,19 +24,20 @@ public class EstoqueIngredienteCriacaoDto {
     @NotBlank
     private String lote;
     private Boolean manipulado;
-    @NotBlank
-    private String nome;
-    @NotBlank
-    private String categoria;
+    private String marca;
+    @Enumerated(EnumType.STRING)
+    private CategoriaEstoque categoriaEstoque;
+    @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
     @NotNull
     private Double valorMedida;
+    private Double valorTotal;
     private String localArmazenamento;
     @PastOrPresent
     private LocalDate dtaCadastro;
     @FutureOrPresent
     private LocalDate dtaAviso;
-    @NotBlank
-    private String marca;
+    private String descricao;
+
 }
