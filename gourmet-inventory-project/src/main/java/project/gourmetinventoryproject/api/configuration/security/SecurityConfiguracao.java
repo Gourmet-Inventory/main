@@ -50,24 +50,24 @@ public class SecurityConfiguracao {
     Quando o Spring Security processa uma requisição, ele itera pelo array URLS_PERMITIDAS.
     */
     private static final AntPathRequestMatcher[] URLS_PERMITIDAS = {
-        new AntPathRequestMatcher("/api/swagger-ui/**"),
-        new AntPathRequestMatcher("/api/swagger-ui.html"),
-        new AntPathRequestMatcher("/api/swagger-resources"),
-        new AntPathRequestMatcher("/api/swagger-resources/**"),
+        new AntPathRequestMatcher("/swagger-ui/**"),
+        new AntPathRequestMatcher("/swagger-ui.html"),
+        new AntPathRequestMatcher("/swagger-resources"),
+        new AntPathRequestMatcher("/swagger-resources/**"),
         new AntPathRequestMatcher("/api/configuration/ui"),
-        new AntPathRequestMatcher("/api/configuration/security"),
+        new AntPathRequestMatcher("configuration/security"),
         new AntPathRequestMatcher("/api/public/**"),
         new AntPathRequestMatcher("/api/public/authenticate"),
         new AntPathRequestMatcher("/api/webjars/**"),
-        new AntPathRequestMatcher("/api/v3/api-docs/**"),
+        new AntPathRequestMatcher("/v3/api-docs/**"),
         new AntPathRequestMatcher("/api/actuator/*"),
-        new AntPathRequestMatcher("/api/usuarios/**"),
+        //new AntPathRequestMatcher("/usuarios/**"),
         new AntPathRequestMatcher("/api/usuarios/login/**"),
         new AntPathRequestMatcher("/api/usuarios/logout/**"),
-        new AntPathRequestMatcher("/h2-console/**"),
+        new AntPathRequestMatcher("/api/h2-console/**"),
         //new AntPathRequestMatcher("http://localhost:3306/workbench/**"), // Adicione a URL do MySQL Workbench
         //new AntPathRequestMatcher("jdbc:mysql://localhost:3306/**"), //??
-        new AntPathRequestMatcher("/error/**"),
+        new AntPathRequestMatcher("/api/error/**"),
         //new AntPathRequestMatcher("http://localhost:8080/**"),
     };
 
