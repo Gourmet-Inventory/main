@@ -35,6 +35,22 @@ class FornecedorServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
+//    @Test
+//    @DisplayName("Should save fornecedor successfully")
+//    void postFornecedorSuccess() {
+//        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
+//        Fornecedor fornecedor = new Fornecedor();
+//        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
+//
+//    void postFornecedorSuccess() throws Exception {
+//        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
+//        Fornecedor fornecedor = new Fornecedor();
+//        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
+//        fornecedorService.postFornecedor(fornecedorCriacaoDto);
+//        verify(fornecedorRepository, times(1)).save(fornecedor);
+//    }
+
     @Test
     @DisplayName("Should save fornecedor successfully")
     void postFornecedorSuccess(){ //throws Exception {
@@ -44,6 +60,7 @@ class FornecedorServiceTest {
         fornecedorService.postFornecedor(fornecedorCriacaoDto);
         verify(fornecedorRepository, times(1)).save(fornecedor);
     }
+
 
     @Test
     @DisplayName("Deve retornar todos os fornecedores")
