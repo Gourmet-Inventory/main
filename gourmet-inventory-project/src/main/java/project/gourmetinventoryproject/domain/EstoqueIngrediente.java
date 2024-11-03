@@ -44,30 +44,8 @@ public class EstoqueIngrediente {
     @OneToMany(mappedBy = "idAlerta", fetch=FetchType.EAGER)
     @JsonIgnore
     private List<Alerta> Alertas;
-    public void addAlerta(Alerta alerta) {
-        Alertas.add(alerta);
-    }
     public void baixarEstoque(Double quantidadeUsada) {
         this.valorMedida -= quantidadeUsada;
-    }
-
-    @Override
-    public String toString() {
-        return "EstoqueIngrediente{" +
-                "idItem=" + idItem +
-                ", lote='" + lote + '\'' +
-                ", manipulado=" + manipulado +
-                ", nome='" + nome + '\'' +
-                ", empresa=" + empresa +
-                ", categoria='" + categoria + '\'' +
-                ", tipoMedida=" + tipoMedida +
-                ", unitario=" + unitario +
-                ", valorMedida=" + valorMedida +
-                ", valorTotal=" + valorTotal +
-                ", localArmazenamento='" + localArmazenamento + '\'' +
-                ", dtaCadastro=" + dtaCadastro +
-                ", dtaAviso=" + dtaAviso +
-                '}';
     }
 }
 

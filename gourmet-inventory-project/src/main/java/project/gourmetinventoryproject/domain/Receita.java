@@ -11,12 +11,10 @@ public class Receita {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long idReceita;
-
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "idPrato", nullable = true)
-    private Prato prato;
+//    @OneToOne(optional = true)
+//    @JoinColumn(name = "prato_id", nullable = true)
+//    private Prato prato;
     private Long idEstoqueIngrediente;
-    private Boolean isPrato;
     @OneToMany
     private List<Ingrediente> ingredientes;
 }

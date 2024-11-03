@@ -30,6 +30,8 @@ public class Prato {
             inverseJoinColumns = @JoinColumn(name = "ingrediente_id")
     )
     private List<Ingrediente> receitaPrato;
+//    @OneToOne(mappedBy = "prato", cascade = CascadeType.ALL, optional = true)
+//    private Receita receita;
     @ElementCollection
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
     @Column(name = "restricao")

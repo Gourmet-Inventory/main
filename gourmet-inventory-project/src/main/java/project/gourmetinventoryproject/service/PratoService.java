@@ -108,14 +108,14 @@ public class PratoService {
             System.out.println("Foto não encontrada");
             List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
             Prato pratoNovo = modelMapper.map(prato, Prato.class);
-            pratoNovo.setReceitaPrato(ingredientes);
+            //pratoNovo.setReceitaPrato(ingredientes);
             pratoNovo.setEmpresa(idEmpresa);
             return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
         }
         System.out.println("Foto encontrada");
         List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
         Prato pratoNovo = modelMapper.map(prato, Prato.class);
-        pratoNovo.setReceitaPrato(ingredientes);
+        //pratoNovo.setReceitaPrato(ingredientes);
         pratoNovo.setEmpresa(idEmpresa);
         return  modelMapper.map(uploadImagePrato(foto,pratoNovo),PratoConsultaDto.class);
 
@@ -141,7 +141,7 @@ public class PratoService {
                 existingPrato.setPreco(prato.getPreco());
                 existingPrato.setCategoria(prato.getCategoria());
                 existingPrato.setAlergicosRestricoes(prato.getAlergicosRestricoes());
-                existingPrato.setReceitaPrato(ingredienteService.createIngrediente(prato.getReceitaPrato()));
+                //existingPrato.setReceitaPrato(ingredienteService.createIngrediente(prato.getReceitaPrato()));
                 return pratoRepository.save(existingPrato);
             } else {
                 throw new IdNotFoundException();
