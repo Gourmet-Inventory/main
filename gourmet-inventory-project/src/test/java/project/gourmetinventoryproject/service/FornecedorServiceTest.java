@@ -35,23 +35,32 @@ class FornecedorServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
 //    @Test
 //    @DisplayName("Should save fornecedor successfully")
-<<<<<<< HEAD
 //    void postFornecedorSuccess() {
 //        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
 //        Fornecedor fornecedor = new Fornecedor();
 //        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
 //
-=======
 //    void postFornecedorSuccess() throws Exception {
 //        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
 //        Fornecedor fornecedor = new Fornecedor();
 //        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
->>>>>>> 7ed6d3c46e25a50256593c25cbc326836945d078
 //        fornecedorService.postFornecedor(fornecedorCriacaoDto);
 //        verify(fornecedorRepository, times(1)).save(fornecedor);
 //    }
+
+    @Test
+    @DisplayName("Should save fornecedor successfully")
+    void postFornecedorSuccess(){ //throws Exception {
+        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
+        Fornecedor fornecedor = new Fornecedor();
+        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
+        fornecedorService.postFornecedor(fornecedorCriacaoDto);
+        verify(fornecedorRepository, times(1)).save(fornecedor);
+    }
+
 
     @Test
     @DisplayName("Deve retornar todos os fornecedores")
@@ -66,6 +75,7 @@ class FornecedorServiceTest {
     void deleteFornecedorWhenExists() {
         when(fornecedorRepository.existsById(anyLong())).thenReturn(true);
         assertDoesNotThrow(() -> fornecedorService.deleteFornecedor(1L));
+        assertDoesNotThrow(() -> fornecedorService.deleteFornecedor(2L));
         verify(fornecedorRepository, times(1)).deleteById(1L);
     }
 

@@ -9,7 +9,7 @@ import project.gourmetinventoryproject.service.UsuarioService;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/api/login")
 public class LoginController {
 
 //    @Autowired

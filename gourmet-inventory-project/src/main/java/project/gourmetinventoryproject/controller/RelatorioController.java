@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/relatorio")
+@RequestMapping("/api/relatorio")
 public class RelatorioController {
 
     @Autowired
@@ -41,7 +41,7 @@ public class RelatorioController {
         return ResponseEntity.status(200).build();
     }
 
-    @GetMapping
+    @GetMapping("/{idEmpresa}")
     public ResponseEntity<List<Relatorio>> getAllRelatorios(Long idEmpresa) {
         List<Relatorio> lista = relatorioService.getAllRelatoriosByEmpresa(idEmpresa);
         return ResponseEntity.status(200).body(lista);
