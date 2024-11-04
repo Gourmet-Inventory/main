@@ -42,6 +42,9 @@ public class PratoService {
     private IngredienteService ingredienteService;
 
     @Autowired
+    private EstoqueIngredienteService estoqueIngredienteService;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
@@ -106,14 +109,14 @@ public class PratoService {
         }
         if (foto == null){
             System.out.println("Foto não encontrada");
-            List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
+            List<Ingrediente> ingredientes = estoqueIngredienteService.createIngrediente(prato.getReceitaPrato());
             Prato pratoNovo = modelMapper.map(prato, Prato.class);
             //pratoNovo.setReceitaPrato(ingredientes);
             pratoNovo.setEmpresa(idEmpresa);
             return modelMapper.map(pratoRepository.save(pratoNovo),PratoConsultaDto.class);
         }
         System.out.println("Foto encontrada");
-        List<Ingrediente> ingredientes = ingredienteService.createIngrediente(prato.getReceitaPrato());
+        List<Ingrediente> ingredientes = estoqueIngredienteService.createIngrediente(prato.getReceitaPrato());
         Prato pratoNovo = modelMapper.map(prato, Prato.class);
         //pratoNovo.setReceitaPrato(ingredientes);
         pratoNovo.setEmpresa(idEmpresa);
