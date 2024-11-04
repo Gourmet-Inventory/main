@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,13 +14,17 @@ import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngrediente
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueReceitaManipuladoCriacao;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
+import project.gourmetinventoryproject.exception.EmptyListException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
+import project.gourmetinventoryproject.repository.IngredienteRepository;
 import project.gourmetinventoryproject.repository.ReceitaRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,8 +48,10 @@ public class EstoqueIngredienteService {
     private ModelMapper modelMapper;
 
     @Autowired
-    @Lazy
     private IngredienteService ingredienteService;
+
+    @Autowired
+    private IngredienteRepository ingredienteRepository;
 
     @Transactional
     public List<Object> getAllEstoqueIngredientes(Long idEmpresa) {
@@ -68,6 +75,26 @@ public class EstoqueIngredienteService {
                     }
                 })
                 .collect(Collectors.toList());
+    }
+
+    public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
+        if (ingredienteDto == null) {
+            throw new IllegalArgumentException("Lista de ingredientes não pode ser nula");
+        }
+        if (ingredienteDto.isEmpty()) {
+            throw new EmptyListException("Lista de ingredientes vazia");
+        }
+
+        List<Ingrediente> lista = new ArrayList<>();
+        for (IngredienteCriacaoDto ingrediente : ingredienteDto) {
+            EstoqueIngrediente newEstoqueIngrediente = getEstoqueIngredienteById(ingrediente.getIdItem());
+            Ingrediente newIngrediente = modelMapper.map(ingrediente, Ingrediente.class);
+            newIngrediente.setEstoqueIngrediente(newEstoqueIngrediente);
+
+            ingredienteRepository.save(newIngrediente);
+            lista.add(newIngrediente);
+        }
+        return lista;
     }
 
 
@@ -111,7 +138,7 @@ public class EstoqueIngredienteService {
         // Receita
         Receita receita1 = new Receita();
         receita1.setIdEstoqueIngrediente(estoqueIngrediente2.getIdItem());
-        List<Ingrediente> ingredientes = ingredienteService.createIngrediente(receita.getReceita());
+        List<Ingrediente> ingredientes = createIngrediente(receita.getReceita());
         receita1.setIngredientes(ingredientes);
         Receita receitaId = receitaRepository.save(receita1);
 
@@ -160,7 +187,7 @@ public class EstoqueIngredienteService {
             if (receitaDto != null) {
                 Receita receita = receitaRepository.findByIdEstoqueIngrediente(id)
                         .orElse(new Receita());
-                receita.setIngredientes(ingredienteService.createIngrediente(receitaDto.getReceita()));
+                receita.setIngredientes(createIngrediente(receitaDto.getReceita()));
                 receita.setIdEstoqueIngrediente(id);
                 receitaRepository.save(receita);
             }

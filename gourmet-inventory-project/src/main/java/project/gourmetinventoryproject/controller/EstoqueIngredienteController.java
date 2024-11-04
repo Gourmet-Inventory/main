@@ -29,8 +29,6 @@ public class EstoqueIngredienteController {
     private EstoqueIngredienteService estoqueIngredienteService;
     @Autowired
     private ModelMapper mapper;
-    @Autowired
-    private EstoqueIngredienteRepository estoqueIngredienteRepository;
 
 
     @Operation(summary = "Obter lista do estoque de ingredientes", method = "GET")
