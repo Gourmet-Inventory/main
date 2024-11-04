@@ -24,13 +24,6 @@ public class IngredienteService {
     @Autowired
     private IngredienteRepository ingredienteRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
-    private EstoqueIngredienteService estoqueIngredienteService;
-
-    private ModelMapper mapper = new ModelMapper();
 
     public List<Ingrediente> getAllIngredientes() {
         return ingredienteRepository.findAll();
@@ -44,25 +37,7 @@ public class IngredienteService {
         throw new IdNotFoundException();
     }
 
-    public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
-        if (ingredienteDto == null) {
-            throw new IllegalArgumentException("Lista de ingredientes não pode ser nula");
-        }
-        if (ingredienteDto.isEmpty()) {
-            throw new EmptyListException("Lista de ingredientes vazia");
-        }
 
-        List<Ingrediente> lista = new ArrayList<>();
-        for (IngredienteCriacaoDto ingrediente : ingredienteDto) {
-            EstoqueIngrediente newEstoqueIngrediente = estoqueIngredienteService.getEstoqueIngredienteById(ingrediente.getIdItem());
-            Ingrediente newIngrediente = modelMapper.map(ingrediente, Ingrediente.class);
-            newIngrediente.setEstoqueIngrediente(newEstoqueIngrediente);
-
-            ingredienteRepository.save(newIngrediente);
-            lista.add(newIngrediente);
-        }
-        return lista;
-    }
 
     public void deleteIngrediente(Long id) {
         if (ingredienteRepository.findById(id).orElse(null) == null) {
