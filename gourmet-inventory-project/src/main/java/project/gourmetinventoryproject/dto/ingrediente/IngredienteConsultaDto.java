@@ -23,5 +23,4 @@ public class IngredienteConsultaDto {
         return valorConcatenado;
     }
 
-
 }

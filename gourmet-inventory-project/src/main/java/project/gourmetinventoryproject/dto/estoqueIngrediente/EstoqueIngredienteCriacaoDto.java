@@ -31,7 +31,7 @@ public class EstoqueIngredienteCriacaoDto {
     private Boolean manipulado;
     private String marca;
     @Enumerated(EnumType.STRING)
-    private CategoriaEstoque categoriaEstoque;
+    private CategoriaEstoque categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
