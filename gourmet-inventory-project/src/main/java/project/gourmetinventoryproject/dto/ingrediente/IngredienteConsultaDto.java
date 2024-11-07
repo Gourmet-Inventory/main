@@ -22,5 +22,4 @@ public class IngredienteConsultaDto {
         valorConcatenado = this.valorMedida + "-" + this.tipoMedida;
         return valorConcatenado;
     }
-
 }

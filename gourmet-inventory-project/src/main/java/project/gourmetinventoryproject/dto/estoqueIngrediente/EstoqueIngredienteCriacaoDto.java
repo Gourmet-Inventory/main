@@ -25,9 +25,8 @@ import java.util.List;
 @NoArgsConstructor
 public class EstoqueIngredienteCriacaoDto {
     @NotBlank
-    private String nome;
-    @NotBlank
     private String lote;
+    private String nome;
     private Boolean manipulado;
     private String marca;
     @Enumerated(EnumType.STRING)
@@ -44,5 +43,4 @@ public class EstoqueIngredienteCriacaoDto {
     @FutureOrPresent
     private LocalDate dtaAviso;
     private String descricao;
-
 }

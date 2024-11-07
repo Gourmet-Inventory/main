@@ -107,7 +107,7 @@ public class EstoqueIngredienteController {
         estoqueIngredienteService.createEstoqueIngrediente(entidade,idEmpresa);
         var dtoResposta = mapper.map(entidade, EstoqueIngredienteConsultaDto.class);
         return new ResponseEntity<>(dtoResposta, HttpStatus.CREATED);
-    }
+    }   
 
     @PostMapping("/manipulado/{idEmpresa}")
     public ResponseEntity<EstoqueIngredienteManipuladoConsultaDto> createEstoqueIngredienteManipulado(@PathVariable Long idEmpresa, @RequestBody @Valid EstoqueReceitaManipuladoCriacao estoqueIngredienteManipulado) {

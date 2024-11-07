@@ -15,8 +15,8 @@ public class ListaComprasController {
     @Autowired
     private ListaComprasService listaComprasService;
 
-    @GetMapping("/listaCompras")
-    public ResponseEntity<List<ItemListaCompras>> getListaCompras(Long idEmpresa) {
+    @GetMapping("/listaCompras/{idEmpresa}")
+    public ResponseEntity<List<ItemListaCompras>> getListaCompras(@PathVariable Long idEmpresa) {
         List<ItemListaCompras> listaDto = listaComprasService.getItemCompras(idEmpresa);
         return ResponseEntity.ok(listaDto);
     }

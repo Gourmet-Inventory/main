@@ -29,6 +29,7 @@ public class EstoqueIngredienteConsultaDto {
     private Double valorMedida;
     private Double valorTotal;
     private String localArmazenamento;
+
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
     private String descricao;

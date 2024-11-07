@@ -29,6 +29,11 @@ public class ComandaService {
         return comandaRepository.findById(id);
     }
 
+    public Comanda getLastComanda() {
+        return comandaRepository.findTopByOrderByIdDesc()
+                .orElseThrow(() -> new RuntimeException("Comanda not found"));
+    }
+
     public Comanda updateComanda(Long id, Comanda updatedComanda) {
         if (!comandaRepository.existsById(id)) {
             throw new RuntimeException("Comanda not found");
