@@ -135,12 +135,12 @@ public class PratoController {
             @RequestParam String descricao,
             @RequestParam Double preco,
             @RequestParam String categoria,
-            @RequestParam(value ="AlergicosRestricoes" , required = false)String alergicosRestricoes,
+            @RequestParam(value ="alergicosRestricoes" , required = false)String alergicosRestricoes,
             @RequestParam(value = "receita", required = false) String receitaPrato,
             @RequestParam(value = "imagem", required = false) MultipartFile foto) throws JsonProcessingException {
         System.out.println("Entrando no createPrato");
         PratoCriacaoDto prato = new PratoCriacaoDto();
-        System.out.println(nome + " " + descricao + " " + preco + " " + categoria + " " + receitaPrato + " " + foto + alergicosRestricoes);
+        System.out.println(nome + " " + descricao + " " + preco + " " + categoria + " " + receitaPrato + " " + foto + " "+ alergicosRestricoes);
         prato.setNome(nome);
         prato.setDescricao(descricao);
         prato.setPreco(preco);

@@ -34,4 +34,11 @@ public class EstoqueIngredienteConsultaDto {
     private LocalDate dtaAviso;
     private String descricao;
     private List<Alerta> Alertas;
+    public String getCategoriaFormatada() {
+        return categoria != null ? categoria.getNomeExibicao() : null;
+    }
+
 }
+
+
+

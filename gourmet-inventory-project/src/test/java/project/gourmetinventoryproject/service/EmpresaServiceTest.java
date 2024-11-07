@@ -133,8 +133,4 @@ class EmpresaServiceTest {
         when(empresaRepository.existsById(3L)).thenReturn(false);
         assertThrows(IdNotFoundException.class, () -> empresaService.putEmpresa(3L, empresaCriacaoDto));
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 7ed6d3c46e25a50256593c25cbc326836945d078
