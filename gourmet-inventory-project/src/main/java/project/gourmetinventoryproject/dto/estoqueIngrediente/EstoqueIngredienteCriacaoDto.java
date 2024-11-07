@@ -1,6 +1,8 @@
 package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 import project.gourmetinventoryproject.domain.Alerta;
+import project.gourmetinventoryproject.domain.CategoriaEstoque;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Medidas;
 
@@ -23,10 +26,11 @@ import java.util.List;
 public class EstoqueIngredienteCriacaoDto {
     @NotBlank
     private String lote;
+    private String nome;
     private Boolean manipulado;
     private String marca;
     @Enumerated(EnumType.STRING)
-    private CategoriaEstoque categoriaEstoque;
+    private CategoriaEstoque categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
@@ -39,5 +43,4 @@ public class EstoqueIngredienteCriacaoDto {
     @FutureOrPresent
     private LocalDate dtaAviso;
     private String descricao;
-
 }

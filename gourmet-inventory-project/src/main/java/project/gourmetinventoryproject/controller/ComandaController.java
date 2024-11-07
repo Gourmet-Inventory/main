@@ -6,12 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Comanda;
+import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
 import project.gourmetinventoryproject.service.ComandaService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/comandas")
+@RequestMapping("/api/comandas")
 @RequiredArgsConstructor
 @Slf4j
 public class ComandaController {
@@ -25,11 +27,27 @@ public class ComandaController {
         return new ResponseEntity<>(createdComanda, HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Comanda>> getAllComandas() {
-        log.info("Buscando todas as comandas");
-        return new ResponseEntity<>(comandaService.getAllComandas(), HttpStatus.OK);
+    @GetMapping("/last")
+    public ResponseEntity<Comanda> getLastComanda() {
+        log.info("Buscando ultima comanda");
+//        return new ResponseEntity<>(comandaService.getAllComandas(), HttpStatus.OK);
+        return new ResponseEntity<>(comandaService.getLastComanda(), HttpStatus.OK);
     }
+
+@GetMapping
+public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
+    log.info("Buscando todas as comandas");
+    List<ComandaResponseDto> comandas = comandaService.getAllComandas()
+            .stream()
+            .map(comanda -> new ComandaResponseDto(
+                    comanda.getId(),
+                    comanda.getTitulo(),
+                    comanda.getMesa(),
+                    comanda.getStatus(),
+                    comanda.getTotal()))
+            .collect(Collectors.toList());
+    return new ResponseEntity<>(comandas, HttpStatus.OK);
+}
 
     @GetMapping("/{id}")
     public ResponseEntity<Comanda> getComandaById(@PathVariable Long id) {

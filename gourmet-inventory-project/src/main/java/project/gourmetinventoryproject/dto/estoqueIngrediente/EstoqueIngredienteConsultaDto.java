@@ -7,10 +7,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.gourmetinventoryproject.domain.Alerta;
-import project.gourmetinventoryproject.domain.Empresa;
-import project.gourmetinventoryproject.domain.Ingrediente;
-import project.gourmetinventoryproject.domain.Medidas;
+import project.gourmetinventoryproject.domain.*;
 
 import java.time.LocalDate;
 import java.util.Date;
