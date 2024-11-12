@@ -11,6 +11,7 @@ public class Comanda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long idGarcom;
     private String titulo;
     private String mesa;
 

@@ -12,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ComandaResponseDto {
     private Long id;
+    private Long idGarcom;
     private String titulo;
     private String mesa;
     private String status;

@@ -41,6 +41,7 @@ public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
             .stream()
             .map(comanda -> new ComandaResponseDto(
                     comanda.getId(),
+                    comanda.getIdGarcom(),
                     comanda.getTitulo(),
                     comanda.getMesa(),
                     comanda.getStatus(),
