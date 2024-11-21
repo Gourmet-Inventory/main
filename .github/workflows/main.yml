@@ -1,41 +1,47 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Permite executar manualmente o pipeline
 
 jobs:
   test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      # Configura o repositório
+      # Passo 1: Checkout do código
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Configura o Java
+      # Passo 2: Configuração do Java
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17' # Versão do Java compatível com o seu projeto
+          java-version: '17'
 
-      # Testa o projeto
+      # Passo 3: Instalar Maven (caso ./mvnw tenha problemas)
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
+      # Passo 4: Rodar testes (substituí ./mvnw por mvn caso o wrapper falhe)
       - name: Run tests
-        run: ./mvnw test # Ajuste se você usar gradle ou outro build tool
+        run: mvn test
 
-      # Build do projeto
+      # Passo 5: Build do JAR (ignorar testes aqui, já rodaram no passo anterior)
       - name: Build JAR
-        run: ./mvnw package -DskipTests
+        run: mvn clean package -DskipTests
 
-      # Configuração do Docker
+      # Passo 6: Login no DockerHub
       - name: Log in to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Passo 7: Build da imagem Docker
       - name: Build Docker Image
-        run: docker build -t gourmet-inventory:latest .
+        run: docker build -t myapp:latest .
 
+      # Passo 8: Push da imagem para o DockerHub
       - name: Push Docker Image
-        run: docker push voltty/gourmet-inventory:latest
+        run: docker push myapp:latest
