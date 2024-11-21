@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Configura o repositório
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Configura o Java
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17' # Versão do Java compatível com o seu projeto
+
+      # Testa o projeto
+      - name: Run tests
+        run: ./mvnw test # Ajuste se você usar gradle ou outro build tool
+
+      # Build do projeto
+      - name: Build JAR
+        run: ./mvnw package -DskipTests
+
+      # Configuração do Docker
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t gourmet-inventory:latest .
+
+      - name: Push Docker Image
+        run: docker push voltty/gourmet-inventory:latest
