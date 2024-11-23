@@ -1,4 +1,4 @@
-package project.gourmetinventoryproject.dto.estoqueIngrediente;
+package project.gourmetinventoryproject.dto.estoqueIngrediente.manipulado;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EstoqueIngredienteManipuladoConsultaDto {
-    Long idItem;
+    private Long idItem;
     private Boolean manipulado;
     private String nome;
     private String lote;

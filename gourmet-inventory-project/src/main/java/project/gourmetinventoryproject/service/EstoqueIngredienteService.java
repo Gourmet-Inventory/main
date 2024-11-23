@@ -1,22 +1,21 @@
 package project.gourmetinventoryproject.service;
 
+import io.swagger.models.auth.In;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.domain.Receita;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteAtualizacaoDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteManipuladoConsultaDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.manipulado.EstoqueIngredienteManipuladoConsultaDto;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
-import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueReceitaManipuladoCriacao;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.manipulado.EstoqueManipuladoAtualizacao;
+import project.gourmetinventoryproject.dto.estoqueIngrediente.manipulado.EstoqueReceitaManipuladoCriacao;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
 import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
-import project.gourmetinventoryproject.dto.receita.ReceitaCriacaoDto;
 import project.gourmetinventoryproject.exception.EmptyListException;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.domain.EstoqueIngrediente;
@@ -53,6 +52,8 @@ public class EstoqueIngredienteService {
     @Autowired
     private IngredienteRepository ingredienteRepository;
 
+
+    //Lista todos ingrediente por empresa
     @Transactional
     public List<Object> getAllEstoqueIngredientes(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -77,38 +78,20 @@ public class EstoqueIngredienteService {
                 .collect(Collectors.toList());
     }
 
-    public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
-        if (ingredienteDto == null) {
-            throw new IllegalArgumentException("Lista de ingredientes não pode ser nula");
-        }
-        if (ingredienteDto.isEmpty()) {
-            throw new EmptyListException("Lista de ingredientes vazia");
-        }
-
-        List<Ingrediente> lista = new ArrayList<>();
-        for (IngredienteCriacaoDto ingrediente : ingredienteDto) {
-            EstoqueIngrediente newEstoqueIngrediente = getEstoqueIngredienteById(ingrediente.getIdItem());
-            Ingrediente newIngrediente = modelMapper.map(ingrediente, Ingrediente.class);
-            newIngrediente.setEstoqueIngrediente(newEstoqueIngrediente);
-
-            ingredienteRepository.save(newIngrediente);
-            lista.add(newIngrediente);
-        }
-        return lista;
-    }
-
-
+    //Traz todos os ingredientes
     @Transactional
     public List<EstoqueIngrediente> getAllEstoqueIngredientes() {
         return estoqueIngredienteRepository.findAll();
     }
 
+    //Traz um estoque ingrediente pelo seu id
     @Transactional
     public EstoqueIngrediente getEstoqueIngredienteById(Long id) {
         return estoqueIngredienteRepository.findById(id)
                 .orElseThrow(IdNotFoundException::new);
     }
 
+    //Traz formatado os dados para o select no front
     @Transactional
     public List<EstoqueIngredientePratosSelectDto> getEIngredientesSelect(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -121,6 +104,7 @@ public class EstoqueIngredienteService {
                 .collect(Collectors.toList());
     }
 
+    //Cria um Estoque ingrediente Industrializado
     @Transactional
     public EstoqueIngrediente createEstoqueIngrediente(EstoqueIngrediente estoqueIngrediente, Long idEmpresa) {
         EstoqueIngrediente estoqueIngrediente1 = verificarTipo(estoqueIngrediente);
@@ -128,73 +112,46 @@ public class EstoqueIngredienteService {
         return estoqueIngredienteRepository.save(estoqueIngrediente1);
     }
 
+    //Cria um Estoque ingrediente Manipulado
     @Transactional
-    public EstoqueIngredienteManipuladoConsultaDto createEstoqueIngredienteManipulado(EstoqueIngrediente estoqueIngrediente, Long idEmpresa, ReceitaCriacaoDto receita) {
+    public EstoqueIngredienteManipuladoConsultaDto createEstoqueIngredienteManipulado(Long idEmpresa, EstoqueReceitaManipuladoCriacao estoqueIngrediente) {
         // Estoque
-        EstoqueIngrediente estoqueIngrediente1 = verificarTipo(estoqueIngrediente);
+        EstoqueIngrediente estoqueIngrediente1 = verificarTipo(modelMapper.map(estoqueIngrediente.getEstoqueIngredienteCriacaoDto(),EstoqueIngrediente.class));
         estoqueIngrediente1.setEmpresa(empresaService.getEmpresasById(idEmpresa));
         EstoqueIngrediente estoqueIngrediente2 = estoqueIngredienteRepository.save(estoqueIngrediente1);
 
         // Receita
         Receita receita1 = new Receita();
         receita1.setIdEstoqueIngrediente(estoqueIngrediente2.getIdItem());
-        List<Ingrediente> ingredientes = createIngrediente(receita.getReceita());
+        List<Ingrediente> ingredientes = createIngrediente(estoqueIngrediente.getReceita());
         receita1.setIngredientes(ingredientes);
         Receita receitaId = receitaRepository.save(receita1);
 
-        EstoqueIngredienteManipuladoConsultaDto estoqueManipuladoConsulta = mapperRetorno(estoqueIngrediente,receitaId);
+        EstoqueIngredienteManipuladoConsultaDto estoqueManipuladoConsulta = mapperRetorno(estoqueIngrediente2, receita1 );
         return estoqueManipuladoConsulta;
     }
 
+
+    //Atualizar um Estoque Ingrediente Industrializado
     @Transactional
-    public EstoqueIngrediente updateEstoqueIngrediente(Long id, EstoqueIngrediente estoqueIngrediente) {
-        return estoqueIngredienteRepository.findById(id).map(existingEstoqueIngrediente -> {
-            verificarTipo(estoqueIngrediente);
-
-            existingEstoqueIngrediente.setLote(estoqueIngrediente.getLote());
-            existingEstoqueIngrediente.setNome(estoqueIngrediente.getNome());
-            existingEstoqueIngrediente.setCategoria(estoqueIngrediente.getCategoria());
-            existingEstoqueIngrediente.setTipoMedida(estoqueIngrediente.getTipoMedida());
-            existingEstoqueIngrediente.setValorMedida(estoqueIngrediente.getValorMedida());
-            existingEstoqueIngrediente.setUnitario(estoqueIngrediente.getUnitario());
-            existingEstoqueIngrediente.setValorTotal(estoqueIngrediente.getValorTotal());
-            existingEstoqueIngrediente.setLocalArmazenamento(estoqueIngrediente.getLocalArmazenamento());
-            existingEstoqueIngrediente.setDtaCadastro(estoqueIngrediente.getDtaCadastro());
-            existingEstoqueIngrediente.setDtaAviso(estoqueIngrediente.getDtaAviso());
-
-            return estoqueIngredienteRepository.save(alertaService.checarAlerta(existingEstoqueIngrediente));
-        }).orElseThrow(IdNotFoundException::new);
+    public EstoqueIngredienteConsultaDto updateEstoqueIngrediente(Long id, EstoqueIngredienteAtualizacaoDto estoqueIngrediente) {
+        EstoqueIngrediente existingEstoqueIngrediente = estoqueIngredienteRepository.findById(id).orElseThrow(IdNotFoundException::new);
+        return modelMapper.map(atualizarEstoque(existingEstoqueIngrediente, estoqueIngrediente),EstoqueIngredienteConsultaDto.class);
     }
 
+    //Atualizar um Estoque Ingrediente Manipulado
     @Transactional
-    public EstoqueIngredienteManipuladoConsultaDto updateEstoqueIngredienteManipulado(Long id, EstoqueReceitaManipuladoCriacao estoqueIngredienteManipuladoDto) {
-        return estoqueIngredienteRepository.findById(id).map(existingManipulado -> {
+    public EstoqueIngredienteManipuladoConsultaDto updateEstoqueIngredienteManipulado(Long id, EstoqueManipuladoAtualizacao estoqueIngredienteManipuladoDto) {
+        EstoqueIngrediente existingManipulado = estoqueIngredienteRepository.findById(id).orElseThrow(IdNotFoundException::new);
+        List<Ingrediente> listaIngrediente = (estoqueIngredienteManipuladoDto.getReceita() == null) ? null : createIngrediente(estoqueIngredienteManipuladoDto.getReceita());
 
-            EstoqueIngrediente estoqueIngrediente = verificarTipo(modelMapper.map(estoqueIngredienteManipuladoDto.getEstoqueIngredienteCriacaoDto(), EstoqueIngrediente.class));
-
-            existingManipulado.setLote(estoqueIngrediente.getLote());
-            existingManipulado.setNome(estoqueIngrediente.getNome());
-            existingManipulado.setCategoria(estoqueIngrediente.getCategoria());
-            existingManipulado.setTipoMedida(estoqueIngrediente.getTipoMedida());
-            existingManipulado.setValorMedida(estoqueIngrediente.getValorMedida());
-            existingManipulado.setUnitario(estoqueIngrediente.getUnitario());
-            existingManipulado.setValorTotal(estoqueIngrediente.getValorTotal());
-            existingManipulado.setLocalArmazenamento(estoqueIngrediente.getLocalArmazenamento());
-            existingManipulado.setDtaCadastro(estoqueIngrediente.getDtaCadastro());
-            existingManipulado.setDtaAviso(estoqueIngrediente.getDtaAviso());
-
-            ReceitaCriacaoDto receitaDto = estoqueIngredienteManipuladoDto.getReceitaCriacaoDto();
-            if (receitaDto != null) {
-                Receita receita = receitaRepository.findByIdEstoqueIngrediente(id)
+        Receita receita = receitaRepository.findByIdEstoqueIngrediente(id)
                         .orElse(new Receita());
-                receita.setIngredientes(createIngrediente(receitaDto.getReceita()));
+                receita.setIngredientes(listaIngrediente);
                 receita.setIdEstoqueIngrediente(id);
-                receitaRepository.save(receita);
-            }
+        receitaRepository.save(receita);
 
-            EstoqueIngrediente updatedEstoqueIngrediente = estoqueIngredienteRepository.save(alertaService.checarAlerta(existingManipulado));
-            return modelMapper.map(updatedEstoqueIngrediente, EstoqueIngredienteManipuladoConsultaDto.class);
-        }).orElseThrow(IdNotFoundException::new);
+        return mapperRetorno(atualizarEstoque(existingManipulado,estoqueIngredienteManipuladoDto.getEstoqueIngredienteAtualizacaoDto()),receita);
     }
 
 
@@ -254,5 +211,42 @@ public class EstoqueIngredienteService {
         dto.setReceita(receitaDto);
 
         return dto;
+    }
+
+    public List<Ingrediente> createIngrediente(List<IngredienteCriacaoDto> ingredienteDto) {
+        if (ingredienteDto == null) {
+            throw new IllegalArgumentException("Lista de ingredientes não pode ser nula");
+        }
+        if (ingredienteDto.isEmpty()) {
+            throw new EmptyListException("Lista de ingredientes vazia");
+        }
+
+        List<Ingrediente> lista = new ArrayList<>();
+        for (IngredienteCriacaoDto ingrediente : ingredienteDto) {
+            EstoqueIngrediente newEstoqueIngrediente = getEstoqueIngredienteById(ingrediente.getIdItem());
+            Ingrediente newIngrediente = modelMapper.map(ingrediente, Ingrediente.class);
+            newIngrediente.setEstoqueIngrediente(newEstoqueIngrediente);
+
+            ingredienteRepository.save(newIngrediente);
+            lista.add(newIngrediente);
+        }
+        return lista;
+    }
+
+    private EstoqueIngrediente atualizarEstoque(EstoqueIngrediente existingEstoqueIngrediente, EstoqueIngredienteAtualizacaoDto estoqueIngrediente ){
+            existingEstoqueIngrediente.setNome(estoqueIngrediente.getNome());
+            existingEstoqueIngrediente.setLote(estoqueIngrediente.getLote());
+            existingEstoqueIngrediente.setMarca(estoqueIngrediente.getMarca());
+            existingEstoqueIngrediente.setCategoria(estoqueIngrediente.getCategoria());
+            existingEstoqueIngrediente.setTipoMedida(estoqueIngrediente.getTipoMedida());
+            existingEstoqueIngrediente.setValorMedida(estoqueIngrediente.getValorMedida());
+            existingEstoqueIngrediente.setUnitario(estoqueIngrediente.getUnitario());
+            existingEstoqueIngrediente.setDescricao(estoqueIngrediente.getDescricao());
+            existingEstoqueIngrediente.setValorTotal(estoqueIngrediente.getValorTotal());
+            existingEstoqueIngrediente.setLocalArmazenamento(estoqueIngrediente.getLocalArmazenamento());
+            existingEstoqueIngrediente.setDtaCadastro(estoqueIngrediente.getDtaCadastro());
+            existingEstoqueIngrediente.setDtaAviso(estoqueIngrediente.getDtaAviso());
+
+            return estoqueIngredienteRepository.save(alertaService.checarAlerta(existingEstoqueIngrediente));
     }
 }

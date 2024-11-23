@@ -1,9 +1,9 @@
 package project.gourmetinventoryproject.dto.receita;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 
 import java.util.List;

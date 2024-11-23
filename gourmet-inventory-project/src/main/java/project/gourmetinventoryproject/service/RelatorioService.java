@@ -83,17 +83,17 @@ public class RelatorioService {
             valorBruto += prato.getPreco();
 
             // Dar baixa nos ingredientes usados no prato
-            if (relatorioDTO.getDescontarEstoque()) {
-                for (Ingrediente ingrediente : prato.getReceitaPrato()) {
-                    EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
-                    if (estoque != null) {
-                        Double quantidadeUsada = ingrediente.getValorMedida();
-                        estoque.baixarEstoque(quantidadeUsada);
-                        estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(), estoque);
-                        estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
-                    }
-                }
-            }
+//            if (relatorioDTO.getDescontarEstoque()) {
+//                for (Ingrediente ingrediente : prato.getReceitaPrato()) {
+//                    EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
+//                    if (estoque != null) {
+//                        Double quantidadeUsada = ingrediente.getValorMedida();
+//                        estoque.baixarEstoque(quantidadeUsada);
+//                        estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(),);
+//                        estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
+//                    }
+//                }
+//            }
         }
 
         relatorio.setValorBruto(valorBruto);
