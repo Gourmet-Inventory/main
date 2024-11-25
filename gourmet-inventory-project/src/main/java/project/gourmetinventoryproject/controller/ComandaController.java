@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Comanda;
 import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.service.ComandaService;
 
 import java.util.List;
@@ -34,21 +36,40 @@ public class ComandaController {
         return new ResponseEntity<>(comandaService.getLastComanda(), HttpStatus.OK);
     }
 
-@GetMapping
-public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
-    log.info("Buscando todas as comandas");
-    List<ComandaResponseDto> comandas = comandaService.getAllComandas()
-            .stream()
-            .map(comanda -> new ComandaResponseDto(
-                    comanda.getId(),
-                    comanda.getIdGarcom(),
-                    comanda.getTitulo(),
-                    comanda.getMesa(),
-                    comanda.getStatus(),
-                    comanda.getTotal()))
-            .collect(Collectors.toList());
-    return new ResponseEntity<>(comandas, HttpStatus.OK);
-}
+    @GetMapping
+    public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
+        log.info("Buscando todas as comandas");
+        List<ComandaResponseDto> comandas = comandaService.getAllComandas()
+                .stream()
+                .map(comanda -> new ComandaResponseDto(
+                        comanda.getId(),
+                        comanda.getIdGarcom(),
+                        comanda.getTitulo(),
+                        comanda.getMesa(),
+                        comanda.getItens().stream()
+                                .map(prato -> new PratoConsultaDto(
+                                        prato.getIdPrato(),
+                                        prato.getNome(),
+                                        prato.getDescricao(),
+                                        prato.getPreco(),
+                                        prato.getAlergicosRestricoes(),
+                                        prato.getCategoria(),
+                                        prato.getReceitaPrato().stream()
+                                                .map(ingrediente -> new IngredienteConsultaDto(
+//                                                        ingrediente.getEstoqueIngrediente().getNome(),
+//                                                        ingrediente.getTipoMedida(),
+//                                                        ingrediente.getValorMedida()
+                                                ))
+                                                .collect(Collectors.toList()),
+                                        prato.getFoto(),
+                                        prato.getURLAssinada()
+                                ))
+                                .collect(Collectors.toList()),
+                        comanda.getStatus(),
+                        comanda.getTotal()))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(comandas, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Comanda> getComandaById(@PathVariable Long id) {

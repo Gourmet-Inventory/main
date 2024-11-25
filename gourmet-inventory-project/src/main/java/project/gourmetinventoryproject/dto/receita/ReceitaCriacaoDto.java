@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReceitaCriacaoDto {
-    private Long idItem;
+//    private Long idItem;
     @NotBlank
     private List<IngredienteCriacaoDto> receita;
 }
