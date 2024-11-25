@@ -14,4 +14,5 @@ public class UsuarioTokenDto {
     private String token;
     private String cargo;
     private EmpresaResumidaDto empresa;
+    private String celular;
 }

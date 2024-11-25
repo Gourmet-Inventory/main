@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.controller.EstoqueIngredienteController;
@@ -21,97 +22,11 @@ import java.net.URL;
 import java.util.*;
 
 @RestController
+@RequestMapping("/api")
 public class NutricaoAPIController {
 
     @Autowired
     private EstoqueIngredienteController estoqueIngredienteController;
-
-    @GetMapping("/consulta-nutricao-api/{idEmpresa}")
-    public ResponseEntity<byte[]> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
-        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
-        List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
-
-        if (estoqueIngredientes == null || estoqueIngredientes.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        // Lista para armazenar os dados finais que serão usados para gerar o Excel
-        List<List<Object>> excelData = new ArrayList<>();
-
-        // Fila para processar os dados antes de adicioná-los à lista excelData
-        Queue<List<Object>> dataQueue = new LinkedList<>();
-
-        // Processar os dados obtidos da API e adicioná-los à fila
-        for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
-            String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
-            URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("accept", "application/json");
-            connection.setRequestProperty("X-Api-Key", "HVxQ77fkJrXL5oz4yfNsPw==153XAxgTjQ7zcIyc");
-
-            try (InputStream responseStream = connection.getInputStream()) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode root = mapper.readTree(responseStream);
-
-                for (JsonNode node : root) {
-                    String name = node.path("name").asText();
-                    double calories = node.path("calories").asDouble();
-                    double servingSize = node.path("serving_size_g").asDouble();
-                    double totalFat = node.path("fat_total_g").asDouble();
-                    double saturatedFat = node.path("fat_saturated_g").asDouble();
-                    double protein = node.path("protein_g").asDouble();
-                    int sodium = node.path("sodium_mg").asInt();
-                    int potassium = node.path("potassium_mg").asInt();
-                    int cholesterol = node.path("cholesterol_mg").asInt();
-                    double totalCarbohydrates = node.path("carbohydrates_total_g").asDouble();
-                    double fiber = node.path("fiber_g").asDouble();
-                    double sugar = node.path("sugar_g").asDouble();
-
-                    // Adicionar os dados à fila para processamento posterior
-                    List<Object> rowData = new ArrayList<>();
-                    rowData.add(name);
-                    rowData.add(calories);
-                    rowData.add(servingSize);
-                    rowData.add(totalFat);
-                    rowData.add(saturatedFat);
-                    rowData.add(protein);
-                    rowData.add(sodium);
-                    rowData.add(potassium);
-                    rowData.add(cholesterol);
-                    rowData.add(totalCarbohydrates);
-                    rowData.add(fiber);
-                    rowData.add(sugar);
-
-                    dataQueue.offer(rowData);
-                }
-            } catch (IOException e) {
-                // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
-                e.printStackTrace();
-                continue;
-            }
-        }
-
-        // Processar os dados da fila e adicionar à lista excelData
-        while (!dataQueue.isEmpty()) {
-            excelData.add(dataQueue.poll());
-        }
-
-        // Ordenar os dados usando Merge Sort
-        mergeSort(excelData, 0, excelData.size() - 1);
-
-        // Criar um arquivo Excel
-        byte[] excelBytes = createExcel(excelData);
-
-        // Definir headers para a resposta HTTP
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=nutrition_data.xlsx");
-        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-
-        // Retornar a resposta HTTP com o conteúdo do arquivo Excel
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(excelBytes);
-    }
 
     private void mergeSort(List<List<Object>> arr, int l, int r) {
         if (l < r) {
@@ -175,6 +90,93 @@ public class NutricaoAPIController {
             k++;
         }
     }
+
+//    @GetMapping("/consulta-nutricao-api/{idEmpresa}")
+//    public ResponseEntity<byte[]> fetchNutritionDataFromAPI(@PathVariable Long idEmpresa) throws IOException {
+//        ResponseEntity<List<EstoqueIngredienteConsultaDto>> responseEntity = estoqueIngredienteController.getAllEstoqueIngredientes(idEmpresa);
+//        List<EstoqueIngredienteConsultaDto> estoqueIngredientes = responseEntity.getBody();
+//
+//        if (estoqueIngredientes == null || estoqueIngredientes.isEmpty()) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//
+//        // Lista para armazenar os dados finais que serão usados para gerar o Excel
+//        List<List<Object>> excelData = new ArrayList<>();
+//
+//        // Fila para processar os dados antes de adicioná-los à lista excelData
+//        Queue<List<Object>> dataQueue = new LinkedList<>();
+//
+//        // Processar os dados obtidos da API e adicioná-los à fila
+//        for (EstoqueIngredienteConsultaDto estoqueIngrediente : estoqueIngredientes) {
+//            String query = estoqueIngrediente.getValorMedida() + "g%20" + estoqueIngrediente.getNome().replace(" ", "%20");
+//            URL url = new URL("https://api.api-ninjas.com/v1/nutrition?query=" + query);
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//            connection.setRequestProperty("accept", "application/json");
+//            connection.setRequestProperty("X-Api-Key", "HVxQ77fkJrXL5oz4yfNsPw==153XAxgTjQ7zcIyc");
+//
+//            try (InputStream responseStream = connection.getInputStream()) {
+//                ObjectMapper mapper = new ObjectMapper();
+//                JsonNode root = mapper.readTree(responseStream);
+//
+//                for (JsonNode node : root) {
+//                    String name = node.path("name").asText();
+//                    double calories = node.path("calories").asDouble();
+//                    double servingSize = node.path("serving_size_g").asDouble();
+//                    double totalFat = node.path("fat_total_g").asDouble();
+//                    double saturatedFat = node.path("fat_saturated_g").asDouble();
+//                    double protein = node.path("protein_g").asDouble();
+//                    int sodium = node.path("sodium_mg").asInt();
+//                    int potassium = node.path("potassium_mg").asInt();
+//                    int cholesterol = node.path("cholesterol_mg").asInt();
+//                    double totalCarbohydrates = node.path("carbohydrates_total_g").asDouble();
+//                    double fiber = node.path("fiber_g").asDouble();
+//                    double sugar = node.path("sugar_g").asDouble();
+//
+//                    // Adicionar os dados à fila para processamento posterior
+//                    List<Object> rowData = new ArrayList<>();
+//                    rowData.add(name);
+//                    rowData.add(calories);
+//                    rowData.add(servingSize);
+//                    rowData.add(totalFat);
+//                    rowData.add(saturatedFat);
+//                    rowData.add(protein);
+//                    rowData.add(sodium);
+//                    rowData.add(potassium);
+//                    rowData.add(cholesterol);
+//                    rowData.add(totalCarbohydrates);
+//                    rowData.add(fiber);
+//                    rowData.add(sugar);
+//
+//                    dataQueue.offer(rowData);
+//                }
+//            } catch (IOException e) {
+//                // Tratar exceção adequadamente (logar, continuar ou interromper, dependendo do caso)
+//                e.printStackTrace();
+//                continue;
+//            }
+//        }
+//
+//        // Processar os dados da fila e adicionar à lista excelData
+//        while (!dataQueue.isEmpty()) {
+//            excelData.add(dataQueue.poll());
+//        }
+//
+//        // Ordenar os dados usando Merge Sort
+//        mergeSort(excelData, 0, excelData.size() - 1);
+//
+//        // Criar um arquivo Excel
+//        byte[] excelBytes = createExcel(excelData);
+//
+//        // Definir headers para a resposta HTTP
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=nutrition_data.xlsx");
+//        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//
+//        // Retornar a resposta HTTP com o conteúdo do arquivo Excel
+//        return ResponseEntity.ok()
+//                .headers(headers)
+//                .body(excelBytes);
+//    }
 
     private byte[] createExcel(List<List<Object>> excelData) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

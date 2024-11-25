@@ -54,20 +54,20 @@ public class SecurityConfiguracao {
         new AntPathRequestMatcher("/swagger-ui.html"),
         new AntPathRequestMatcher("/swagger-resources"),
         new AntPathRequestMatcher("/swagger-resources/**"),
-        new AntPathRequestMatcher("/configuration/ui"),
-        new AntPathRequestMatcher("/configuration/security"),
+        new AntPathRequestMatcher("/api/configuration/ui"),
+        new AntPathRequestMatcher("configuration/security"),
         new AntPathRequestMatcher("/api/public/**"),
         new AntPathRequestMatcher("/api/public/authenticate"),
-        new AntPathRequestMatcher("/webjars/**"),
+        new AntPathRequestMatcher("/api/webjars/**"),
         new AntPathRequestMatcher("/v3/api-docs/**"),
-        new AntPathRequestMatcher("/actuator/*"),
+        new AntPathRequestMatcher("/api/actuator/*"),
         //new AntPathRequestMatcher("/usuarios/**"),
-        new AntPathRequestMatcher("/usuarios/login/**"),
-        new AntPathRequestMatcher("/usuarios/logout/**"),
-        new AntPathRequestMatcher("/h2-console/**"),
+        new AntPathRequestMatcher("/api/usuarios/login/**"),
+        new AntPathRequestMatcher("/api/usuarios/logout/**"),
+        new AntPathRequestMatcher("/api/h2-console/**"),
         //new AntPathRequestMatcher("http://localhost:3306/workbench/**"), // Adicione a URL do MySQL Workbench
         //new AntPathRequestMatcher("jdbc:mysql://localhost:3306/**"), //??
-        new AntPathRequestMatcher("/error/**"),
+        new AntPathRequestMatcher("/api/error/**"),
         //new AntPathRequestMatcher("http://localhost:8080/**"),
     };
 

@@ -27,7 +27,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuarios")
 public class UsuarioController {
 
     @Autowired
@@ -81,5 +81,10 @@ public class UsuarioController {
        }
         String arquivo = UsuarioService.downloadFile(nomeArquivo);
         return arquivo.equals("Download concluído com sucesso!") ? status(200).body(arquivo) : status(404).build();
+    }
+
+    @GetMapping("/teste")
+    public String teste() {
+        return "sucesso!!!!";
     }
 }

@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.GerenciadorArquivoCSV;
+import project.gourmetinventoryproject.domain.Empresa;
 import project.gourmetinventoryproject.domain.Relatorio;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
 import project.gourmetinventoryproject.repository.RelatorioRepository;
+import project.gourmetinventoryproject.service.EmpresaService;
 import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.RelatorioService;
 
@@ -19,7 +21,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/relatorio")
+@RequestMapping("/api/relatorio")
 public class RelatorioController {
 
     @Autowired
@@ -30,6 +32,8 @@ public class RelatorioController {
 
     @Autowired
     private RelatorioRepository relatorioRepository;
+    @Autowired
+    private EmpresaService empresaService;
 
     @PostMapping("/gerar/{data}")
     public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
@@ -37,9 +41,9 @@ public class RelatorioController {
         return ResponseEntity.status(200).build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<Relatorio>> getAllRelatorios() {
-        List<Relatorio> lista = relatorioRepository.findAll();
+    @GetMapping("/{idEmpresa}")
+    public ResponseEntity<List<Relatorio>> getAllRelatorios(Long idEmpresa) {
+        List<Relatorio> lista = relatorioService.getAllRelatoriosByEmpresa(idEmpresa);
         return ResponseEntity.status(200).body(lista);
     }
 
@@ -71,5 +75,19 @@ public class RelatorioController {
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=estoques.csv");
         headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/ingredientes/{idRelatorio}")
+    public ResponseEntity<byte[]> downloadCsvIngredientes(@PathVariable Long idRelatorio) {
+        try {
+            String csvContent = relatorioService.generateCsvIngredientes(idRelatorio);
+            byte[] bytes = csvContent.getBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ingredientes.csv");
+            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

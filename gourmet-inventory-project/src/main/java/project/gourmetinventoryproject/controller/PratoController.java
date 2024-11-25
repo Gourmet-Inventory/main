@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.AlergicosRestricoes;
-import project.gourmetinventoryproject.domain.ByteArrayMultipartFile;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredientePratosSelectDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
@@ -37,7 +36,7 @@ import java.io.ByteArrayInputStream;
 
 
 @RestController
-@RequestMapping("/pratos")
+@RequestMapping("/api/pratos")
 public class PratoController {
 
     ObjectMapper objectMapper = new ObjectMapper();
@@ -78,35 +77,31 @@ public class PratoController {
 
     @GetMapping("/getAllImagem/{idEmpresa}")
     public ResponseEntity<List<PratoConsultaDto>> getAllPratosImagem(@PathVariable Long idEmpresa) {
-        List<Prato> pratos = pratoService.getAllPratosImagem(idEmpresa);
-        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
-                .map(prato-> mapper.map(prato, PratoConsultaDto.class))
-                .collect(Collectors.toList()), HttpStatus.OK);
+        return new ResponseEntity<>(pratoService.getAllPratosImagem(idEmpresa),HttpStatus.OK);
     }
 
-    @Operation(summary = "Buscar prato por ID", method = "GET")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode ="200", description = "Sucesso - encontrado com sucesso",
-                    content = {@Content(mediaType = "application/json",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
-                    content = {@Content(mediaType = "text/plain",
-                            examples = {@ExampleObject(value = "")})}),
-    })
-    @GetMapping("/id/{id}")
-    public ResponseEntity<PratoConsultaDto> getPratoById(@PathVariable Long id) {
-        Prato prato = pratoService.getPratoById(id);
-        return new ResponseEntity<>(mapper.map(prato,PratoConsultaDto.class), HttpStatus.OK);
-    }
+//    @Operation(summary = "Buscar prato por ID", method = "GET")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode ="200", description = "Sucesso - encontrado com sucesso",
+//                    content = {@Content(mediaType = "application/json",
+//                            examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="404", description = "Não encontrado - ID não encontrado",
+//                    content = {@Content(mediaType = "text/plain",
+//                            examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="401", description = "Não autorizado - Autenticação necessária e falhou ou ainda não foi fornecida",
+//                    content = {@Content(mediaType = "text/plain",
+//                            examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="403", description = "Proibido - O servidor entende a requisição, mas se recusa a autorizá-la",
+//                    content = {@Content(mediaType = "text/plain",
+//                            examples = {@ExampleObject(value = "")})}),
+//            @ApiResponse(responseCode ="500", description = "Erro interno no servidor - Problema ao processar a requisição",
+//                    content = {@Content(mediaType = "text/plain",
+//                            examples = {@ExampleObject(value = "")})}),
+//    })
+////    @GetMapping("/id/{id}")
+////    public ResponseEntity<PratoConsultaDto> getPratoById(@PathVariable Long id) {
+////        return new ResponseEntity<>(pratoService.getPratoById(id)), HttpStatus.OK);
+////    }
 
     @Operation(summary = "Criar novo prato", method = "POST")
     @ApiResponses(value = {
@@ -134,25 +129,25 @@ public class PratoController {
             @PathVariable Long idEmpresa,
             @RequestParam String nome,
             @RequestParam String descricao,
+            @RequestParam Boolean isBebida,
             @RequestParam Double preco,
             @RequestParam String categoria,
-            @RequestParam(value ="AlergicosRestricoes" , required = false)String alergicosRestricoes,
-            @RequestParam(value = "receita", required = false) String receitaPrato,
+            @RequestParam(value ="alergicosRestricoes" , required = false) List<String> alergicosRestricoes,
+            @RequestParam(value = "receita", required = false) List<IngredienteCriacaoDto> receita,
             @RequestParam(value = "imagem", required = false) MultipartFile foto) throws JsonProcessingException {
-        System.out.println("Entrando no createPrato");
-        PratoCriacaoDto prato = new PratoCriacaoDto();
-        System.out.println(nome + " " + descricao + " " + preco + " " + categoria + " " + receitaPrato + " " + foto + alergicosRestricoes);
-        prato.setNome(nome);
-        prato.setDescricao(descricao);
-        prato.setPreco(preco);
-        prato.setCategoria(categoria);
-        prato.setAlergicosRestricoes(objectMapper.readValue(alergicosRestricoes, new TypeReference<List<String>>() {}));
-        prato.setReceitaPrato(objectMapper.readValue(receitaPrato, new TypeReference<List<IngredienteCriacaoDto>>() {}));
-        prato.setFoto(foto);
-        System.out.println(prato);
-        // Criação do prato
-        PratoConsultaDto createdPrato = pratoService.createPrato(prato, idEmpresa, foto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPrato);
+
+        PratoCriacaoDto prato = PratoCriacaoDto.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .preco(preco)
+                .categoria(categoria)
+                .alergicosRestricoes(alergicosRestricoes)
+                .receitaPrato(receita)
+                .isBebida(isBebida)
+                .build();
+
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(pratoService.createPrato(prato,idEmpresa,foto));
     }
 
 
@@ -177,10 +172,30 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<PratoConsultaDto> updatePrato(@PathVariable Long id, @RequestBody PratoCriacaoDto pratoDto) {
-        return new ResponseEntity<>(mapper.map(pratoService.updatePrato(id, pratoDto), PratoConsultaDto.class), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PratoConsultaDto> updatePrato(
+            @PathVariable Long id,
+            @RequestParam String nome,
+            @RequestParam String descricao,
+            @RequestParam Boolean isBebida,
+            @RequestParam Double preco,
+            @RequestParam String categoria,
+            @RequestParam(value ="alergicosRestricoes" , required = false) List<String> alergicosRestricoes,
+            @RequestParam(value = "receita", required = false) List<IngredienteCriacaoDto> receita) throws JsonProcessingException {
+
+        PratoCriacaoDto prato = PratoCriacaoDto.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .preco(preco)
+                .categoria(categoria)
+                .alergicosRestricoes(alergicosRestricoes)
+                .receitaPrato(receita)
+                .isBebida(isBebida)
+                .build();
+
+        return ResponseEntity.ok(pratoService.updatePrato(id, prato));
     }
+
 
 
     @Operation(summary = "Deletar prato por ID", method = "DELETE")

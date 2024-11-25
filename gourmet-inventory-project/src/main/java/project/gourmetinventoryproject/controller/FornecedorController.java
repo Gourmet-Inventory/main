@@ -1,6 +1,7 @@
 package project.gourmetinventoryproject.controller;
 
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,8 +13,9 @@ import java.util.List;
 
 import static org.springframework.http.ResponseEntity.status;
 
+@Slf4j
 @RestController
-@RequestMapping("/fornecedores")
+@RequestMapping("/api/fornecedores")
 public class FornecedorController {
 
     @Autowired
@@ -21,6 +23,9 @@ public class FornecedorController {
 
     @PostMapping
     public ResponseEntity<Void> postFornecedor(@RequestBody FornecedorCriacaoDto novoFornecedor) {
+        log.info("Recebendo requisição de criação de fornecedor: {}", novoFornecedor);
+        System.out.println("Recebendo requisição de criação de fornecedor: " + novoFornecedor);
+
         try {
             fornecedorService.postFornecedor(novoFornecedor);
             return status(201).build();

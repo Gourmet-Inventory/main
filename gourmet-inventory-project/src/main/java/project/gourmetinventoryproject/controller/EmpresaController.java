@@ -15,7 +15,7 @@ import java.util.Optional;
 import static org.springframework.http.ResponseEntity.status;
 
 @RestController
-@RequestMapping("/empresas")
+@RequestMapping("/api/empresas")
 public class EmpresaController {
 
     @Autowired

@@ -15,17 +15,21 @@ import project.gourmetinventoryproject.domain.Ingrediente;
 import project.gourmetinventoryproject.dto.estoqueIngrediente.EstoqueIngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteCriacaoDto;
+import project.gourmetinventoryproject.service.EstoqueIngredienteService;
 import project.gourmetinventoryproject.service.IngredienteService;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/ingredientes")
+@RequestMapping("/api/ingredientes")
 public class IngredienteController {
 
     @Autowired
     private IngredienteService ingredienteService;
+
+    @Autowired
+    private EstoqueIngredienteService estoqueIngredienteService;
 
     @Autowired
     private ModelMapper mapper;
@@ -80,7 +84,7 @@ public class IngredienteController {
 //    })
   @PostMapping
  public ResponseEntity<IngredienteConsultaDto> createIngrediente(@RequestBody List<IngredienteCriacaoDto> ingredienteDto) {
-        return new ResponseEntity<>(mapper.map(ingredienteService.createIngrediente(ingredienteDto), IngredienteConsultaDto.class), HttpStatus.CREATED);
+        return new ResponseEntity<>(mapper.map(estoqueIngredienteService.createIngrediente(ingredienteDto), IngredienteConsultaDto.class), HttpStatus.CREATED);
     }
 
 //    @Operation(summary = "Atualizar ingrediente", method = "PUT")
