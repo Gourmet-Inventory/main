@@ -31,7 +31,7 @@ jobs:
 
       # Etapa 4: Rodar testes e buildar o projeto
       - name: Run tests and build
-        run: cd gourmet-inventory-project && mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
+        run: cd gourmet-inventory-project && mvn clean package -DskipTests -DfinalName=gourmet-inventory-project -Dmaven.repo.local=~/.m2/repository
 
       # Salvar o jar como artefato para compartilhar com outros jobs
       - name: Upload jar as artifact
