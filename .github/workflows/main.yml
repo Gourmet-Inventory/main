@@ -27,8 +27,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-
-      # Step 4: Build the project with Maven
+            
+       # Step 4.1: teste
+      - name: Checking
+        run: ls -la
+        
+      # Step 4.2: Build the project with Maven
       - name: Build with Maven
         run: mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
 
