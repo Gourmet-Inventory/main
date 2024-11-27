@@ -30,7 +30,7 @@ jobs:
 
       # Step 4: Build the project with Maven
       - name: Build with Maven
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
 
       # Step 5: Log in to Docker Hub
       - name: Log in to Docker Hub
