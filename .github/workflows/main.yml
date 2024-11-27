@@ -43,7 +43,7 @@ jobs:
   # Job 2: Fazer login no Docker Hub
   docker-login:
     runs-on: ubuntu-latest
-    needs: test-and-build # Este job só executa após o sucesso do test-and-build
+    needs: prepare-and-build # Este job só executa após o sucesso do prepare-and-build
 
     steps:
       # Etapa 1: Fazer login no Docker Hub
