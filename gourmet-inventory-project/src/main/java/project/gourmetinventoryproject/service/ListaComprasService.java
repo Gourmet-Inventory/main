@@ -49,8 +49,8 @@ public class ListaComprasService {
             itemsComprasRepository.delete(item);
         }
     }
-    public void deleteItemCompras(ItemListaCompras itemListaCompra) {
-        itemsComprasRepository.delete(itemListaCompra);
+    public void deleteItemCompras(Long idItemListaCompra) {
+        itemsComprasRepository.deleteById(idItemListaCompra);
     }
 
 }
