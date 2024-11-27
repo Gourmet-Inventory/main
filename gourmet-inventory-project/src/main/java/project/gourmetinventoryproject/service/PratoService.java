@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,9 +67,10 @@ public class PratoService {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         List<Prato> pratos = pratoRepository.findAllByEmpresa(empresa);
 
-        return pratos.stream()
-                .map(this::processarPrato)
-                .collect(Collectors.toList());
+            return pratos.stream()
+                    .map(this::processarPrato)
+                    .collect(Collectors.toList());
+
     }
 
     //Pegar prato por id
@@ -78,7 +80,7 @@ public class PratoService {
     }
 
     //Criar novo prato
-    public PratoConsultaDto createPrato(PratoCriacaoDto prato, Long idEmpresa, MultipartFile foto) {
+    public void createPrato(PratoCriacaoDto prato, Long idEmpresa, MultipartFile foto) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
         if (idEmpresa.equals(null)) {
             System.out.println("Empresa não encontrada");
@@ -99,21 +101,20 @@ public class PratoService {
                 .ingredientes(ingredientes)
                 .build();
 
-        if (foto != null) {
+        if (foto != null && !foto.isEmpty())  {
             receita.setIdPrato(uploadImagePrato(foto, pratoNovo).getIdPrato());
-            return mapperToDto(pratoNovo, receita);
+            receitaRepository.save(receita);
         } else {
             Prato prato1 = pratoRepository.save(pratoNovo);
             receita.setIdPrato(prato1.getIdPrato());
-            return mapperToDto(prato1, receitaRepository.save(receita));
+            receitaRepository.save(receita);
         }
     }
 
-    public PratoConsultaDto updatePrato(Long id, PratoCriacaoDto prato) {
-        if (pratoRepository.existsById(id)) {
-            Optional<Prato> existingPratoOptional = pratoRepository.findById(id);
-            if (existingPratoOptional.isPresent()) {
-                Prato existingPrato = existingPratoOptional.get();
+    public void updatePrato(Long id, PratoCriacaoDto prato) {
+
+        if (pratoRepository.existsById(id)){
+            Prato existingPrato = pratoRepository.findById(id).orElse(null);
                 existingPrato.setNome(prato.getNome());
                 existingPrato.setDescricao(prato.getDescricao());
                 existingPrato.setPreco(prato.getPreco());
@@ -124,13 +125,13 @@ public class PratoService {
                 Receita existingReceita = receitaRepository.findByIdPrato(existingPrato.getIdPrato()).orElse(null);
                 existingReceita.setIngredientes(estoqueIngredienteService.createIngrediente(prato.getReceitaPrato()));
 
-                return mapperToDto(pratoRepository.save(existingPrato), receitaRepository.save(existingReceita));
-            } else {
-                throw new IdNotFoundException();
-            }
-        }
-        throw new IdNotFoundException();
+                pratoRepository.save(existingPrato);
+                receitaRepository.save(existingReceita);
 
+
+        }else{
+            throw new IdNotFoundException();
+        }
     }
 
     public void deletePrato(Long idPrato) {
@@ -162,15 +163,19 @@ public class PratoService {
         return mapperToDto(prato, receita);
     }
 
-    public Prato uploadImagePrato(@RequestParam("file") MultipartFile file, @PathVariable Prato prato) {
+    public Prato uploadImagePrato(MultipartFile file, Prato prato) {
+        if (file == null || file.isEmpty()) {
+            return prato;
+        }
+
         try {
             return s3Service.uploadFile(file, prato);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Falha ao fazer o upload da imagem para o S3.", e);
         }
-
     }
+
 
     public ResponseEntity<String> updateImagemPrato(@PathVariable Long idPrato, @RequestBody MultipartFile file) throws IOException {
         Prato prato = pratoRepository.findById(idPrato).orElse(null);
