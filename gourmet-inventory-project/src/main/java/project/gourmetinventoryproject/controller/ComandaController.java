@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Literal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.service.ComandaService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,36 +41,38 @@ public class ComandaController {
     @GetMapping
     public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
         log.info("Buscando todas as comandas");
-        List<ComandaResponseDto> comandas = comandaService.getAllComandas()
-                .stream()
-                .map(comanda -> new ComandaResponseDto(
-                        comanda.getId(),
-                        comanda.getIdGarcom(),
-                        comanda.getTitulo(),
-                        comanda.getMesa(),
-                        comanda.getItens().stream()
-                                .map(prato -> new PratoConsultaDto(
-                                        prato.getIdPrato(),
-                                        prato.getNome(),
-                                        prato.getDescricao(),
-                                        prato.getPreco(),
-                                        prato.getAlergicosRestricoes(),
-                                        prato.getCategoria(),
-                                        prato.getReceitaPrato().stream()
-                                                .map(ingrediente -> new IngredienteConsultaDto(
-//                                                        ingrediente.getEstoqueIngrediente().getNome(),
-//                                                        ingrediente.getTipoMedida(),
-//                                                        ingrediente.getValorMedida()
-                                                ))
-                                                .collect(Collectors.toList()),
-                                        prato.getFoto(),
-                                        prato.getURLAssinada()
-                                ))
-                                .collect(Collectors.toList()),
-                        comanda.getStatus(),
-                        comanda.getTotal()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(comandas, HttpStatus.OK);
+//        List<ComandaResponseDto> comandas = comandaService.getAllComandas()
+//                .stream()
+//                .map(comanda -> new ComandaResponseDto(
+//                        comanda.getId(),
+//                        comanda.getIdGarcom(),
+//                        comanda.getTitulo(),
+//                        comanda.getMesa(),
+//                        comanda.getItens().stream()
+//                                .map(prato -> new PratoConsultaDto(
+//                                        prato.getIdPrato(),
+//                                        prato.getNome(),
+//                                        prato.getDescricao(),
+//                                        prato.getPreco(),
+//                                        prato.getAlergicosRestricoes(),
+//                                        prato.getCategoria(),
+//                                        prato.getReceitaPrato().stream()
+//                                                .map(ingrediente -> new IngredienteConsultaDto(
+////                                                        ingrediente.getEstoqueIngrediente().getNome(),
+////                                                        ingrediente.getTipoMedida(),
+////                                                        ingrediente.getValorMedida()
+//                                                ))
+//                                                .collect(Collectors.toList()),
+//                                        prato.getFoto(),
+//                                        prato.getURLAssinada()
+//                                ))
+//                                .collect(Collectors.toList()),
+//                        comanda.getStatus(),
+//                        comanda.getTotal()))
+//                .collect(Collectors.toList());
+        List<Comanda> comandas = comandaService.getAllComandas();
+        List<ComandaResponseDto> comandaResponseDto = Collections.singletonList(comandaService.mapperRetornoComanda((Comanda) comandas));
+        return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -80,7 +84,7 @@ public class ComandaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comanda> updateComanda(@PathVariable Long id, @RequestBody Comanda updatedComanda) {
+    public ResponseEntity<ComandaResponseDto> updateComanda(@PathVariable Long id, @RequestBody Comanda updatedComanda) {
         log.info("Atualizando comanda com id: {}", id);
         try {
             return new ResponseEntity<>(comandaService.updateComanda(id, updatedComanda), HttpStatus.OK);
@@ -96,13 +100,13 @@ public class ComandaController {
     }
 
     @DeleteMapping("/{comandaId}/removePrato/{pratoId}")
-    public ResponseEntity<Comanda> removePratoFromComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
+    public ResponseEntity<ComandaResponseDto> removePratoFromComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
         return new ResponseEntity<>(comandaService.removePratoFromComanda(comandaId, pratoId), HttpStatus.OK);
     }
 
     @PatchMapping("/{comandaId}/status")
-    public ResponseEntity<Comanda> updateComandaStatus(@PathVariable Long comandaId, @RequestParam String status) {
-        Comanda updatedComanda = comandaService.updateStatus(comandaId, status);
+    public ResponseEntity<ComandaResponseDto> updateComandaStatus(@PathVariable Long comandaId, @RequestParam String status) {
+        ComandaResponseDto updatedComanda = comandaService.updateStatus(comandaId, status);
         return new ResponseEntity<>(updatedComanda, HttpStatus.OK);
     }
 
