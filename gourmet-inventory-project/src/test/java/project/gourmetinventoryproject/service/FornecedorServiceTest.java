@@ -31,12 +31,29 @@ class FornecedorServiceTest {
 
     @BeforeEach
     void setUp() {
+        //Esta linha inicializa campos anotados com anotações do Mockito (como @Mock, @InjectMocks, etc.)
         MockitoAnnotations.openMocks(this);
     }
 
+
+//    @Test
+//    @DisplayName("Should save fornecedor successfully")
+//    void postFornecedorSuccess() {
+//        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
+//        Fornecedor fornecedor = new Fornecedor();
+//        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
+//
+//    void postFornecedorSuccess() throws Exception {
+//        FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
+//        Fornecedor fornecedor = new Fornecedor();
+//        when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
+//        fornecedorService.postFornecedor(fornecedorCriacaoDto);
+//        verify(fornecedorRepository, times(1)).save(fornecedor);
+//    }
+
     @Test
     @DisplayName("Should save fornecedor successfully")
-    void postFornecedorSuccess() {
+    void postFornecedorSuccess(){ //throws Exception {
         FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
         Fornecedor fornecedor = new Fornecedor();
         when(modelMapper.map(fornecedorCriacaoDto, Fornecedor.class)).thenReturn(fornecedor);
@@ -44,8 +61,9 @@ class FornecedorServiceTest {
         verify(fornecedorRepository, times(1)).save(fornecedor);
     }
 
+
     @Test
-    @DisplayName("Should return all fornecedores")
+    @DisplayName("Deve retornar todos os fornecedores")
     void getFornecedoresSuccess() {
         when(fornecedorRepository.findAll()).thenReturn(Arrays.asList(new Fornecedor(), new Fornecedor()));
         List<Fornecedor> fornecedores = fornecedorService.getFornecedores();
@@ -53,22 +71,23 @@ class FornecedorServiceTest {
     }
 
     @Test
-    @DisplayName("Should delete fornecedor when exists")
+    @DisplayName("Deve deletar fornecedor quando existir")
     void deleteFornecedorWhenExists() {
         when(fornecedorRepository.existsById(anyLong())).thenReturn(true);
         assertDoesNotThrow(() -> fornecedorService.deleteFornecedor(1L));
+        assertDoesNotThrow(() -> fornecedorService.deleteFornecedor(2L));
         verify(fornecedorRepository, times(1)).deleteById(1L);
     }
 
     @Test
-    @DisplayName("Should throw IdNotFoundException when delete fornecedor not exists")
+    @DisplayName("Deve retornar um IdNotFoundException quando fornecedor não existir")
     void deleteFornecedorWhenNotExists() {
         when(fornecedorRepository.existsById(anyLong())).thenReturn(false);
-        assertThrows(IdNotFoundException.class, () -> fornecedorService.deleteFornecedor(1L));
+        assertThrows(IdNotFoundException.class, () -> fornecedorService.deleteFornecedor(2L));
     }
 
     @Test
-    @DisplayName("Should update fornecedor when exists")
+    @DisplayName("Deve atualizar um fornecedor quando existir")
     void patchFornecedorWhenExists() {
         Fornecedor fornecedor = new Fornecedor();
         FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
@@ -79,7 +98,7 @@ class FornecedorServiceTest {
     }
 
     @Test
-    @DisplayName("Should throw IdNotFoundException when update fornecedor not exists")
+    @DisplayName("Deve retornar IdNotFoundException quando um atualizar um fornecedor que não exista")
     void patchFornecedorWhenNotExists() {
         FornecedorCriacaoDto fornecedorCriacaoDto = mock(FornecedorCriacaoDto.class);
         when(fornecedorRepository.existsById(anyLong())).thenReturn(false);

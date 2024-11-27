@@ -32,9 +32,6 @@ public class AlertaService {
     @Autowired
     private UsuarioService usuarioService;
 
-    @Autowired
-    private ListaComprasService listaCompras;
-
     @Transactional()
     public List<Alerta> getAllAlerta(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -116,7 +113,6 @@ public class AlertaService {
         if (estoqueIngrediente.getAlertas().isEmpty() && tipoAlertaValorTotal(estoqueIngrediente) != null) {
             System.out.println("Entrando na lista vazia e precisa de alerta");
             Alerta alerta = createAlerta(estoqueIngrediente);
-            listaCompras.postListaCompras(estoqueIngrediente.getEmpresa().getIdEmpresa(),alerta);
             System.out.println("Alerta criado");
             emailAlerta(estoqueIngrediente, alerta);
             return estoqueIngrediente;
@@ -128,17 +124,15 @@ public class AlertaService {
                 Alerta alerta = iterator.next();
                 if (!alerta.getTipoAlerta().equals("Data Proxima") && !alerta.getTipoAlerta().equals("Dia Checagem")) {
                     System.out.println("checagem maxima");
-                    if (estoqueIngrediente.getValorTotal() >= 30) {
+                    if (estoqueIngrediente.getValorTotal() > 60) {
                         iterator.remove();
                         deleteAlerta(alerta.getIdAlerta());
                     } else if (estoqueIngrediente.getValorTotal() <= 0) {
                         alerta.setTipoAlerta("Estoque vazio");
-                        listaCompras.postListaCompras(estoqueIngrediente.getEmpresa().getIdEmpresa(),alerta);
                         emailAlerta(estoqueIngrediente, alerta);
                         System.out.println("Email mandado estoque vazio");
                     } else {
                         alerta.setTipoAlerta("Estoque acabando");
-                        listaCompras.postListaCompras(estoqueIngrediente.getEmpresa().getIdEmpresa(),alerta);
                         emailAlerta(estoqueIngrediente, alerta);
                         System.out.println("Email mandado estoque acabando");
                     }
