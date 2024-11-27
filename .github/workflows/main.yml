@@ -28,13 +28,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
             
-       # Step 4.1: teste
+       # Step 4.1: teste 1
       - name: Checking
         run: ls -la
         
       # Step 4.2: Build the project with Maven
       - name: Build with Maven
-        run: mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
+        run: cd gourmet-inventory-project ; mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
+
+      # Step 4.3: teste 2
+      - name: Checking
+        run: ls -la
 
       # Step 5: Log in to Docker Hub
       - name: Log in to Docker Hub
