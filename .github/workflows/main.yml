@@ -79,7 +79,7 @@ jobs:
 
       # Etapa 3: Construir a imagem Docker
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/gourmet-inventory:latest -f target/Dockerfile target/
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/gourmet-inventory:latest .
 
       # Etapa 4: Enviar a imagem Docker para o Docker Hub
       - name: Push Docker image
