@@ -69,7 +69,7 @@ jobs:
 
        # Etapa 2.1: Construir a imagem Docker
       - name: ls -la teste
-        run: ls -la
+        run: ls -la && cd target && ls -la
 
       # Etapa 2: Construir a imagem Docker
       - name: Build Docker image
