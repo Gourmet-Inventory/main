@@ -65,6 +65,10 @@ jobs:
         with:
           name: gourmet-inventory-jar
 
+      # Etapa 2.1: ls teste
+      - name: ls -la teste
+        run: ls -la
+
       # Etapa 2: Construir a imagem Docker
       - name: Build Docker image
         run: docker build -t voltty/gourmet-inventory:latest .
