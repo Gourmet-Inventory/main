@@ -20,14 +20,13 @@ public class ListaComprasController {
         List<ItemListaCompras> listaDto = listaComprasService.getItemCompras(idEmpresa);
         return ResponseEntity.ok(listaDto);
     }
-
-//    @PostMapping("/createItensCompras")
-//    public void postItensCompras(LocalDate dataInicio, LocalDate dataFim, Long idEmpresa) {
-//        listaComprasService.postListaCompras(dataInicio,dataFim,idEmpresa);
-//    }
-    @DeleteMapping
-    public void deleteItensCompras(@RequestBody List<ItemListaCompras> itemListaCompras){
-        listaComprasService.deleteItemCompras(itemListaCompras);
+    @DeleteMapping("/lista")
+    public void deleteItemsCompras(@RequestBody List<ItemListaCompras> itemListaCompras){
+        listaComprasService.deleteItemsCompras(itemListaCompras);
+    }
+    @DeleteMapping("/{idItem}")
+    public void deleteItemCompras(@PathVariable Long idItem){
+        listaComprasService.deleteItemCompras(idItem);
     }
 
 

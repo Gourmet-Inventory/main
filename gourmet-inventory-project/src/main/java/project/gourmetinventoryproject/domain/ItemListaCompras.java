@@ -16,7 +16,6 @@ public class ItemListaCompras {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long idItemLista;
     private String nome;
-    private Integer qtdMedia;
     @OneToOne
     private EstoqueIngrediente estoqueIngrediente;
 }
