@@ -18,14 +18,11 @@ public class CorsConfig {
                                 "http://localhost/",
                                 "http://localhost/api",
                                 "http://nginx/api",
+                                "http://nginx/",
                                 "http://54.85.12.204/api",
                                 "http://54.85.12.204/",
-                                "http://54.85.12.204:8080/",
-                                "http://54.85.12.204:8080/api",
                                 "http://10.0.0.97/api",
-                                "http://10.0.0.97/",
-                                "http://10.0.0.97:8080/",
-                                "http://10.0.0.97:8080/api")
+                                "http://10.0.0.97/")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);
