@@ -33,9 +33,13 @@ jobs:
       - name: Run tests and build
         run: cd gourmet-inventory-project && mvn clean package -DskipTests -Dmaven.repo.local=~/.m2/repository
 
+      # Etapa 5.1: Verificar o conteúdo dos arquivos baixados
+      - name: List root
+        run: ls -la
+
       # Etapa 5: Mover o Dockerfile para o diretório do .jar
       - name: Move Dockerfile to target directory
-        run: cp gourmet-inventory-project/Dockerfile gourmet-inventory-project/target/
+        run: cp Dockerfile gourmet-inventory-project/target/
 
       # Salvar o jar e o Dockerfile como artefato para compartilhar com outros jobs
       - name: Upload jar and Dockerfile as artifacts
