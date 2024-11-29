@@ -19,7 +19,6 @@ public class RelatorioService {
 
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
-
     @Autowired
     private PratoService pratoService;
     @Autowired

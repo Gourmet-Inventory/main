@@ -1,0 +1,37 @@
+package project.gourmetinventoryproject.domain;
+
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Setter
+@Getter
+@Entity
+//@Data
+public class Comanda {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long idGarcom;
+    private String titulo;
+    private String mesa;
+
+    @ManyToMany
+    @JoinTable(
+            name = "comanda_prato",
+            joinColumns = @JoinColumn(name = "comanda_id"),
+            inverseJoinColumns = @JoinColumn(name = "prato_id")
+    )
+    private List<Prato> itens;
+    private String status;
+    private Double total = 0.0;
+
+    public void calcularTotal() {
+        this.total = itens.stream()
+                .mapToDouble(Prato::getPreco)
+                .sum();
+    }
+}

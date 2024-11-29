@@ -1,13 +1,16 @@
 package project.gourmetinventoryproject.dto.estoqueIngrediente;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.gourmetinventoryproject.domain.Alerta;
-import project.gourmetinventoryproject.domain.Empresa;
-import project.gourmetinventoryproject.domain.Medidas;
+import project.gourmetinventoryproject.domain.*;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -15,11 +18,12 @@ import java.util.List;
 @NoArgsConstructor
 public class EstoqueIngredienteConsultaDto {
     private Long idItem;
-    private Empresa empresa;
     private Boolean manipulado;
-    private String lote;
     private String nome;
-    private String categoria;
+    private String lote;
+    private CategoriaEstoque categoria;
+    private String marca;
+    @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
     private Double valorMedida;
@@ -28,7 +32,13 @@ public class EstoqueIngredienteConsultaDto {
 
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
-   // private List<Ingrediente> receitaManipulado;
+    private String descricao;
     private List<Alerta> Alertas;
-    private String marca;
+    public String getCategoriaFormatada() {
+        return categoria != null ? categoria.getNomeExibicao() : null;
+    }
+
 }
+
+
+

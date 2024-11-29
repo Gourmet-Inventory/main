@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Data
+//@Data
 @Getter
 @Setter
 @Builder
@@ -23,16 +23,25 @@ public class Prato {
     private String descricao;
     private Double preco;
     private String categoria;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "prato_ingrediente",
             joinColumns = @JoinColumn(name = "prato_id"),
             inverseJoinColumns = @JoinColumn(name = "ingrediente_id")
     )
     private List<Ingrediente> receitaPrato;
+//    @OneToOne(mappedBy = "prato", cascade = CascadeType.ALL, optional = true)
+//    private Receita receita;
     @ElementCollection
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
-    private byte[] foto;
+    
+    @ManyToMany(mappedBy = "itens")
+    private List<Comanda> comandas;
+    
+  private String foto;
+    @Column(name = "URLASSINADA", length = 2000)
+    private String URLAssinada;
+
 }

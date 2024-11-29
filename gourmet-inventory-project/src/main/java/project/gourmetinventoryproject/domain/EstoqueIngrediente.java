@@ -23,58 +23,29 @@ public class EstoqueIngrediente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idItem;
-    @NotBlank
-    private String lote;
-    private Boolean manipulado;
-    @NotBlank
-    private String nome;
     @ManyToOne
     @JoinColumn(name = "id_empresa")
     private Empresa empresa;
-    @NotBlank
-    private String categoria;
+    private Boolean manipulado;
+    private String nome;
+    private String lote;
+    private String marca;
+    @Enumerated(EnumType.STRING)
+    private CategoriaEstoque categoria;
     @Enumerated(EnumType.STRING)
     private Medidas tipoMedida;
     private Integer unitario;
-    @NotNull
     private Double valorMedida;
     private Double valorTotal;
     private String localArmazenamento;
-    @PastOrPresent
     private LocalDate dtaCadastro;
-    @FutureOrPresent
     private LocalDate dtaAviso;
-    //@OneToMany(mappedBy = "estoqueIngrediente")
-   // private List<Ingrediente> receitaManipulado;
+    private String descricao;
     @OneToMany(mappedBy = "idAlerta", fetch=FetchType.EAGER)
     @JsonIgnore
     private List<Alerta> Alertas;
-    private String marca;
-    public void addAlerta(Alerta alerta) {
-        Alertas.add(alerta);
-    }
     public void baixarEstoque(Double quantidadeUsada) {
         this.valorMedida -= quantidadeUsada;
-    }
-
-    @Override
-    public String toString() {
-        return "EstoqueIngrediente{" +
-                "idItem=" + idItem +
-                ", lote='" + lote + '\'' +
-                ", manipulado=" + manipulado +
-                ", nome='" + nome + '\'' +
-                ", empresa=" + empresa +
-                ", categoria='" + categoria + '\'' +
-                ", tipoMedida=" + tipoMedida +
-                ", unitario=" + unitario +
-                ", valorMedida=" + valorMedida +
-                ", valorTotal=" + valorTotal +
-                ", localArmazenamento='" + localArmazenamento + '\'' +
-                ", dtaCadastro=" + dtaCadastro +
-                ", dtaAviso=" + dtaAviso +
-                ", marca='" + marca + '\'' +
-                '}';
     }
 }
 

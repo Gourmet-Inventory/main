@@ -19,4 +19,6 @@ public class PratoConsultaDto {
     private List<String> alergicosRestricoes;
     private String categoria;
     private List<IngredienteConsultaDto> receitaPrato;
+    private String foto;
+    private String URLAssinada;
 }
