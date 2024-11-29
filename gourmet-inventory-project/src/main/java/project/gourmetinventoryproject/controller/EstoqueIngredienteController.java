@@ -142,7 +142,7 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PutMapping("/atualizar-estoque/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<EstoqueIngredienteConsultaDto> updateEstoqueIngrediente(@PathVariable Long id, @RequestBody EstoqueIngrediente estoqueIngredienteDto) {
         System.out.println(("Recebida requisição para atualizar estoque com ID: {}" + id));
         EstoqueIngrediente updatedEstoqueIngrediente = estoqueIngredienteService.updateEstoqueIngrediente(id, estoqueIngredienteDto);
@@ -186,7 +186,7 @@ public class EstoqueIngredienteController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @DeleteMapping("/deletar-item/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEstoqueIngrediente(@PathVariable Long id) {
         estoqueIngredienteService.deleteEstoqueIngrediente(id);
         return new ResponseEntity<>(HttpStatus.OK);

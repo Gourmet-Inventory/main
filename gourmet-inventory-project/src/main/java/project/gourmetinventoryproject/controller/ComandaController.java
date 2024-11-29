@@ -71,7 +71,9 @@ public class ComandaController {
 //                        comanda.getTotal()))
 //                .collect(Collectors.toList());
         List<Comanda> comandas = comandaService.getAllComandas();
-        List<ComandaResponseDto> comandaResponseDto = Collections.singletonList(comandaService.mapperRetornoComanda((Comanda) comandas));
+        List<ComandaResponseDto> comandaResponseDto = comandas.stream()
+                .map(comandaService::mapperRetornoComanda)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
     }
 

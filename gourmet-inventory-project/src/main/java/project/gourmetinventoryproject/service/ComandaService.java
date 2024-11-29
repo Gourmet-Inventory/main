@@ -66,7 +66,7 @@ public class ComandaService {
 
         comanda.getItens().remove(prato);
         comanda.calcularTotal();
-        ComandaResponseDto comandaResponseDto = mapperRetornoComanda(comanda); ;
+        ComandaResponseDto comandaResponseDto = mapperRetornoComanda(comanda);
         return comandaResponseDto;
     }
 
@@ -74,7 +74,10 @@ public class ComandaService {
         Comanda comanda = comandaRepository.findById(comandaId)
                 .orElseThrow(() -> new RuntimeException("Comanda not found"));
 
+        System.out.println("Comanda encontrada: " + comanda);
         comanda.setStatus(newStatus);
+        comandaRepository.save(comanda);
+        System.out.println("Comanda atualizada: " + comanda);
         ComandaResponseDto comandaResponseDto = mapperRetornoComanda(comanda);
         return comandaResponseDto;
     }
@@ -94,32 +97,32 @@ public class ComandaService {
         dto.setMesa(comanda.getMesa());
         dto.setStatus(comanda.getStatus());
         dto.setTotal(comanda.getTotal());
-
-        List<PratoConsultaDto> itensDto = comanda.getItens().stream()
-                .map(prato -> {
-                    PratoConsultaDto pratoDto = new PratoConsultaDto();
-                    pratoDto.setIdPrato(prato.getIdPrato());
-                    pratoDto.setNome(prato.getNome());
-                    pratoDto.setPreco(prato.getPreco());
-                    pratoDto.setDescricao(prato.getDescricao());
-                    pratoDto.setCategoria(prato.getCategoria());
-                    pratoDto.setAlergicosRestricoes(prato.getAlergicosRestricoes());
-                    pratoDto.setReceitaPrato(prato.getReceitaPrato().stream()
-                            .map(ingrediente -> {
-                                IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
-                                ingredienteDto.setNome(ingrediente.getEstoqueIngrediente().getNome());
-                                ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
-                                ingredienteDto.setValorMedida(ingrediente.getValorMedida());
-                                return ingredienteDto;
-                            })
-                            .collect(Collectors.toList()));
-                    pratoDto.setFoto(prato.getFoto());
-                    pratoDto.setURLAssinada(prato.getURLAssinada());
-                    return pratoDto;
-                })
-                .collect(Collectors.toList());
-        dto.setItens(itensDto);
-
+        dto.setItens(comanda.getItens().stream().map(
+                        prato -> {
+                            PratoConsultaDto pratoDto = new PratoConsultaDto();
+                            pratoDto.setIdPrato(prato.getIdPrato());
+                            pratoDto.setNome(prato.getNome());
+                            pratoDto.setDescricao(prato.getDescricao());
+                            pratoDto.setPreco(prato.getPreco());
+                            pratoDto.setAlergicosRestricoes(prato.getAlergicosRestricoes());
+                            pratoDto.setCategoria(prato.getCategoria());
+                            pratoDto.setReceitaPrato(prato.getReceitaPrato().stream()
+                                    .map(ingrediente -> {
+                                        IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
+                                        if (ingrediente.getEstoqueIngrediente() != null) {
+                                            ingredienteDto.setNome(ingrediente.getEstoqueIngrediente().getNome());
+                                            ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
+                                            ingredienteDto.setValorMedida(ingrediente.getValorMedida());
+                                        }
+                                        return ingredienteDto;
+                                    })
+                                    .collect(Collectors.toList()));
+                            pratoDto.setFoto(prato.getFoto());
+                            pratoDto.setURLAssinada(prato.getURLAssinada());
+                            return pratoDto;
+                        })
+                .collect(Collectors.toList()
+                ));
         return dto;
     }
 }
