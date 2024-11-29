@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -131,6 +132,8 @@ public class PratoController {
             @RequestParam(value = "receita", required = false) String receita,
             @RequestParam(value = "imagem", required = false) MultipartFile foto) throws JsonProcessingException {
 
+        System.out.println("Receita: " + receita);
+        System.out.println("isBebida: " + isBebida);
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -157,7 +160,7 @@ public class PratoController {
                 .descricao(descricao)
                 .preco(preco)
                 .categoria(categoria)
-                .isBebida(isBebida)
+                .isBebida(Boolean.valueOf(isBebida))
                 .receitaPrato(receitaList)
                 .alergicosRestricoes(alergicosRestricoesList)
                 .build();

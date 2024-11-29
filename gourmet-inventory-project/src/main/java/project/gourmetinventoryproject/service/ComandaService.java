@@ -7,6 +7,7 @@ import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
 import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
+import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.repository.ComandaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 
@@ -106,17 +107,17 @@ public class ComandaService {
                             pratoDto.setPreco(prato.getPreco());
                             pratoDto.setAlergicosRestricoes(prato.getAlergicosRestricoes());
                             pratoDto.setCategoria(prato.getCategoria());
-                            pratoDto.setReceitaPrato(prato.getReceitaPrato().stream()
-                                    .map(ingrediente -> {
-                                        IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
-                                        if (ingrediente.getEstoqueIngrediente() != null) {
-                                            ingredienteDto.setNome(ingrediente.getEstoqueIngrediente().getNome());
-                                            ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
-                                            ingredienteDto.setValorMedida(ingrediente.getValorMedida());
-                                        }
-                                        return ingredienteDto;
-                                    })
-                                    .collect(Collectors.toList()));
+//                            pratoDto.setReceitaPrato((ReceitaConsultaDto) prato.getReceitaPrato().getReceita().stream()
+//                                    .map(ingrediente -> {
+//                                        IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
+//                                        if (ingrediente != null) {
+//                                            ingredienteDto.setNome(ingrediente.getNome());
+//                                            ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
+//                                            ingredienteDto.setValorMedida(ingrediente.getValorMedida());
+//                                        }
+//                                        return ingredienteDto;
+//                                    })
+//                                    .collect(Collectors.toList()));
                             pratoDto.setFoto(prato.getFoto());
                             pratoDto.setURLAssinada(prato.getURLAssinada());
                             return pratoDto;

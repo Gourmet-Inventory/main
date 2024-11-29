@@ -14,5 +14,4 @@ import java.util.List;
 public class ReceitaConsultaDto {
     private Long idReceita;
     private List<IngredienteConsultaDto> receita;
-
 }

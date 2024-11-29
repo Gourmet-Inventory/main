@@ -20,7 +20,7 @@ public class PratoConsultaDto {
     private Double preco;
     private List<String> alergicosRestricoes;
     private String categoria;
-    private ReceitaConsultaDto receitaPrato;
+//    private ReceitaConsultaDto receitaPrato;
     private String foto;
     private String URLAssinada;
 }
