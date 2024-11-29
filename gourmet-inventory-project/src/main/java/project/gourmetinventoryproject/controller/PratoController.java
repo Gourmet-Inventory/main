@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,8 +44,6 @@ public class PratoController {
 
     @Autowired
     private PratoService pratoService;
-    @Autowired
-    private ModelMapper mapper;
     @Autowired
     private EstoqueIngredienteService estoqueIngredienteService;
 
@@ -69,19 +68,12 @@ public class PratoController {
     })
     @GetMapping("/{idEmpresa}")
     public ResponseEntity<List<PratoConsultaDto>> getAllPratos(@PathVariable Long idEmpresa) {
-        List<Prato> pratos = pratoService.getAllPratos(idEmpresa);
-        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
-                .map(prato-> mapper.map(prato, PratoConsultaDto.class))
-                .collect(Collectors.toList()), HttpStatus.OK);
+        List<PratoConsultaDto> pratos = pratoService.getAllPratosImagem(idEmpresa);
+        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos, HttpStatus.OK);
+
     }
 
-    @GetMapping("/getAllImagem/{idEmpresa}")
-    public ResponseEntity<List<PratoConsultaDto>> getAllPratosImagem(@PathVariable Long idEmpresa) {
-        List<Prato> pratos = pratoService.getAllPratosImagem(idEmpresa);
-        return pratos.isEmpty() ? new ResponseEntity<>(null, HttpStatus.NO_CONTENT) : new ResponseEntity<>(pratos.stream()
-                .map(prato-> mapper.map(prato, PratoConsultaDto.class))
-                .collect(Collectors.toList()), HttpStatus.OK);
-    }
+
 
     @Operation(summary = "Buscar prato por ID", method = "GET")
     @ApiResponses(value = {
@@ -103,8 +95,7 @@ public class PratoController {
     })
     @GetMapping("/id/{id}")
     public ResponseEntity<PratoConsultaDto> getPratoById(@PathVariable Long id) {
-        Prato prato = pratoService.getPratoById(id);
-        return new ResponseEntity<>(mapper.map(prato,PratoConsultaDto.class), HttpStatus.OK);
+        return new ResponseEntity<>(pratoService.getPratoById(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Criar novo prato", method = "POST")
@@ -129,29 +120,50 @@ public class PratoController {
                             examples = {@ExampleObject(value = "")})}),
     })
     @PostMapping(value = "/{idEmpresa}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PratoConsultaDto> createPrato(
+    public ResponseEntity<Void> createPrato(
             @PathVariable Long idEmpresa,
             @RequestParam String nome,
             @RequestParam String descricao,
+            @RequestParam Boolean isBebida,
             @RequestParam Double preco,
             @RequestParam String categoria,
-            @RequestParam(value ="alergicosRestricoes" , required = false)String alergicosRestricoes,
-            @RequestParam(value = "receita", required = false) String receitaPrato,
+            @RequestParam(value ="alergicosRestricoes" , required = false) String alergicosRestricoes,
+            @RequestParam(value = "receita", required = false) String receita,
             @RequestParam(value = "imagem", required = false) MultipartFile foto) throws JsonProcessingException {
-        System.out.println("Entrando no createPrato");
-        PratoCriacaoDto prato = new PratoCriacaoDto();
-        System.out.println(nome + " " + descricao + " " + preco + " " + categoria + " " + receitaPrato + " " + foto + " "+ alergicosRestricoes);
-        prato.setNome(nome);
-        prato.setDescricao(descricao);
-        prato.setPreco(preco);
-        prato.setCategoria(categoria);
-        prato.setAlergicosRestricoes(objectMapper.readValue(alergicosRestricoes, new TypeReference<List<String>>() {}));
-        prato.setReceitaPrato(objectMapper.readValue(receitaPrato, new TypeReference<List<IngredienteCriacaoDto>>() {}));
-        prato.setFoto(foto);
-        System.out.println(prato);
-        // Criação do prato
-        PratoConsultaDto createdPrato = pratoService.createPrato(prato, idEmpresa, foto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPrato);
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<String> alergicosRestricoesList = new ArrayList<>();
+        if (alergicosRestricoes != null && !alergicosRestricoes.trim().isEmpty()) {
+            try {
+                alergicosRestricoesList = objectMapper.readValue(alergicosRestricoes, new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Formato de JSON inválido para alergicosRestricoes.");
+            }
+        }
+
+        List<IngredienteCriacaoDto> receitaList = new ArrayList<>();
+        if (receita != null && !receita.trim().isEmpty()) {
+            try {
+                receitaList = objectMapper.readValue(receita, new TypeReference<List<IngredienteCriacaoDto>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Formato de JSON inválido para a receita.");
+            }
+        }
+
+        PratoCriacaoDto prato = PratoCriacaoDto.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .preco(preco)
+                .categoria(categoria)
+                .isBebida(isBebida)
+                .receitaPrato(receitaList)
+                .alergicosRestricoes(alergicosRestricoesList)
+                .build();
+
+            pratoService.createPrato(prato,idEmpresa,foto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
@@ -176,10 +188,50 @@ public class PratoController {
                     content = {@Content(mediaType = "text/plain",
                             examples = {@ExampleObject(value = "")})}),
     })
-    @PutMapping("/{id}")
-    public ResponseEntity<PratoConsultaDto> updatePrato(@PathVariable Long id, @RequestBody PratoCriacaoDto pratoDto) {
-        return new ResponseEntity<>(mapper.map(pratoService.updatePrato(id, pratoDto), PratoConsultaDto.class), HttpStatus.OK);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updatePrato(
+            @PathVariable Long id,
+            @RequestParam String nome,
+            @RequestParam String descricao,
+            @RequestParam Boolean isBebida,
+            @RequestParam Double preco,
+            @RequestParam String categoria,
+            @RequestParam(value ="alergicosRestricoes" , required = false) String alergicosRestricoes,
+            @RequestParam(value = "receita", required = false) String receita) throws JsonProcessingException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<String> alergicosRestricoesList = new ArrayList<>();
+        if (alergicosRestricoes != null && !alergicosRestricoes.trim().isEmpty()) {
+            try {
+                alergicosRestricoesList = objectMapper.readValue(alergicosRestricoes, new TypeReference<List<String>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Formato de JSON inválido para alergicosRestricoes.");
+            }
+        }
+
+        List<IngredienteCriacaoDto> receitaList = new ArrayList<>();
+        if (receita != null && !receita.trim().isEmpty()) {
+            try {
+                receitaList = objectMapper.readValue(receita, new TypeReference<List<IngredienteCriacaoDto>>() {});
+            } catch (JsonProcessingException e) {
+                throw new IllegalArgumentException("Formato de JSON inválido para a receita.");
+            }
+        }
+        PratoCriacaoDto prato = PratoCriacaoDto.builder()
+                .nome(nome)
+                .descricao(descricao)
+                .preco(preco)
+                .categoria(categoria)
+                .alergicosRestricoes(alergicosRestricoesList)
+                .receitaPrato(receitaList)
+                .isBebida(isBebida)
+                .build();
+
+        pratoService.updatePrato(id, prato);
+        return ResponseEntity.ok().build();
     }
+
 
 
     @Operation(summary = "Deletar prato por ID", method = "DELETE")
@@ -223,12 +275,6 @@ public class PratoController {
 //        int[][] report = pratoService.generateIngredientUsageReport(servedDishesIds, numberOfIngredients);
 //        return new ResponseEntity<>(report, HttpStatus.OK);
 //    }
-
-
-    @GetMapping("/alergicos")
-    public List<AlergicosRestricoes> getAlergicos() {
-        return Arrays.asList(AlergicosRestricoes.values());
-    }
 
     @PostMapping("/generateReport")
     public ResponseEntity<String> generateReport(

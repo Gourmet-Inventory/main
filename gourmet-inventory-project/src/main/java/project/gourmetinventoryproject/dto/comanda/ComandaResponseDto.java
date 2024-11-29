@@ -5,10 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import project.gourmetinventoryproject.domain.Prato;
-import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
-
-import java.util.List;
 
 @Getter
 @Setter

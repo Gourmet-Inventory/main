@@ -22,6 +22,7 @@ public class PratoCriacaoDto {
     private String descricao;
     private Double preco;
     private String categoria;
+    private Boolean isBebida;
     private List<IngredienteCriacaoDto> receitaPrato;
     private List<String> alergicosRestricoes;
     private MultipartFile foto;

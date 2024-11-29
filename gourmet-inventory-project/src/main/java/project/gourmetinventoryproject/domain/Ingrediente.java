@@ -5,7 +5,7 @@ import lombok.*;
 
 
 @Entity
-//@Data
+@Data
 @Getter
 @Setter
 @Builder

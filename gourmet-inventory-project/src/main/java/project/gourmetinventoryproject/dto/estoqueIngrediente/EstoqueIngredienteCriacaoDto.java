@@ -25,8 +25,8 @@ import java.util.List;
 @NoArgsConstructor
 public class EstoqueIngredienteCriacaoDto {
     @NotBlank
-    private String lote;
     private String nome;
+    private String lote;
     private Boolean manipulado;
     private String marca;
     @Enumerated(EnumType.STRING)

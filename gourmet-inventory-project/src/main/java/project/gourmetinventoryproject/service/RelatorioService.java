@@ -55,65 +55,65 @@ public class RelatorioService {
         return fila;
     }
 
-    public void gerarRelatorio(LocalDate data, SaidaDTO relatorioDTO) {
-        System.out.println("Entrou no método gerarRelatorio " + "Data: " + data + " Lista de pratosId: " + relatorioDTO.getIdPratoList());
-        List<Prato> listaPratos = new ArrayList<>();
-
-        for (Long idPrato : relatorioDTO.getIdPratoList()){
-            Prato prato = pratoService.getPratoById(idPrato);
-            if (prato != null){
-                listaPratos.add(prato);
-            }else{
-                throw new IdNotFoundException();
-            }
-        }
-
-        Queue<Prato> pratos = organizarPratos(listaPratos);
-        System.out.println("Pratos organizados: " + pratos);
-
-        Empresa empresa = listaPratos.get(0).getEmpresa();
-        Relatorio relatorio = new Relatorio();
-        relatorio.setData(data);
-        relatorio.setPratoList(listaPratos);
-        relatorio.setEmpresa(empresa);
-        Double valorBruto = 0.0;
-
-        // Calcular o valor bruto dos pratos
-        for (Prato prato : pratos) {
-            valorBruto += prato.getPreco();
-
-            // Dar baixa nos ingredientes usados no prato
-            if (relatorioDTO.getDescontarEstoque()) {
-                for (Ingrediente ingrediente : prato.getReceitaPrato()) {
-                    EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
-                    if (estoque != null) {
-                        Double quantidadeUsada = ingrediente.getValorMedida();
-                        estoque.baixarEstoque(quantidadeUsada);
-                        estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(), estoque);
-                        estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
-                    }
-                }
-            }
-        }
-
-        relatorio.setValorBruto(valorBruto);
-
-        try {
-            Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
-
-            if (antigo != null ){
-                List<Prato> listPrato = antigo.getPratoList();
-                listPrato.addAll(listaPratos);
-                antigo.setPratoList(listPrato);
-                relatorioRepository.save(antigo);
-            }else {
-                relatorioRepository.save(relatorio);
-                System.out.println("Relatório gerado: " + relatorio);}
-        } catch (Exception e) {
-            System.err.println("Erro ao salvar o relatório: " + e.getMessage());
-
-        }
-    }
+//    public void gerarRelatorio(LocalDate data, SaidaDTO relatorioDTO) {
+//        System.out.println("Entrou no método gerarRelatorio " + "Data: " + data + " Lista de pratosId: " + relatorioDTO.getIdPratoList());
+//        List<Prato> listaPratos = new ArrayList<>();
+//
+//        for (Long idPrato : relatorioDTO.getIdPratoList()){
+//            Prato prato = pratoService.getPratoById(idPrato);
+//            if (prato != null){
+//                listaPratos.add(prato);
+//            }else{
+//                throw new IdNotFoundException();
+//            }
+//        }
+//
+//        Queue<Prato> pratos = organizarPratos(listaPratos);
+//        System.out.println("Pratos organizados: " + pratos);
+//
+//        Empresa empresa = listaPratos.get(0).getEmpresa();
+//        Relatorio relatorio = new Relatorio();
+//        relatorio.setData(data);
+//        relatorio.setPratoList(listaPratos);
+//        relatorio.setEmpresa(empresa);
+//        Double valorBruto = 0.0;
+//
+//        // Calcular o valor bruto dos pratos
+//        for (Prato prato : pratos) {
+//            valorBruto += prato.getPreco();
+//
+//            // Dar baixa nos ingredientes usados no prato
+////            if (relatorioDTO.getDescontarEstoque()) {
+////                for (Ingrediente ingrediente : prato.getReceitaPrato()) {
+////                    EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
+////                    if (estoque != null) {
+////                        Double quantidadeUsada = ingrediente.getValorMedida();
+////                        estoque.baixarEstoque(quantidadeUsada);
+////                        estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(),);
+////                        estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
+////                    }
+////                }
+////            }
+//        }
+//
+//        relatorio.setValorBruto(valorBruto);
+//
+//        try {
+//            Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
+//
+//            if (antigo != null ){
+//                List<Prato> listPrato = antigo.getPratoList();
+//                listPrato.addAll(listaPratos);
+//                antigo.setPratoList(listPrato);
+//                relatorioRepository.save(antigo);
+//            }else {
+//                relatorioRepository.save(relatorio);
+//                System.out.println("Relatório gerado: " + relatorio);}
+//        } catch (Exception e) {
+//            System.err.println("Erro ao salvar o relatório: " + e.getMessage());
+//
+//        }
+//    }
 
     public void deletarRelatorio(Long idRelatorio) {
         Optional<Relatorio> relatorio = relatorioRepository.findById(idRelatorio);
@@ -154,32 +154,32 @@ public class RelatorioService {
         return stringWriter.toString();
     }
 
-    public String generateCsvIngredientes(Long idRelatorio) {
-        Relatorio relatorio = relatorioRepository.findById(idRelatorio)
-                .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
-
-        Map<String, Double> ingredienteQuantidades = new HashMap<>();
-
-        for (Prato prato : relatorio.getPratoList()) {
-            // Itera sobre os ingredientes de cada prato
-            for (Ingrediente ingrediente : prato.getReceitaPrato()) {
-                String nomeIngrediente = ingrediente.getEstoqueIngrediente().getNome();
-                Double quantidade = ingrediente.getValorMedida();
-                ingredienteQuantidades.put(nomeIngrediente, ingredienteQuantidades.getOrDefault(nomeIngrediente, 0.0) + quantidade);
-            }
-        }
-
-        // Cria o conteúdo CSV
-        StringWriter stringWriter = new StringWriter();
-        stringWriter.append("Nome Ingrediente;Quantidade\n");
-
-        for (Map.Entry<String, Double> entry : ingredienteQuantidades.entrySet()) {
-            stringWriter.append(entry.getKey()).append(";")
-                    .append(entry.getValue().toString()).append("\n");
-        }
-
-        return stringWriter.toString();
-    }
+//    public String generateCsvIngredientes(Long idRelatorio) {
+//        Relatorio relatorio = relatorioRepository.findById(idRelatorio)
+//                .orElseThrow(() -> new RuntimeException("Relatório não encontrado"));
+//
+//        Map<String, Double> ingredienteQuantidades = new HashMap<>();
+//
+//        for (Prato prato : relatorio.getPratoList()) {
+//            // Itera sobre os ingredientes de cada prato
+//            for (Ingrediente ingrediente : prato.getReceitaPrato()) {
+//                String nomeIngrediente = ingrediente.getEstoqueIngrediente().getNome();
+//                Double quantidade = ingrediente.getValorMedida();
+//                ingredienteQuantidades.put(nomeIngrediente, ingredienteQuantidades.getOrDefault(nomeIngrediente, 0.0) + quantidade);
+//            }
+//        }
+//
+//        // Cria o conteúdo CSV
+//        StringWriter stringWriter = new StringWriter();
+//        stringWriter.append("Nome Ingrediente;Quantidade\n");
+//
+//        for (Map.Entry<String, Double> entry : ingredienteQuantidades.entrySet()) {
+//            stringWriter.append(entry.getKey()).append(";")
+//                    .append(entry.getValue().toString()).append("\n");
+//        }
+//
+//        return stringWriter.toString();
+//    }
 
 
 

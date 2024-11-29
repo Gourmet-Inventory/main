@@ -28,6 +28,9 @@ public class AlertaJob {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private ListaComprasService listaComprasService;
+
     @Scheduled(fixedRate = 86400000)
     public void alertarDiarios() {
         LocalDate dataAtual = LocalDate.now();

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.repository.PratoRepository;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
@@ -74,7 +75,7 @@ public class S3Service {
         return presignedRequest.url().toString();
     }
 
-    public String uploadFile(MultipartFile file, Prato prato) throws IOException {
+    public Prato uploadFile(MultipartFile file, Prato prato) throws IOException {
         String key = file.getOriginalFilename();
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
@@ -82,13 +83,13 @@ public class S3Service {
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-        prato.setFoto("https://gourmet-inventory-bucket.s3.amazonaws.com/" + key);
-        pratoRepository.save(prato);
-        return key;
+        prato.setFoto("https://"+bucketName+".s3.amazonaws.com/" + key);
+
+        return pratoRepository.save(prato);
     }
 
 
-    public String updateFile(String existingKey, MultipartFile file, Prato prato) throws IOException {
+    public Prato updateFile(String existingKey, MultipartFile file, Prato prato) throws IOException {
         deleteFile(existingKey);
         return uploadFile(file,prato);
     }

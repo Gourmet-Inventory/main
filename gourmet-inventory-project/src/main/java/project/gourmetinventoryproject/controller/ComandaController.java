@@ -2,17 +2,13 @@ package project.gourmetinventoryproject.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.weaver.ast.Literal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import project.gourmetinventoryproject.domain.Comanda;
 import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
-import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
 import project.gourmetinventoryproject.service.ComandaService;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 

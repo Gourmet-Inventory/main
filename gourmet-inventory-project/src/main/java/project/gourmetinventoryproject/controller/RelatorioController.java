@@ -35,11 +35,11 @@ public class RelatorioController {
     @Autowired
     private EmpresaService empresaService;
 
-    @PostMapping("/gerar/{data}")
-    public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
-        relatorioService.gerarRelatorio(data, relatorio);
-        return ResponseEntity.status(200).build();
-    }
+//    @PostMapping("/gerar/{data}")
+//    public ResponseEntity<Void> gerarRelatorio(@PathVariable @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate data, @RequestBody SaidaDTO relatorio) {
+//        relatorioService.gerarRelatorio(data, relatorio);
+//        return ResponseEntity.status(200).build();
+//    }
 
     @GetMapping("/{idEmpresa}")
     public ResponseEntity<List<Relatorio>> getAllRelatorios(Long idEmpresa) {
@@ -77,17 +77,17 @@ public class RelatorioController {
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 
-    @GetMapping("/ingredientes/{idRelatorio}")
-    public ResponseEntity<byte[]> downloadCsvIngredientes(@PathVariable Long idRelatorio) {
-        try {
-            String csvContent = relatorioService.generateCsvIngredientes(idRelatorio);
-            byte[] bytes = csvContent.getBytes();
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ingredientes.csv");
-            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
-            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
+//    @GetMapping("/ingredientes/{idRelatorio}")
+//    public ResponseEntity<byte[]> downloadCsvIngredientes(@PathVariable Long idRelatorio) {
+//        try {
+//            String csvContent = relatorioService.generateCsvIngredientes(idRelatorio);
+//            byte[] bytes = csvContent.getBytes();
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ingredientes.csv");
+//            headers.add(HttpHeaders.CONTENT_TYPE, "text/csv");
+//            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+//        } catch (Exception e) {
+//            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }

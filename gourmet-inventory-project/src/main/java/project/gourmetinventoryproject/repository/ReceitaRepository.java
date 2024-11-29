@@ -12,4 +12,8 @@ public interface ReceitaRepository extends JpaRepository<Receita,Long> {
     @Query("SELECT r FROM Receita r WHERE r.idEstoqueIngrediente = :idEstoqueIngrediente")
     Optional<Receita> findByIdEstoqueIngrediente(@Param("idEstoqueIngrediente") Long idEstoqueIngrediente);
 
+    @Query("select r FROM Receita r WHERE r.idPrato = :idPrato")
+    Optional<Receita> findByIdPrato(@Param("idPrato") Long idPrato);
+
+
 }
