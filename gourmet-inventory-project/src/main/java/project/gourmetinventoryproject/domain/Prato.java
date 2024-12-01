@@ -36,4 +36,14 @@ public class Prato {
     @Column(name = "URLASSINADA", length = 2000)
     private String URLAssinada;
 
+    @Override
+    public String toString() {
+        return "Prato{" +
+                "idPrato=" + idPrato +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", preco=" + preco +
+                ", categoria='" + categoria + '\'' +
+                '}';
+    }
 }
