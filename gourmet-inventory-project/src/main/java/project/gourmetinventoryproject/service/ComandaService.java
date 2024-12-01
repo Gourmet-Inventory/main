@@ -5,12 +5,11 @@ import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Comanda;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
-import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
-import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.repository.ComandaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,12 +21,18 @@ public class ComandaService {
     private final ComandaRepository comandaRepository;
     private final PratoRepository pratoRepository;
 
+
     public Comanda createComanda(Comanda comanda) {
+        comanda.setData(LocalDate.now());
         return comandaRepository.save(comanda);
     }
 
     public List<Comanda> getAllComandas() {
         return comandaRepository.findAll();
+    }
+    
+    public List<Comanda> getAllComandasFiltradasHoje(String status) {
+        return comandaRepository.findAllByStatusAndData(status,LocalDate.now());
     }
 
     public Optional<Comanda> getComandaById(Long id) {

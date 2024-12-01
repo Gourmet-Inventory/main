@@ -72,6 +72,22 @@ public class ComandaController {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
     }
+    @GetMapping({"/comandas-finalizadas-hoje"})
+    public ResponseEntity<List<ComandaResponseDto>> getComandasFinalizadas() {
+        List<Comanda> comandas = comandaService.getAllComandasFiltradasHoje("Finalizada");
+        List<ComandaResponseDto> comandaResponseDto = comandas.stream()
+                .map(comandaService::mapperRetornoComanda)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
+    }
+    @GetMapping({"/comandas-enviadas-hoje"})
+    public ResponseEntity<List<ComandaResponseDto>> getComandasEnviadas() {
+        List<Comanda> comandas = comandaService.getAllComandasFiltradasHoje("Enviada");
+        List<ComandaResponseDto> comandaResponseDto = comandas.stream()
+                .map(comandaService::mapperRetornoComanda)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Comanda> getComandaById(@PathVariable Long id) {

@@ -3,6 +3,7 @@ package project.gourmetinventoryproject.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -24,6 +25,7 @@ public class Comanda {
     private List<Prato> itens;
     private String status;
     private Double total;
+    private LocalDate data;
 
     public void calcularTotal() {
         this.total = itens.stream()
