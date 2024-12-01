@@ -26,4 +26,4 @@ public class EstoqueIngredienteAtualizacaoDto {
     private LocalDate dtaCadastro;
     private LocalDate dtaAviso;
     private String descricao;
-    }
+}

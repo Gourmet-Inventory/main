@@ -192,11 +192,12 @@ public class PratoService {
         return PratoConsultaDto.builder()
                 .idPrato(prato.getIdPrato())
                 .nome(prato.getNome())
+                .isBebida(prato.getIsBebida())
                 .descricao(prato.getDescricao())
                 .preco(prato.getPreco())
                 .alergicosRestricoes(prato.getAlergicosRestricoes())
                 .categoria(prato.getCategoria())
-                .receitaPrato(ingredienteService.mapReceitaToDto(receita))
+//                .receitaPrato(ingredienteService.mapReceitaToDto(receita))
                 .foto(prato.getFoto())
                 .URLAssinada(gerarUrlAssinada(prato))
                 .build();

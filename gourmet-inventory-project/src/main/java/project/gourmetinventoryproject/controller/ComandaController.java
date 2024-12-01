@@ -34,20 +34,44 @@ public class ComandaController {
         return new ResponseEntity<>(comandaService.getLastComanda(), HttpStatus.OK);
     }
 
-@GetMapping
-public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
-    log.info("Buscando todas as comandas");
-    List<ComandaResponseDto> comandas = comandaService.getAllComandas()
-            .stream()
-            .map(comanda -> new ComandaResponseDto(
-                    comanda.getId(),
-                    comanda.getTitulo(),
-                    comanda.getMesa(),
-                    comanda.getStatus(),
-                    comanda.getTotal()))
-            .collect(Collectors.toList());
-    return new ResponseEntity<>(comandas, HttpStatus.OK);
-}
+    @GetMapping
+    public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
+        log.info("Buscando todas as comandas");
+//        List<ComandaResponseDto> comandas = comandaService.getAllComandas()
+//                .stream()
+//                .map(comanda -> new ComandaResponseDto(
+//                        comanda.getId(),
+//                        comanda.getIdGarcom(),
+//                        comanda.getTitulo(),
+//                        comanda.getMesa(),
+//                        comanda.getItens().stream()
+//                                .map(prato -> new PratoConsultaDto(
+//                                        prato.getIdPrato(),
+//                                        prato.getNome(),
+//                                        prato.getDescricao(),
+//                                        prato.getPreco(),
+//                                        prato.getAlergicosRestricoes(),
+//                                        prato.getCategoria(),
+//                                        prato.getReceitaPrato().stream()
+//                                                .map(ingrediente -> new IngredienteConsultaDto(
+////                                                        ingrediente.getEstoqueIngrediente().getNome(),
+////                                                        ingrediente.getTipoMedida(),
+////                                                        ingrediente.getValorMedida()
+//                                                ))
+//                                                .collect(Collectors.toList()),
+//                                        prato.getFoto(),
+//                                        prato.getURLAssinada()
+//                                ))
+//                                .collect(Collectors.toList()),
+//                        comanda.getStatus(),
+//                        comanda.getTotal()))
+//                .collect(Collectors.toList());
+        List<Comanda> comandas = comandaService.getAllComandas();
+        List<ComandaResponseDto> comandaResponseDto = comandas.stream()
+                .map(comandaService::mapperRetornoComanda)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(comandaResponseDto, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Comanda> getComandaById(@PathVariable Long id) {
@@ -58,7 +82,7 @@ public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Comanda> updateComanda(@PathVariable Long id, @RequestBody Comanda updatedComanda) {
+    public ResponseEntity<ComandaResponseDto> updateComanda(@PathVariable Long id, @RequestBody Comanda updatedComanda) {
         log.info("Atualizando comanda com id: {}", id);
         try {
             return new ResponseEntity<>(comandaService.updateComanda(id, updatedComanda), HttpStatus.OK);
@@ -74,13 +98,13 @@ public ResponseEntity<List<ComandaResponseDto>> getAllComandas() {
     }
 
     @DeleteMapping("/{comandaId}/removePrato/{pratoId}")
-    public ResponseEntity<Comanda> removePratoFromComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
+    public ResponseEntity<ComandaResponseDto> removePratoFromComanda(@PathVariable Long comandaId, @PathVariable Long pratoId) {
         return new ResponseEntity<>(comandaService.removePratoFromComanda(comandaId, pratoId), HttpStatus.OK);
     }
 
     @PatchMapping("/{comandaId}/status")
-    public ResponseEntity<Comanda> updateComandaStatus(@PathVariable Long comandaId, @RequestParam String status) {
-        Comanda updatedComanda = comandaService.updateStatus(comandaId, status);
+    public ResponseEntity<ComandaResponseDto> updateComandaStatus(@PathVariable Long comandaId, @RequestParam String status) {
+        ComandaResponseDto updatedComanda = comandaService.updateStatus(comandaId, status);
         return new ResponseEntity<>(updatedComanda, HttpStatus.OK);
     }
 

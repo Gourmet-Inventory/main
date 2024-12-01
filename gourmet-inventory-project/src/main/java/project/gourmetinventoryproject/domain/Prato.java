@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 
 import java.util.List;
 
@@ -28,10 +29,21 @@ public class Prato {
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
+//    private ReceitaConsultaDto receitaPrato;
     @ManyToMany(mappedBy = "itens")
     private List<Comanda> comandas;
     private String foto;
     @Column(name = "URLASSINADA", length = 2000)
     private String URLAssinada;
 
+    @Override
+    public String toString() {
+        return "Prato{" +
+                "idPrato=" + idPrato +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", preco=" + preco +
+                ", categoria='" + categoria + '\'' +
+                '}';
+    }
 }

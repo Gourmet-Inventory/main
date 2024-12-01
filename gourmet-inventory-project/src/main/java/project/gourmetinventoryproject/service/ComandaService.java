@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import project.gourmetinventoryproject.domain.Comanda;
 import project.gourmetinventoryproject.domain.Prato;
+import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
+import project.gourmetinventoryproject.dto.ingrediente.IngredienteConsultaDto;
+import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
+import project.gourmetinventoryproject.dto.receita.ReceitaConsultaDto;
 import project.gourmetinventoryproject.repository.ComandaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +39,13 @@ public class ComandaService {
                 .orElseThrow(() -> new RuntimeException("Comanda not found"));
     }
 
-    public Comanda updateComanda(Long id, Comanda updatedComanda) {
+    public ComandaResponseDto updateComanda(Long id, Comanda updatedComanda) {
         if (!comandaRepository.existsById(id)) {
             throw new RuntimeException("Comanda not found");
         }
         updatedComanda.setId(id);
-        return comandaRepository.save(updatedComanda);
+        ComandaResponseDto comandaResponseDto = mapperRetornoComanda(updatedComanda);
+        return comandaResponseDto;
     }
 
     public Comanda addPratoToComanda(Long comandaId, Long pratoId) {
@@ -53,7 +59,7 @@ public class ComandaService {
         return comandaRepository.save(comanda);
     }
 
-    public Comanda removePratoFromComanda(Long comandaId, Long pratoId) {
+    public ComandaResponseDto removePratoFromComanda(Long comandaId, Long pratoId) {
         Comanda comanda = comandaRepository.findById(comandaId)
                 .orElseThrow(() -> new RuntimeException("Comanda not found"));
         Prato prato = pratoRepository.findById(pratoId)
@@ -61,15 +67,20 @@ public class ComandaService {
 
         comanda.getItens().remove(prato);
         comanda.calcularTotal();
-        return comandaRepository.save(comanda);
+        ComandaResponseDto comandaResponseDto = mapperRetornoComanda(comanda);
+        return comandaResponseDto;
     }
 
-    public Comanda updateStatus(Long comandaId, String newStatus) {
+    public ComandaResponseDto updateStatus(Long comandaId, String newStatus) {
         Comanda comanda = comandaRepository.findById(comandaId)
                 .orElseThrow(() -> new RuntimeException("Comanda not found"));
 
+        System.out.println("Comanda encontrada: " + comanda);
         comanda.setStatus(newStatus);
-        return comandaRepository.save(comanda);
+        comandaRepository.save(comanda);
+        System.out.println("Comanda atualizada: " + comanda);
+        ComandaResponseDto comandaResponseDto = mapperRetornoComanda(comanda);
+        return comandaResponseDto;
     }
 
     public void deleteComanda(Long id) {
@@ -77,5 +88,42 @@ public class ComandaService {
             throw new RuntimeException("Comanda not found");
         }
         comandaRepository.deleteById(id);
+    }
+
+    public ComandaResponseDto mapperRetornoComanda(Comanda comanda) {
+        ComandaResponseDto dto = new ComandaResponseDto();
+        dto.setId(comanda.getId());
+        dto.setIdGarcom(comanda.getIdGarcom());
+        dto.setTitulo(comanda.getTitulo());
+        dto.setMesa(comanda.getMesa());
+        dto.setStatus(comanda.getStatus());
+        dto.setTotal(comanda.getTotal());
+        dto.setItens(comanda.getItens().stream().map(
+                        prato -> {
+                            PratoConsultaDto pratoDto = new PratoConsultaDto();
+                            pratoDto.setIdPrato(prato.getIdPrato());
+                            pratoDto.setNome(prato.getNome());
+                            pratoDto.setDescricao(prato.getDescricao());
+                            pratoDto.setPreco(prato.getPreco());
+                            pratoDto.setAlergicosRestricoes(prato.getAlergicosRestricoes());
+                            pratoDto.setCategoria(prato.getCategoria());
+//                            pratoDto.setReceitaPrato((ReceitaConsultaDto) prato.getReceitaPrato().getReceita().stream()
+//                                    .map(ingrediente -> {
+//                                        IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
+//                                        if (ingrediente != null) {
+//                                            ingredienteDto.setNome(ingrediente.getNome());
+//                                            ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
+//                                            ingredienteDto.setValorMedida(ingrediente.getValorMedida());
+//                                        }
+//                                        return ingredienteDto;
+//                                    })
+//                                    .collect(Collectors.toList()));
+                            pratoDto.setFoto(prato.getFoto());
+                            pratoDto.setURLAssinada(prato.getURLAssinada());
+                            return pratoDto;
+                        })
+                .collect(Collectors.toList()
+                ));
+        return dto;
     }
 }

@@ -11,6 +11,7 @@ public class Comanda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long idGarcom;
     private String titulo;
     private String mesa;
 
@@ -22,11 +23,22 @@ public class Comanda {
     )
     private List<Prato> itens;
     private String status;
-    private Double total = 0.0;
+    private Double total;
 
     public void calcularTotal() {
         this.total = itens.stream()
                 .mapToDouble(Prato::getPreco)
                 .sum();
+    }
+
+    @Override
+    public String toString() {
+        return "Comanda{" +
+                "id=" + id +
+                ", titulo='" + titulo + '\'' +
+                ", mesa='" + mesa + '\'' +
+                ", status='" + status + '\'' +
+                ", total=" + total +
+                '}';
     }
 }
