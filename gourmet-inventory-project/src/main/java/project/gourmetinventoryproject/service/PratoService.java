@@ -169,6 +169,7 @@ public class PratoService {
         }
 
         try {
+            System.out.println("entrando no try para acessar s3");
             return s3Service.uploadFile(file, prato);
         } catch (Exception e) {
             e.printStackTrace();
