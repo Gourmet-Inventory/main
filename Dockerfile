@@ -8,7 +8,7 @@ WORKDIR /app
 COPY gourmet-inventory-project.jar /app/gourmet-inventory-project.jar
 
 # Defina valores padrão para as variáveis de ambiente AWS
-ENV aws_region=us-east-1
+ENV aws_region=gourmet-s3
 ENV aws_s3_bucket=gourmet-inventory-bucket
 
 # Exponha a porta 8080 (ou a porta do seu app)
