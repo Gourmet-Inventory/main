@@ -29,11 +29,11 @@ public class S3Service {
     private S3Client s3Client;
     private S3Presigner s3Presigner;
 
-    private final String accessKey = System.getenv("aws_access_key_id");
-    private final String secretKey = System.getenv("aws_secret_access_key");
-    private final String sessionToken = System.getenv("aws_session_token");
-    private final String bucketName = System.getenv("aws_s3_bucket");
-    private final String region = System.getenv("aws_region");
+    private final String accessKey = "ASIARMPMV546MEKGB6EZ";
+    private final String secretKey = "6aq9kOG3sm1DFOpRU5dmzHFJkwUWAhfTNWOXPh43";
+    private final String sessionToken = "IQoJb3JpZ2luX2VjEBgaCXVzLXdlc3QtMiJHMEUCIQDmpDrKMokd/DncwMR1ybpak6MJ2cxHHe3QpQz2AGigEwIgXx4MKtbBbcylqWf+3AfRGBj4ejLhCmsU8YOFU/HYwSUqwAIIwf//////////ARAAGgwwOTU1MjI1MTY3OTYiDHc8uQrComsuORcwmCqUAl1XfanF7ycOmaRxhtY1HoMvkmP9hkzJ1gxHnBljG1v5BbQVwbZobLGvXuuDfTN2AK9udFya+FiRMl8htAgaJhwCd3VTz7chxu4gJd5Gk5794/mGCEIF4YVrqQ28U2DTxsn1tqRsHvQLS8eSFQ1NvcXpY9kkZhuinByyEXxpkmGsofnxA8wTEK6FIwrG8Bh6TGgV8o+sSxAZb+uONodOkCqAGkbMG08vNXg4fejqHkvYMVzJbQQFew3NlzfzBqARKLD79zvhdqrueh4KHUdw5+zADS3qFPCm+xOwRV/kj32HD3bVMnCADIQAz+g585LAulrEE5P+LuBO5TnSH2FJfYTbcDcIzgWHjB3+OICEa/pbV4fJRTDKsbe6BjqdAbsOsXdQVTIoYOP+Hgo3ycCeyA/HZY1gN4yZH4XiyRutUNn84lRtG4bFqTUI+Ermx2DEhD81P+grk6SFkHIRnyQGzZhEogeKhFWHD/WAbjcaJ0lQsQfUehEgbwcWUGPVpHCXxiarNLQKB3RyPbZhshRdVrJgEdWZBWthYOKJuSuAZqubNAYNZL/qsse0vwS+P3Tb+zE/U1UmT6yQ+8U=" ;
+    private final String bucketName = "gourmet-s3";
+    private final String region = "us-east-1";
 
     @Autowired
     private PratoRepository pratoRepository;
