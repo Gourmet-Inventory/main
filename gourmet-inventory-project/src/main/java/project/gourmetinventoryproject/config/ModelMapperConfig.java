@@ -19,15 +19,6 @@ public class ModelMapperConfig {
                 .setMatchingStrategy(MatchingStrategies.STRICT)
                 .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);
 
-        modelMapper.addMappings(new PropertyMap<Ingrediente, IngredienteConsultaDto>() {
-            @Override
-            protected void configure() {
-                map(source.getEstoqueIngrediente().getNome(), destination.getNome());
-                map().setTipoMedida(source.getTipoMedida());
-                map().setValorMedida(source.getValorMedida());
-            }
-        });
-
         return modelMapper;
     }
 }

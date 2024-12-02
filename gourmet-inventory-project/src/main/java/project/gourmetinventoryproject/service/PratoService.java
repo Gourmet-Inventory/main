@@ -197,7 +197,7 @@ public class PratoService {
                 .preco(prato.getPreco())
                 .alergicosRestricoes(prato.getAlergicosRestricoes())
                 .categoria(prato.getCategoria())
-//                .receitaPrato(ingredienteService.mapReceitaToDto(receita))
+                .receitaPrato(ingredienteService.mapReceitaToDto(receita))
                 .foto(prato.getFoto())
                 .URLAssinada(gerarUrlAssinada(prato))
                 .build();

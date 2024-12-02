@@ -62,17 +62,17 @@ public class EstoqueIngredienteService {
         return estoqueIngredientes.stream()
                 .map(estoqueIngrediente -> {
                     if (estoqueIngrediente.getManipulado() != null && estoqueIngrediente.getManipulado()) {
-                        EstoqueIngredienteManipuladoConsultaDto manipuladoDto = modelMapper.map(estoqueIngrediente, EstoqueIngredienteManipuladoConsultaDto.class);
 
-                        Optional<Receita> receita = receitaRepository.findByIdEstoqueIngrediente(estoqueIngrediente.getIdItem());
-                        receita.ifPresent(r -> {
-                            ReceitaConsultaDto receitaDto = ingredienteService.mapReceitaToDto(r);
-                            manipuladoDto.setReceita(receitaDto);
-                        });
+                        Receita receita = receitaRepository.findByIdEstoqueIngrediente(estoqueIngrediente.getIdItem()).orElse(null);
+                        EstoqueIngredienteManipuladoConsultaDto manipuladoDto = mapperRetorno(estoqueIngrediente,receita);
 
                         return manipuladoDto;
                     } else {
-                        return modelMapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class);
+                        EstoqueIngredienteConsultaDto estoqueIngredienteConsultaDto = modelMapper.map(estoqueIngrediente, EstoqueIngredienteConsultaDto.class);
+
+                        estoqueIngredienteConsultaDto.setCategoria(estoqueIngrediente.getCategoria().getNomeExibicao());
+                        estoqueIngredienteConsultaDto.setTipoMedida(estoqueIngrediente.getTipoMedida().getNomeLegivel());
+                        return estoqueIngredienteConsultaDto;
                     }
                 })
                 .collect(Collectors.toList());
@@ -196,8 +196,8 @@ public class EstoqueIngredienteService {
         dto.setManipulado(estoqueIngrediente.getManipulado());
         dto.setNome(estoqueIngrediente.getNome());
         dto.setLote(estoqueIngrediente.getLote());
-        dto.setCategoria(estoqueIngrediente.getCategoria());
-        dto.setTipoMedida(estoqueIngrediente.getTipoMedida());
+        dto.setCategoria(estoqueIngrediente.getCategoria().getNomeExibicao());
+        dto.setTipoMedida(estoqueIngrediente.getTipoMedida().getNomeLegivel());
         dto.setUnitario(estoqueIngrediente.getUnitario());
         dto.setValorMedida(estoqueIngrediente.getValorMedida());
         dto.setValorTotal(estoqueIngrediente.getValorTotal());
@@ -206,6 +206,7 @@ public class EstoqueIngredienteService {
         dto.setDtaAviso(estoqueIngrediente.getDtaAviso());
         dto.setDescricao(estoqueIngrediente.getDescricao());
         dto.setAlertas(estoqueIngrediente.getAlertas());
+
 
         ReceitaConsultaDto receitaDto = ingredienteService.mapReceitaToDto(receita);
         dto.setReceita(receitaDto);

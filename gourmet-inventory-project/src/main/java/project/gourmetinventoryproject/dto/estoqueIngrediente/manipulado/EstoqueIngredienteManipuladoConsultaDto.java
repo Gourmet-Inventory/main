@@ -23,9 +23,8 @@ public class EstoqueIngredienteManipuladoConsultaDto {
     private Boolean manipulado;
     private String nome;
     private String lote;
-    private CategoriaEstoque categoria;
-    @Enumerated(EnumType.STRING)
-    private Medidas tipoMedida;
+    private String categoria;
+    private String tipoMedida;
     private Integer unitario;
     private Double valorMedida;
     private Double valorTotal;

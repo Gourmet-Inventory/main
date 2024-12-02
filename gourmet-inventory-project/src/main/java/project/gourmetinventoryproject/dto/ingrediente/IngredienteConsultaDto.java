@@ -12,8 +12,9 @@ import project.gourmetinventoryproject.domain.Medidas;
 @Setter
 @NoArgsConstructor
 public class IngredienteConsultaDto {
+    private Long idIngrediente;
     private String nome;
-    private Medidas tipoMedida;
+    private String tipoMedida;
     private Double valorMedida;
     private String exibirConca;
 

@@ -2,6 +2,7 @@ package project.gourmetinventoryproject.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -136,6 +137,9 @@ public class PratoController {
         System.out.println("isBebida: " + isBebida);
 
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+
 
         List<String> alergicosRestricoesList = new ArrayList<>();
         if (alergicosRestricoes != null && !alergicosRestricoes.trim().isEmpty()) {
@@ -154,6 +158,7 @@ public class PratoController {
                 throw new IllegalArgumentException("Formato de JSON inválido para a receita.");
             }
         }
+
 
         PratoCriacaoDto prato = PratoCriacaoDto.builder()
                 .nome(nome)

@@ -21,10 +21,9 @@ public class EstoqueIngredienteConsultaDto {
     private Boolean manipulado;
     private String nome;
     private String lote;
-    private CategoriaEstoque categoria;
+    private String categoria;
     private String marca;
-    @Enumerated(EnumType.STRING)
-    private Medidas tipoMedida;
+    private String tipoMedida;
     private Integer unitario;
     private Double valorMedida;
     private Double valorTotal;
@@ -33,10 +32,6 @@ public class EstoqueIngredienteConsultaDto {
     private LocalDate dtaAviso;
     private String descricao;
     private List<Alerta> Alertas;
-    public String getCategoriaFormatada() {
-        return categoria != null ? categoria.getNomeExibicao() : null;
-    }
-
 }
 
 

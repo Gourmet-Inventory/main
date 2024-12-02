@@ -53,9 +53,10 @@ public class IngredienteService {
         List<IngredienteConsultaDto> ingredientes = receita.getIngredientes().stream()
                 .map(ingrediente -> {
                     IngredienteConsultaDto ingredienteDto = new IngredienteConsultaDto();
+                    ingredienteDto.setIdIngrediente(ingrediente.getEstoqueIngrediente().getIdItem());
                     ingredienteDto.setNome(ingrediente.getEstoqueIngrediente().getNome());
                     ingredienteDto.setValorMedida(ingrediente.getValorMedida());
-                    ingredienteDto.setTipoMedida(ingrediente.getTipoMedida());
+                    ingredienteDto.setTipoMedida(ingrediente.getTipoMedida().getNomeLegivel());
                     return ingredienteDto;
                 })
                 .collect(Collectors.toList());
