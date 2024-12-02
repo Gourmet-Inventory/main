@@ -30,8 +30,9 @@ public class RelatorioService {
     private EmpresaService empresaService;
     @Autowired
     private ModelMapper modelMapper;
-
+    @Autowired
     private AlertaService alertaService;
+    @Autowired
     private ReceitaRepository receitaRepository;
 
     public List<Relatorio> getAllRelatoriosByEmpresa(Long idEmpresa) {
@@ -78,7 +79,7 @@ public class RelatorioService {
             Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
 
             if (antigo != null ){
-                List<Prato> listPrato = antigo.getPratoList();
+                List<Prato> listPrato = new ArrayList<>(antigo.getPratoList());
                 listPrato.addAll(pratos);
                 antigo.setPratoList(listPrato);
                 relatorioRepository.save(antigo);

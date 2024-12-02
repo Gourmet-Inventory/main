@@ -42,7 +42,7 @@ public class RelatorioController {
 //    }
 
     @GetMapping("/{idEmpresa}")
-    public ResponseEntity<List<Relatorio>> getAllRelatorios(Long idEmpresa) {
+    public ResponseEntity<List<Relatorio>> getAllRelatorios(@PathVariable Long idEmpresa) {
         List<Relatorio> lista = relatorioService.getAllRelatoriosByEmpresa(idEmpresa);
         return ResponseEntity.status(200).body(lista);
     }
