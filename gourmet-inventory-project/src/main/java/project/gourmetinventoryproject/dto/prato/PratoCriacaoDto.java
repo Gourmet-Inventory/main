@@ -25,4 +25,5 @@ public class PratoCriacaoDto {
     private Boolean isBebida;
     private List<IngredienteCriacaoDto> receitaPrato;
     private List<String> alergicosRestricoes;
+    private MultipartFile foto;
 }
