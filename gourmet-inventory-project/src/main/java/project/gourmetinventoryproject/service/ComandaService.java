@@ -6,6 +6,7 @@ import project.gourmetinventoryproject.domain.Comanda;
 import project.gourmetinventoryproject.domain.Prato;
 import project.gourmetinventoryproject.dto.comanda.ComandaResponseDto;
 import project.gourmetinventoryproject.dto.prato.PratoConsultaDto;
+import project.gourmetinventoryproject.exception.IdNotFoundException;
 import project.gourmetinventoryproject.repository.ComandaRepository;
 import project.gourmetinventoryproject.repository.PratoRepository;
 
@@ -20,6 +21,7 @@ public class ComandaService {
 
     private final ComandaRepository comandaRepository;
     private final PratoRepository pratoRepository;
+    private final RelatorioService relatorioService;
 
 
     public Comanda createComanda(Comanda comanda) {
@@ -130,5 +132,13 @@ public class ComandaService {
                 .collect(Collectors.toList()
                 ));
         return dto;
+    }
+
+
+    public void updateStatusComandaCozinha(Long id){
+        Comanda comanda = comandaRepository.findById(id).orElseThrow(IdNotFoundException::new);
+        comanda.setStatus("Pronto");
+        comandaRepository.save(comanda);
+        relatorioService.gerarRelatorio(comanda.getData(),comanda.getItens());
     }
 }

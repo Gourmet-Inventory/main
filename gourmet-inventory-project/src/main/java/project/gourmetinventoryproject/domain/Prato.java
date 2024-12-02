@@ -29,7 +29,6 @@ public class Prato {
     @CollectionTable(name = "prato_alergicos_restricoes", joinColumns = @JoinColumn(name = "prato_id"))
     @Column(name = "restricao")
     private List<String> alergicosRestricoes;
-//    private ReceitaConsultaDto receitaPrato;
     @ManyToMany(mappedBy = "itens")
     private List<Comanda> comandas;
     private String foto;

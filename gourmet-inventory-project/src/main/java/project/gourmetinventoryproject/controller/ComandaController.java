@@ -135,4 +135,11 @@ public class ComandaController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PutMapping("/mudar-status-cozinha/{id}")
+    public ResponseEntity<Void> updateStatusComandaCozinha(@PathVariable Long id){
+        log.info("Comanda" + id);
+        comandaService.updateStatusComandaCozinha(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

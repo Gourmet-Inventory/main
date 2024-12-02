@@ -8,6 +8,7 @@ import project.gourmetinventoryproject.domain.*;
 import project.gourmetinventoryproject.repository.EstoqueIngredienteRepository;
 import project.gourmetinventoryproject.dto.saida.SaidaDTO;
 import project.gourmetinventoryproject.exception.IdNotFoundException;
+import project.gourmetinventoryproject.repository.ReceitaRepository;
 import project.gourmetinventoryproject.repository.RelatorioRepository;
 
 import java.io.StringWriter;
@@ -29,6 +30,9 @@ public class RelatorioService {
     private EmpresaService empresaService;
     @Autowired
     private ModelMapper modelMapper;
+
+    private AlertaService alertaService;
+    private ReceitaRepository receitaRepository;
 
     public List<Relatorio> getAllRelatoriosByEmpresa(Long idEmpresa) {
         Empresa empresa = empresaService.getEmpresasById(idEmpresa);
@@ -55,65 +59,36 @@ public class RelatorioService {
         return fila;
     }
 
-//    public void gerarRelatorio(LocalDate data, SaidaDTO relatorioDTO) {
-//        System.out.println("Entrou no método gerarRelatorio " + "Data: " + data + " Lista de pratosId: " + relatorioDTO.getIdPratoList());
-//        List<Prato> listaPratos = new ArrayList<>();
-//
-//        for (Long idPrato : relatorioDTO.getIdPratoList()){
-//            Prato prato = pratoService.getPratoById(idPrato);
-//            if (prato != null){
-//                listaPratos.add(prato);
-//            }else{
-//                throw new IdNotFoundException();
-//            }
-//        }
-//
-//        Queue<Prato> pratos = organizarPratos(listaPratos);
-//        System.out.println("Pratos organizados: " + pratos);
-//
-//        Empresa empresa = listaPratos.get(0).getEmpresa();
-//        Relatorio relatorio = new Relatorio();
-//        relatorio.setData(data);
-//        relatorio.setPratoList(listaPratos);
-//        relatorio.setEmpresa(empresa);
-//        Double valorBruto = 0.0;
-//
-//        // Calcular o valor bruto dos pratos
-//        for (Prato prato : pratos) {
-//            valorBruto += prato.getPreco();
-//
-//            // Dar baixa nos ingredientes usados no prato
-////            if (relatorioDTO.getDescontarEstoque()) {
-////                for (Ingrediente ingrediente : prato.getReceitaPrato()) {
-////                    EstoqueIngrediente estoque = ingrediente.getEstoqueIngrediente();
-////                    if (estoque != null) {
-////                        Double quantidadeUsada = ingrediente.getValorMedida();
-////                        estoque.baixarEstoque(quantidadeUsada);
-////                        estoqueIngredienteService.updateEstoqueIngrediente(estoque.getIdItem(),);
-////                        estoqueIngredienteService.setValorMedidaIfNegativo(estoque.getIdItem());
-////                    }
-////                }
-////            }
-//        }
-//
-//        relatorio.setValorBruto(valorBruto);
-//
-//        try {
-//            Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
-//
-//            if (antigo != null ){
-//                List<Prato> listPrato = antigo.getPratoList();
-//                listPrato.addAll(listaPratos);
-//                antigo.setPratoList(listPrato);
-//                relatorioRepository.save(antigo);
-//            }else {
-//                relatorioRepository.save(relatorio);
-//                System.out.println("Relatório gerado: " + relatorio);}
-//        } catch (Exception e) {
-//            System.err.println("Erro ao salvar o relatório: " + e.getMessage());
-//
-//        }
-//    }
+    public void gerarRelatorio(LocalDate data, List<Prato> pratos){
+        Empresa empresa = pratos.get(0).getEmpresa();
+        Relatorio relatorio = new Relatorio();
+        relatorio.setData(data);
+        relatorio.setPratoList(pratos);
+        relatorio.setEmpresa(empresa);
+        Double valorBruto = 0.0;
+
+        for (Prato prato : pratos) {
+            valorBruto += prato.getPreco();
+        }
+
+        relatorio.setValorBruto(valorBruto);
+
+        darBaixaNoEstoque(pratos);
+        try {
+            Relatorio antigo = relatorioRepository.findByDataAndEmpresa(data,empresa);
+
+            if (antigo != null ){
+                List<Prato> listPrato = antigo.getPratoList();
+                listPrato.addAll(pratos);
+                antigo.setPratoList(listPrato);
+                relatorioRepository.save(antigo);
+            }else {
+                relatorioRepository.save(relatorio);
+                System.out.println("Relatório gerado: " + relatorio);}
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar o relatório: " + e.getMessage());
+        }
+    }
 
     public void deletarRelatorio(Long idRelatorio) {
         Optional<Relatorio> relatorio = relatorioRepository.findById(idRelatorio);
@@ -201,4 +176,34 @@ public class RelatorioService {
 //        System.out.printf("| %-18s | %7.2f |\n", "SOMA", somaPreco);
 //
 //    }
+
+    private void darBaixaNoEstoque(List<Prato> pratos) {
+        for (Prato prato : pratos) {
+            Receita receita = receitaRepository.findByIdPrato(prato.getIdPrato()).orElse(null);
+            if (receita == null) continue;
+
+            for (Ingrediente ingrediente : receita.getIngredientes()) {
+                EstoqueIngrediente estoqueIngrediente = estoqueIngredienteRepository.findById(ingrediente.getIdIngrediente()).orElse(null);
+                if (estoqueIngrediente == null) continue;
+
+                if (ingrediente.getTipoMedida() == Medidas.UNIDADE && estoqueIngrediente.getTipoMedida() == Medidas.UNIDADE) {
+                    double novoValor = estoqueIngrediente.getValorTotal() - ingrediente.getValorMedida();
+                    estoqueIngrediente.setValorTotal(Math.max(novoValor, 0));
+                } else {
+                    Double valorTotalEmGramas = estoqueIngrediente.getValorTotal() * estoqueIngrediente.getTipoMedida().getValorEmGramas();
+                    Double valorGastoEmGramas = ingrediente.getValorMedida() * ingrediente.getTipoMedida().getValorEmGramas();
+                    Double novoValorEmGramas = valorTotalEmGramas - valorGastoEmGramas;
+
+                    if (novoValorEmGramas <= 0) {
+                        estoqueIngrediente.setValorTotal(0.0);
+                    } else {
+                        estoqueIngrediente.setValorTotal(novoValorEmGramas / estoqueIngrediente.getTipoMedida().getValorEmGramas());
+                    }
+                }
+
+                estoqueIngredienteRepository.save(alertaService.checarAlerta(estoqueIngrediente));
+            }
+        }
+    }
+
 }
