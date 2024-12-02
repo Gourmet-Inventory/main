@@ -29,9 +29,9 @@ public class S3Service {
     private S3Client s3Client;
     private S3Presigner s3Presigner;
 
-    private final String accessKey = "ASIARMPMV546MEKGB6EZ";
-    private final String secretKey = "6aq9kOG3sm1DFOpRU5dmzHFJkwUWAhfTNWOXPh43";
-    private final String sessionToken = "IQoJb3JpZ2luX2VjEBgaCXVzLXdlc3QtMiJHMEUCIQDmpDrKMokd/DncwMR1ybpak6MJ2cxHHe3QpQz2AGigEwIgXx4MKtbBbcylqWf+3AfRGBj4ejLhCmsU8YOFU/HYwSUqwAIIwf//////////ARAAGgwwOTU1MjI1MTY3OTYiDHc8uQrComsuORcwmCqUAl1XfanF7ycOmaRxhtY1HoMvkmP9hkzJ1gxHnBljG1v5BbQVwbZobLGvXuuDfTN2AK9udFya+FiRMl8htAgaJhwCd3VTz7chxu4gJd5Gk5794/mGCEIF4YVrqQ28U2DTxsn1tqRsHvQLS8eSFQ1NvcXpY9kkZhuinByyEXxpkmGsofnxA8wTEK6FIwrG8Bh6TGgV8o+sSxAZb+uONodOkCqAGkbMG08vNXg4fejqHkvYMVzJbQQFew3NlzfzBqARKLD79zvhdqrueh4KHUdw5+zADS3qFPCm+xOwRV/kj32HD3bVMnCADIQAz+g585LAulrEE5P+LuBO5TnSH2FJfYTbcDcIzgWHjB3+OICEa/pbV4fJRTDKsbe6BjqdAbsOsXdQVTIoYOP+Hgo3ycCeyA/HZY1gN4yZH4XiyRutUNn84lRtG4bFqTUI+Ermx2DEhD81P+grk6SFkHIRnyQGzZhEogeKhFWHD/WAbjcaJ0lQsQfUehEgbwcWUGPVpHCXxiarNLQKB3RyPbZhshRdVrJgEdWZBWthYOKJuSuAZqubNAYNZL/qsse0vwS+P3Tb+zE/U1UmT6yQ+8U=" ;
+    private final String accessKey = "ASIARMPMV546JBRY5PEC";
+    private final String secretKey = "vWYk6zlBYHpWdXkKY7w0pmr156cEO7dJJ6PwK8n0";
+    private final String sessionToken = "IQoJb3JpZ2luX2VjEB4aCXVzLXdlc3QtMiJGMEQCIEl683jS1swSa9sJGWrIq2rs71Rj63MHxtOU57DwVUl0AiB+iYe4t3H6GN78dX5mz6XUY69L9K/Z7VfSxFW1VJuszCrAAgjH//////////8BEAAaDDA5NTUyMjUxNjc5NiIME70ph8FDO8igi1PRKpQCBn24GIHdjyyJlHfAEpyHGrbwyVkwD/OngCaUgLBa5BFGCq3cw7zJkLINN08B7oAF6ZpterVrofUFpI1N1FyGDHsMo6yrpk6ec+XAcPI3RUI6PVYzfmz8zV+1D5bLiY4IJnyFvw7u1w+nOqYLY+Hbqq+gT0koyPcNGruW1471NqDrcTBAy3mS8HDmomi6jnGQCe6P50X3tIbZ5VC1iIdxCw+Xh8rQYQ8R39cO4k15v2r7Kukje49bMsGy1xkO8oX+6SGG2V7OIuW3pgWvDWIhoFiG3d8vvRQ18IOt80J5UBidLjg+RhjfbYRZUlRFNo1trCZ8YlilgI+ut19N3Bd4DpbNuj9pamWVnJ0PeKMIPoXVHg8NMIbhuLoGOp4B72PlpOxko7CGKcUYm4WZ6KNpy13V8xkREr8L3NHWdbnDTWZHq11z/oIr2sPbOWXkoRDDH9iB0PqbfDS18oSzDubWgL7gg47gYMTgFs6VUmCfQF/0/yOZkSTlVrdSXI+0YxDJkaYYtPh5s61ulCYOoPFRKT357/95ohklzLHDqaqyzzbFLU40RHuGQi4/aSru4+QSDiP9hlY/OsAZAPs=" ;
     private final String bucketName = "gourmet-s3";
     private final String region = "us-east-1";
 
